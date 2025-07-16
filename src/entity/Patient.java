@@ -1,14 +1,5 @@
-/*
- * Click nbfs://nbhost/SystemFileSystem/Templates/Licenses/license-default.txt to change this license
- * Click nbfs://nbhost/SystemFileSystem/Templates/Classes/Class.java to edit this template
- */
 package entity;
 
-
-/**
- *
- * @author Jason
- */
 public class Patient {
     private int id;
     private String name;
@@ -19,8 +10,6 @@ public class Patient {
     private String address;
     private String registrationDate;
     private String medicalHistory;
-    
-    //Optional:For Queue management
     private boolean isInWaiting;
     private String currentStatus; //eg."waiting","In consultation","Completed"
 
@@ -111,9 +100,4 @@ public class Patient {
     public void setCurrentStatus(String currentStatus) {
         this.currentStatus = currentStatus;
     }
-    
-    
-
-    
-    
 }

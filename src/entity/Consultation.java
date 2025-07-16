@@ -1,13 +1,5 @@
-/*
- * Click nbfs://nbhost/SystemFileSystem/Templates/Licenses/license-default.txt to change this license
- * Click nbfs://nbhost/SystemFileSystem/Templates/Classes/Class.java to edit this template
- */
 package entity;
 
-/**
- *
- * @author Jason
- */
 public class Consultation {
     private String consultationId;
     private String patientId;
@@ -72,6 +64,4 @@ public class Consultation {
     public void setNextAppointmentDate(String nextAppointmentDate) {
         this.nextAppointmentDate = nextAppointmentDate;
     }
-    
-    
 }
