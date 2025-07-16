@@ -47,5 +47,4 @@ public class Set<T> implements SetInterface<T> {
         }
         set = newSet;
     }
-    System.Out.Println("Jeeshen Is gay");
 }
