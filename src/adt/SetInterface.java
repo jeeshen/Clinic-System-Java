@@ -5,7 +5,7 @@ public interface SetInterface<T> {
     public boolean addAll(T newEntry);
     public boolean contains(T entry);
     public boolean containsAll(T entry);
-    public boolean isEqual();
+    public boolean isEqual(SetInterface<T> entry);
     public boolean isEmpty();
     public boolean remove();
     
