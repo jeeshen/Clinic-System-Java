@@ -3,14 +3,31 @@ package entity;
 public class Doctor {
     private String doctorId;
     private String name;
-    private String specialization; // Faculty (e.g., Cardiology, Pediatrics)
+    private String specialization; //faculty such as cardiology, pediatrics
     private String contactNumber;
     private String email;
     private boolean isAvailable;
-    private String dutySchedule; // e.g., "Mon-Wed 9AM-5PM"
+    private String dutySchedule; //mon-wed 9am-5pm
     private boolean onLeave;
     private String leaveDateStart;
     private String leaveDateEnd;
+
+    public Doctor() {
+        this("", "", "", "", "", false, "", false, "", "");
+    }
+
+    public Doctor(String doctorId, String name, String specialization, String contactNumber, String email, boolean isAvailable, String dutySchedule, boolean onLeave, String leaveDateStart, String leaveDateEnd) {
+        this.doctorId = doctorId;
+        this.name = name;
+        this.specialization = specialization;
+        this.contactNumber = contactNumber;
+        this.email = email;
+        this.isAvailable = isAvailable;
+        this.dutySchedule = dutySchedule;
+        this.onLeave = onLeave;
+        this.leaveDateStart = leaveDateStart;
+        this.leaveDateEnd = leaveDateEnd;
+    }
 
     public String getDoctorId() {
         return doctorId;
@@ -90,6 +107,39 @@ public class Doctor {
 
     public void setLeaveDateEnd(String leaveDateEnd) {
         this.leaveDateEnd = leaveDateEnd;
+    }
+
+    @Override
+    public String toString() {
+        return "Doctor{" +
+                "doctorId='" + doctorId + '\'' +
+                ", name='" + name + '\'' +
+                ", specialization='" + specialization + '\'' +
+                ", contactNumber='" + contactNumber + '\'' +
+                ", email='" + email + '\'' +
+                ", isAvailable=" + isAvailable +
+                ", dutySchedule='" + dutySchedule + '\'' +
+                ", onLeave=" + onLeave +
+                ", leaveDateStart='" + leaveDateStart + '\'' +
+                ", leaveDateEnd='" + leaveDateEnd + '\'' +
+                '}';
+    }
+
+    @Override
+    public boolean equals(Object obj) {
+        if (this == obj) return true;
+        if (obj == null || getClass() != obj.getClass()) return false;
+        Doctor doctor = (Doctor) obj;
+        return isAvailable == doctor.isAvailable &&
+                onLeave == doctor.onLeave &&
+                java.util.Objects.equals(doctorId, doctor.doctorId) &&
+                java.util.Objects.equals(name, doctor.name) &&
+                java.util.Objects.equals(specialization, doctor.specialization) &&
+                java.util.Objects.equals(contactNumber, doctor.contactNumber) &&
+                java.util.Objects.equals(email, doctor.email) &&
+                java.util.Objects.equals(dutySchedule, doctor.dutySchedule) &&
+                java.util.Objects.equals(leaveDateStart, doctor.leaveDateStart) &&
+                java.util.Objects.equals(leaveDateEnd, doctor.leaveDateEnd);
     }
 }
 

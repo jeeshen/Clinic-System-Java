@@ -11,7 +11,25 @@ public class Patient {
     private String registrationDate;
     private String medicalHistory;
     private boolean isInWaiting;
-    private String currentStatus; //eg."waiting","In consultation","Completed"
+    private String currentStatus; //waiting, in consultation, completed
+
+    public Patient() {
+        this(0, "", 0, "", "", "", "", "", "", false, "");
+    }
+
+    public Patient(int id, String name, int age, String gender, String allegy, String contactNumber, String address, String registrationDate, String medicalHistory, boolean isInWaiting, String currentStatus) {
+        this.id = id;
+        this.name = name;
+        this.age = age;
+        this.gender = gender;
+        this.allegy = allegy;
+        this.contactNumber = contactNumber;
+        this.address = address;
+        this.registrationDate = registrationDate;
+        this.medicalHistory = medicalHistory;
+        this.isInWaiting = isInWaiting;
+        this.currentStatus = currentStatus;
+    }
 
     public int getId() {
         return id;
@@ -99,5 +117,40 @@ public class Patient {
 
     public void setCurrentStatus(String currentStatus) {
         this.currentStatus = currentStatus;
+    }
+
+    @Override
+    public String toString() {
+        return "Patient{" +
+                "id=" + id +
+                ", name='" + name + '\'' +
+                ", age=" + age +
+                ", gender='" + gender + '\'' +
+                ", allegy='" + allegy + '\'' +
+                ", contactNumber='" + contactNumber + '\'' +
+                ", address='" + address + '\'' +
+                ", registrationDate='" + registrationDate + '\'' +
+                ", medicalHistory='" + medicalHistory + '\'' +
+                ", isInWaiting=" + isInWaiting +
+                ", currentStatus='" + currentStatus + '\'' +
+                '}';
+    }
+
+    @Override
+    public boolean equals(Object obj) {
+        if (this == obj) return true;
+        if (obj == null || getClass() != obj.getClass()) return false;
+        Patient patient = (Patient) obj;
+        return id == patient.id &&
+                age == patient.age &&
+                isInWaiting == patient.isInWaiting &&
+                java.util.Objects.equals(name, patient.name) &&
+                java.util.Objects.equals(gender, patient.gender) &&
+                java.util.Objects.equals(allegy, patient.allegy) &&
+                java.util.Objects.equals(contactNumber, patient.contactNumber) &&
+                java.util.Objects.equals(address, patient.address) &&
+                java.util.Objects.equals(registrationDate, patient.registrationDate) &&
+                java.util.Objects.equals(medicalHistory, patient.medicalHistory) &&
+                java.util.Objects.equals(currentStatus, patient.currentStatus);
     }
 }

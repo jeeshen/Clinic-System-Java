@@ -5,9 +5,23 @@ public class Treatment {
     private String patientId;
     private String doctorId;
     private String diagnosis;
-    private String prescribedMedications; // Can be simplified or made into a List
+    private String prescribedMedications; //can make to list
     private String treatmentDate;
     private String followUpDate;
+
+    public Treatment() {    
+        this("", "", "", "", "", "", "");
+    }
+
+    public Treatment(String treatmentId, String patientId, String doctorId, String diagnosis, String prescribedMedications, String treatmentDate, String followUpDate) {
+        this.treatmentId = treatmentId;
+        this.patientId = patientId;
+        this.doctorId = doctorId;
+        this.diagnosis = diagnosis;
+        this.prescribedMedications = prescribedMedications;
+        this.treatmentDate = treatmentDate;
+        this.followUpDate = followUpDate;
+    }
 
     public String getTreatmentId() {
         return treatmentId;
@@ -63,5 +77,32 @@ public class Treatment {
 
     public void setFollowUpDate(String followUpDate) {
         this.followUpDate = followUpDate;
+    }
+
+    @Override
+    public String toString() {
+        return "Treatment{" +
+                "treatmentId='" + treatmentId + '\'' +
+                ", patientId='" + patientId + '\'' +
+                ", doctorId='" + doctorId + '\'' +
+                ", diagnosis='" + diagnosis + '\'' +
+                ", prescribedMedications='" + prescribedMedications + '\'' +
+                ", treatmentDate='" + treatmentDate + '\'' +
+                ", followUpDate='" + followUpDate + '\'' +
+                '}';
+    }
+
+    @Override
+    public boolean equals(Object obj) {
+        if (this == obj) return true;
+        if (obj == null || getClass() != obj.getClass()) return false;
+        Treatment treatment = (Treatment) obj;
+        return java.util.Objects.equals(treatmentId, treatment.treatmentId) &&
+                java.util.Objects.equals(patientId, treatment.patientId) &&
+                java.util.Objects.equals(doctorId, treatment.doctorId) &&
+                java.util.Objects.equals(diagnosis, treatment.diagnosis) &&
+                java.util.Objects.equals(prescribedMedications, treatment.prescribedMedications) &&
+                java.util.Objects.equals(treatmentDate, treatment.treatmentDate) &&
+                java.util.Objects.equals(followUpDate, treatment.followUpDate);
     }
 }

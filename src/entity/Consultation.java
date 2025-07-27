@@ -5,9 +5,23 @@ public class Consultation {
     private String patientId;
     private String doctorId;
     private String consultationDate;
-    private String status; // e.g., "Scheduled", "Completed"
+    private String status; //scheduled or completed
     private String notes;
     private String nextAppointmentDate;
+
+    public Consultation() {
+        this("", "", "", "", "", "", "");
+    }
+
+    public Consultation(String consultationId, String patientId, String doctorId, String consultationDate, String status, String notes, String nextAppointmentDate) {
+        this.consultationId = consultationId;
+        this.patientId = patientId;
+        this.doctorId = doctorId;
+        this.consultationDate = consultationDate;
+        this.status = status;
+        this.notes = notes;
+        this.nextAppointmentDate = nextAppointmentDate;
+    }
 
     public String getConsultationId() {
         return consultationId;
@@ -63,5 +77,32 @@ public class Consultation {
 
     public void setNextAppointmentDate(String nextAppointmentDate) {
         this.nextAppointmentDate = nextAppointmentDate;
+    }
+
+    @Override
+    public String toString() {
+        return "Consultation{" +
+                "consultationId='" + consultationId + '\'' +
+                ", patientId='" + patientId + '\'' +
+                ", doctorId='" + doctorId + '\'' +
+                ", consultationDate='" + consultationDate + '\'' +
+                ", status='" + status + '\'' +
+                ", notes='" + notes + '\'' +
+                ", nextAppointmentDate='" + nextAppointmentDate + '\'' +
+                '}';
+    }
+
+    @Override
+    public boolean equals(Object obj) {
+        if (this == obj) return true;
+        if (obj == null || getClass() != obj.getClass()) return false;
+        Consultation that = (Consultation) obj;
+        return java.util.Objects.equals(consultationId, that.consultationId) &&
+                java.util.Objects.equals(patientId, that.patientId) &&
+                java.util.Objects.equals(doctorId, that.doctorId) &&
+                java.util.Objects.equals(consultationDate, that.consultationDate) &&
+                java.util.Objects.equals(status, that.status) &&
+                java.util.Objects.equals(notes, that.notes) &&
+                java.util.Objects.equals(nextAppointmentDate, that.nextAppointmentDate);
     }
 }
