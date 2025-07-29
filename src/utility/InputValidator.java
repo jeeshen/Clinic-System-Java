@@ -5,9 +5,6 @@ import java.util.regex.Pattern;
 
 public class InputValidator {
     
-    /**
-     * Get valid integer input within a range
-     */
     public static int getValidInt(Scanner scanner, int min, int max, String prompt) {
         int input;
         do {
@@ -17,7 +14,7 @@ public class InputValidator {
                 scanner.next();
             }
             input = scanner.nextInt();
-            scanner.nextLine(); // Consume newline
+            scanner.nextLine();
             
             if (input < min || input > max) {
                 System.out.print("Please enter a number between " + min + " and " + max + ": ");
@@ -27,9 +24,6 @@ public class InputValidator {
         return input;
     }
     
-    /**
-     * Get valid integer input (any integer)
-     */
     public static int getValidInt(Scanner scanner, String prompt) {
         System.out.print(prompt);
         while (!scanner.hasNextInt()) {
@@ -37,13 +31,10 @@ public class InputValidator {
             scanner.next();
         }
         int input = scanner.nextInt();
-        scanner.nextLine(); // Consume newline
+        scanner.nextLine();
         return input;
     }
     
-    /**
-     * Get valid double input
-     */
     public static double getValidDouble(Scanner scanner, String prompt) {
         System.out.print(prompt);
         while (!scanner.hasNextDouble()) {
@@ -51,13 +42,10 @@ public class InputValidator {
             scanner.next();
         }
         double input = scanner.nextDouble();
-        scanner.nextLine(); // Consume newline
+        scanner.nextLine();
         return input;
     }
     
-    /**
-     * Get valid boolean input
-     */
     public static boolean getValidBoolean(Scanner scanner, String prompt) {
         System.out.print(prompt + " (true/false): ");
         String input = scanner.nextLine().toLowerCase();
@@ -68,9 +56,6 @@ public class InputValidator {
         return Boolean.parseBoolean(input);
     }
     
-    /**
-     * Get valid string input (non-empty)
-     */
     public static String getValidString(Scanner scanner, String prompt) {
         String input;
         do {
@@ -83,17 +68,11 @@ public class InputValidator {
         return input;
     }
     
-    /**
-     * Get valid string input (can be empty)
-     */
     public static String getValidStringAllowEmpty(Scanner scanner, String prompt) {
         System.out.print(prompt);
         return scanner.nextLine().trim();
     }
     
-    /**
-     * Get valid phone number (Malaysian format)
-     */
     public static String getValidPhoneNumber(Scanner scanner, String prompt) {
         String phone;
         Pattern phonePattern = Pattern.compile("^(01[0-9]|03|04|05|06|07|08|09)-?[0-9]{7,8}$");
@@ -109,9 +88,6 @@ public class InputValidator {
         return phone;
     }
     
-    /**
-     * Get valid email address
-     */
     public static String getValidEmail(Scanner scanner, String prompt) {
         String email;
         Pattern emailPattern = Pattern.compile("^[A-Za-z0-9+_.-]+@[A-Za-z0-9.-]+\\.[A-Za-z]{2,}$");
@@ -127,9 +103,6 @@ public class InputValidator {
         return email;
     }
     
-    /**
-     * Get valid date in dd-MM-yyyy format
-     */
     public static String getValidDate(Scanner scanner, String prompt) {
         String date;
         Pattern datePattern = Pattern.compile("^(0[1-9]|[12][0-9]|3[01])-(0[1-9]|1[012])-(19|20)\\d\\d$");
@@ -139,22 +112,45 @@ public class InputValidator {
             date = scanner.nextLine().trim();
             if (!datePattern.matcher(date).matches()) {
                 System.out.println("Invalid date format. Please use dd-MM-yyyy format (e.g., 25-12-2024)");
+            } else if (!isDateValid(date)) {
+                System.out.println("Date must be today or later. Please enter a valid date.");
             }
-        } while (!datePattern.matcher(date).matches());
+        } while (!datePattern.matcher(date).matches() || !isDateValid(date));
         
         return date;
     }
     
-    /**
-     * Get valid age (1-120)
-     */
+    private static boolean isDateValid(String dateStr) {
+        try {
+            java.text.SimpleDateFormat sdf = new java.text.SimpleDateFormat("dd-MM-yyyy");
+            sdf.setLenient(false);
+            java.util.Date inputDate = sdf.parse(dateStr);
+            java.util.Date currentDate = new java.util.Date();
+            
+            java.util.Calendar inputCal = java.util.Calendar.getInstance();
+            inputCal.setTime(inputDate);
+            inputCal.set(java.util.Calendar.HOUR_OF_DAY, 0);
+            inputCal.set(java.util.Calendar.MINUTE, 0);
+            inputCal.set(java.util.Calendar.SECOND, 0);
+            inputCal.set(java.util.Calendar.MILLISECOND, 0);
+            
+            java.util.Calendar currentCal = java.util.Calendar.getInstance();
+            currentCal.setTime(currentDate);
+            currentCal.set(java.util.Calendar.HOUR_OF_DAY, 0);
+            currentCal.set(java.util.Calendar.MINUTE, 0);
+            currentCal.set(java.util.Calendar.SECOND, 0);
+            currentCal.set(java.util.Calendar.MILLISECOND, 0);
+            
+            return !inputCal.getTime().before(currentCal.getTime());
+        } catch (Exception e) {
+            return false;
+        }
+    }
+    
     public static int getValidAge(Scanner scanner, String prompt) {
         return getValidInt(scanner, 1, 120, prompt);
     }
     
-    /**
-     * Get valid gender
-     */
     public static String getValidGender(Scanner scanner, String prompt) {
         String gender;
         do {
@@ -168,9 +164,6 @@ public class InputValidator {
         return gender;
     }
     
-    /**
-     * Get valid ID (positive integer)
-     */
     public static int getValidId(Scanner scanner, String prompt) {
         int id;
         do {
@@ -182,9 +175,6 @@ public class InputValidator {
         return id;
     }
     
-    /**
-     * Get valid price (positive double)
-     */
     public static double getValidPrice(Scanner scanner, String prompt) {
         double price;
         do {
@@ -196,9 +186,6 @@ public class InputValidator {
         return price;
     }
     
-    /**
-     * Get valid quantity (positive integer)
-     */
     public static int getValidQuantity(Scanner scanner, String prompt) {
         int quantity;
         do {

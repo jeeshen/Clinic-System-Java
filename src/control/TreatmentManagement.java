@@ -1,6 +1,7 @@
 package control;
 
 import adt.SetAndQueueInterface;
+import adt.SetAndQueue;
 import entity.Treatment;
 import entity.Patient;
 import entity.Doctor;
@@ -13,9 +14,7 @@ public class TreatmentManagement {
     private SetAndQueueInterface<Doctor> doctors;
     private SimpleDateFormat dateFormat = new SimpleDateFormat("dd-MM-yyyy");
     
-    public TreatmentManagement(SetAndQueueInterface<Treatment> treatments,
-                             SetAndQueueInterface<Patient> patients,
-                             SetAndQueueInterface<Doctor> doctors) {
+    public TreatmentManagement(SetAndQueueInterface<Treatment> treatments, SetAndQueueInterface<Patient> patients, SetAndQueueInterface<Doctor> doctors) {
         this.treatments = treatments;
         this.patients = patients;
         this.doctors = doctors;
@@ -166,7 +165,7 @@ public class TreatmentManagement {
         Treatment[] tempResults = new Treatment[treatmentArray.length];
         int count = 0;
         
-        // Simple check for recent treatments (in real implementation, parse dates)
+        //simple check for recent treatments (in real implementation, parse dates)
         for (Object obj : treatmentArray) {
             if (obj instanceof Treatment) {
                 Treatment treatment = (Treatment) obj;
@@ -181,6 +180,180 @@ public class TreatmentManagement {
             results[i] = tempResults[i];
         }
         return results;
+    }
+    
+    //get treatments by diagnosis using set operations
+    public SetAndQueueInterface<Treatment> getTreatmentsByDiagnosisSet(String diagnosis) {
+        SetAndQueue<Treatment> diagnosisTreatments = new SetAndQueue<>();
+        Object[] treatmentArray = treatments.toArray();
+        
+        for (Object obj : treatmentArray) {
+            if (obj instanceof Treatment) {
+                Treatment treatment = (Treatment) obj;
+                if (treatment.getDiagnosis().toLowerCase().contains(diagnosis.toLowerCase())) {
+                    diagnosisTreatments.add(treatment);
+                }
+            }
+        }
+        return diagnosisTreatments;
+    }
+    
+    //get treatments by patient using set operations
+    public SetAndQueueInterface<Treatment> getTreatmentsByPatientSet(String patientId) {
+        SetAndQueue<Treatment> patientTreatments = new SetAndQueue<>();
+        Object[] treatmentArray = treatments.toArray();
+        
+        for (Object obj : treatmentArray) {
+            if (obj instanceof Treatment) {
+                Treatment treatment = (Treatment) obj;
+                if (treatment.getPatientId().equals(patientId)) {
+                    patientTreatments.add(treatment);
+                }
+            }
+        }
+        return patientTreatments;
+    }
+    
+    //get treatments by doctor using set operations
+    public SetAndQueueInterface<Treatment> getTreatmentsByDoctorSet(String doctorId) {
+        SetAndQueue<Treatment> doctorTreatments = new SetAndQueue<>();
+        Object[] treatmentArray = treatments.toArray();
+        
+        for (Object obj : treatmentArray) {
+            if (obj instanceof Treatment) {
+                Treatment treatment = (Treatment) obj;
+                if (treatment.getDoctorId().equals(doctorId)) {
+                    doctorTreatments.add(treatment);
+                }
+            }
+        }
+        return doctorTreatments;
+    }
+    
+    //get treatments with follow-up using set operations
+    public SetAndQueueInterface<Treatment> getTreatmentsWithFollowUpSet() {
+        SetAndQueue<Treatment> followUpTreatments = new SetAndQueue<>();
+        Object[] treatmentArray = treatments.toArray();
+        
+        for (Object obj : treatmentArray) {
+            if (obj instanceof Treatment) {
+                Treatment treatment = (Treatment) obj;
+                if (treatment.getFollowUpDate() != null && !treatment.getFollowUpDate().isEmpty()) {
+                    followUpTreatments.add(treatment);
+                }
+            }
+        }
+        return followUpTreatments;
+    }
+    
+    //union: treatments by patient OR by diagnosis
+    public SetAndQueueInterface<Treatment> getTreatmentsByPatientOrDiagnosis(String patientId, String diagnosis) {
+        SetAndQueueInterface<Treatment> patientTreatments = getTreatmentsByPatientSet(patientId);
+        SetAndQueueInterface<Treatment> diagnosisTreatments = getTreatmentsByDiagnosisSet(diagnosis);
+        return patientTreatments.union(diagnosisTreatments);
+    }
+    
+    //intersection: treatments by patient AND by diagnosis
+    public SetAndQueueInterface<Treatment> getTreatmentsByPatientAndDiagnosis(String patientId, String diagnosis) {
+        SetAndQueueInterface<Treatment> patientTreatments = getTreatmentsByPatientSet(patientId);
+        SetAndQueueInterface<Treatment> diagnosisTreatments = getTreatmentsByDiagnosisSet(diagnosis);
+        return patientTreatments.intersection(diagnosisTreatments);
+    }
+    
+    //difference: treatments by patient but NOT with specific diagnosis
+    public SetAndQueueInterface<Treatment> getTreatmentsByPatientNotDiagnosis(String patientId, String diagnosis) {
+        SetAndQueueInterface<Treatment> patientTreatments = getTreatmentsByPatientSet(patientId);
+        SetAndQueueInterface<Treatment> diagnosisTreatments = getTreatmentsByDiagnosisSet(diagnosis);
+        return patientTreatments.difference(diagnosisTreatments);
+    }
+    
+    //check if all patient's treatments have follow-up (subset operation)
+    public boolean areAllPatientTreatmentsWithFollowUp(String patientId) {
+        SetAndQueueInterface<Treatment> patientTreatments = getTreatmentsByPatientSet(patientId);
+        SetAndQueueInterface<Treatment> followUpTreatments = getTreatmentsWithFollowUpSet();
+        return patientTreatments.isSubsetOf(followUpTreatments);
+    }
+    
+    //get treatments with multiple criteria using intersection
+    public SetAndQueueInterface<Treatment> getTreatmentsWithMultipleCriteria(String patientId, String doctorId, String diagnosis) {
+        SetAndQueueInterface<Treatment> patientTreatments = getTreatmentsByPatientSet(patientId);
+        SetAndQueueInterface<Treatment> doctorTreatments = getTreatmentsByDoctorSet(doctorId);
+        SetAndQueueInterface<Treatment> diagnosisTreatments = getTreatmentsByDiagnosisSet(diagnosis);
+        
+        SetAndQueueInterface<Treatment> temp = patientTreatments.intersection(doctorTreatments);
+        return temp.intersection(diagnosisTreatments);
+    }
+    
+    //get urgent treatments (specific diagnoses + follow-up required)
+    public SetAndQueueInterface<Treatment> getUrgentTreatments() {
+        String[] urgentDiagnoses = {"emergency", "critical", "acute", "severe"};
+        SetAndQueue<Treatment> urgentDiagnosisTreatments = new SetAndQueue<>();
+        
+        Object[] treatmentArray = treatments.toArray();
+        for (Object obj : treatmentArray) {
+            if (obj instanceof Treatment) {
+                Treatment treatment = (Treatment) obj;
+                for (String urgentDiagnosis : urgentDiagnoses) {
+                    if (treatment.getDiagnosis().toLowerCase().contains(urgentDiagnosis.toLowerCase())) {
+                        urgentDiagnosisTreatments.add(treatment);
+                        break;
+                    }
+                }
+            }
+        }
+        
+        SetAndQueueInterface<Treatment> followUpTreatments = getTreatmentsWithFollowUpSet();
+        return urgentDiagnosisTreatments.union(followUpTreatments);
+    }
+    
+    //get treatments by medication type
+    public SetAndQueueInterface<Treatment> getTreatmentsByMedication(String medication) {
+        SetAndQueue<Treatment> medicationTreatments = new SetAndQueue<>();
+        Object[] treatmentArray = treatments.toArray();
+        
+        for (Object obj : treatmentArray) {
+            if (obj instanceof Treatment) {
+                Treatment treatment = (Treatment) obj;
+                if (treatment.getPrescribedMedications() != null && 
+                    treatment.getPrescribedMedications().toLowerCase().contains(medication.toLowerCase())) {
+                    medicationTreatments.add(treatment);
+                }
+            }
+        }
+        return medicationTreatments;
+    }
+    
+    //check if treatment sets are equal
+    public boolean areTreatmentSetsEqual(Treatment[] set1, Treatment[] set2) {
+        SetAndQueue<Treatment> queue1 = new SetAndQueue<>();
+        SetAndQueue<Treatment> queue2 = new SetAndQueue<>();
+        
+        for (Treatment treatment : set1) {
+            queue1.add(treatment);
+        }
+        for (Treatment treatment : set2) {
+            queue2.add(treatment);
+        }
+        
+        return queue1.isEqual(queue2);
+    }
+    
+    //get treatment statistics using set operations
+    public String getTreatmentStatistics() {
+        StringBuilder stats = new StringBuilder();
+        stats.append("=== TREATMENT STATISTICS ===\n");
+        
+        SetAndQueueInterface<Treatment> followUpTreatments = getTreatmentsWithFollowUpSet();
+        SetAndQueueInterface<Treatment> urgentTreatments = getUrgentTreatments();
+        
+        stats.append("Treatments with Follow-up: ").append(followUpTreatments.size()).append("\n");
+        stats.append("Urgent Treatments: ").append(urgentTreatments.size()).append("\n");
+        
+        //union of follow-up and urgent treatments
+        SetAndQueueInterface<Treatment> priorityTreatments = followUpTreatments.union(urgentTreatments);
+        stats.append("Priority Treatments (Follow-up OR Urgent): ").append(priorityTreatments.size()).append("\n");
+        
+        return stats.toString();
     }
     
     //generate treatment report
@@ -212,6 +385,18 @@ public class TreatmentManagement {
         report.append("\n=== SUMMARY ===\n");
         report.append("Total Treatments: ").append(totalTreatments).append("\n");
         report.append("Treatments with Follow-up: ").append(treatmentsWithFollowUp).append("\n");
+        
+        report.append("\n=== ADVANCED ADT ANALYTICS ===\n");
+        SetAndQueueInterface<Treatment> urgentTreatments = getUrgentTreatments();
+        report.append("Urgent Treatments: ").append(urgentTreatments.size()).append("\n");
+        
+        SetAndQueueInterface<Treatment> followUpOrUrgent = getTreatmentsWithFollowUpSet().union(getUrgentTreatments());
+        report.append("Follow-up OR Urgent Treatments: ").append(followUpOrUrgent.size()).append("\n");
+        
+        SetAndQueueInterface<Treatment> followUpAndUrgent = getTreatmentsWithFollowUpSet().intersection(getUrgentTreatments());
+        report.append("Follow-up AND Urgent Treatments: ").append(followUpAndUrgent.size()).append("\n");
+        
+        report.append(getTreatmentStatistics());
         
         return report.toString();
     }
@@ -287,5 +472,34 @@ public class TreatmentManagement {
             }
         }
         return false;
+    }
+    
+    //check if treatments set is empty
+    public boolean isTreatmentDatabaseEmpty() {
+        return treatments.isEmpty();
+    }
+    
+    //clear all treatments
+    public void clearAllTreatments() {
+        treatments.clearSet();
+    }
+    
+    //get total number of treatments
+    public int getTotalTreatmentCount() {
+        return treatments.size();
+    }
+    
+    //check if all treatments contain specific diagnosis
+    public boolean containsAllTreatmentsWithDiagnosis(String diagnosis) {
+        SetAndQueueInterface<Treatment> allTreatments = new SetAndQueue<>();
+        Object[] treatmentArray = treatments.toArray();
+        for (Object obj : treatmentArray) {
+            if (obj instanceof Treatment) {
+                allTreatments.add((Treatment) obj);
+            }
+        }
+        
+        SetAndQueueInterface<Treatment> diagnosisTreatments = getTreatmentsByDiagnosisSet(diagnosis);
+        return allTreatments.containsAll(diagnosisTreatments);
     }
 } 

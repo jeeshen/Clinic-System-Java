@@ -82,54 +82,54 @@ public class PatientManagementUI {
         
         Patient patient = new Patient();
         
-        // Get Patient ID with retry for duplicates
+        //get patient ID with retry for duplicates
         int patientId;
         do {
             patientId = InputValidator.getValidId(scanner, "Enter Patient ID: ");
             patient.setId(patientId);
             
-            // Check if patient ID already exists
+            //check if patient ID already exists
             if (patientManagement.patientExists(patientId)) {
                 System.out.println("Patient ID already exists. Please choose a different ID.");
                 System.out.print("Press Enter to try again or '0' to return to menu: ");
                 String choice = scanner.nextLine().trim();
                 if (choice.equals("0")) {
-                    return; // Return to main menu only if user chooses to
+                    return; //return to main menu only if user chooses to
                 }
             } else {
-                break; // Exit loop if ID is unique
+                break; //exit loop if ID is unique
             }
         } while (true);
         
-        // Get Patient Name
+        //get patient name
         String name = InputValidator.getValidString(scanner, "Enter Patient Name: ");
         patient.setName(name);
         
-        // Get Age
+        //get age
         int age = InputValidator.getValidAge(scanner, "Enter Age: ");
         patient.setAge(age);
         
-        // Get Gender
+        //get gender
         String gender = InputValidator.getValidGender(scanner, "Enter Gender");
         patient.setGender(gender);
         
-        // Get Allergies
+        //get allergies
         String allegy = InputValidator.getValidStringAllowEmpty(scanner, "Enter Allergies (or press Enter if none): ");
         patient.setAllegy(allegy);
         
-        // Get Contact Number
+        //get contact number
         String contactNumber = InputValidator.getValidPhoneNumber(scanner, "Enter Contact Number: ");
         patient.setContactNumber(contactNumber);
         
-        // Get Address
+        //get address
         String address = InputValidator.getValidString(scanner, "Enter Address: ");
         patient.setAddress(address);
         
-        // Get Registration Date
+        //get registration date
         String registrationDate = InputValidator.getValidDate(scanner, "Enter Registration Date");
         patient.setRegistrationDate(registrationDate);
         
-        // Get Medical History
+        //get medical history
         String medicalHistory = InputValidator.getValidStringAllowEmpty(scanner, "Enter Medical History (or press Enter if none): ");
         patient.setMedicalHistory(medicalHistory);
         
@@ -179,12 +179,12 @@ public class PatientManagementUI {
         Patient updatedPatient = new Patient();
         updatedPatient.setId(patientId);
         
-        // Update Name
+        //update name
         System.out.print("Enter new Patient Name (current: " + existingPatient.getName() + "): ");
         String name = scanner.nextLine().trim();
         updatedPatient.setName(name.isEmpty() ? existingPatient.getName() : name);
         
-        // Update Age
+        //update age
         System.out.print("Enter new Age (current: " + existingPatient.getAge() + "): ");
         String ageStr = scanner.nextLine().trim();
         if (!ageStr.isEmpty()) {
@@ -204,7 +204,7 @@ public class PatientManagementUI {
             updatedPatient.setAge(existingPatient.getAge());
         }
         
-        // Update Gender
+        //update gender
         System.out.print("Enter new Gender (current: " + existingPatient.getGender() + "): ");
         String gender = scanner.nextLine().trim();
         if (!gender.isEmpty() && (gender.equalsIgnoreCase("Male") || gender.equalsIgnoreCase("Female"))) {
@@ -213,12 +213,12 @@ public class PatientManagementUI {
             updatedPatient.setGender(existingPatient.getGender());
         }
         
-        // Update Allergies
+        //update allergies
         System.out.print("Enter new Allergies (current: " + existingPatient.getAllegy() + "): ");
         String allegy = scanner.nextLine().trim();
         updatedPatient.setAllegy(allegy.isEmpty() ? existingPatient.getAllegy() : allegy);
         
-        // Update Contact Number
+        //update contact number
         System.out.print("Enter new Contact Number (current: " + existingPatient.getContactNumber() + "): ");
         String contactNumber = scanner.nextLine().trim();
         if (!contactNumber.isEmpty()) {
@@ -233,12 +233,12 @@ public class PatientManagementUI {
             updatedPatient.setContactNumber(existingPatient.getContactNumber());
         }
         
-        // Update Address
+        //update address
         System.out.print("Enter new Address (current: " + existingPatient.getAddress() + "): ");
         String address = scanner.nextLine().trim();
         updatedPatient.setAddress(address.isEmpty() ? existingPatient.getAddress() : address);
         
-        // Update Medical History
+        //update medical history
         System.out.print("Enter new Medical History (current: " + existingPatient.getMedicalHistory() + "): ");
         String medicalHistory = scanner.nextLine().trim();
         updatedPatient.setMedicalHistory(medicalHistory.isEmpty() ? existingPatient.getMedicalHistory() : medicalHistory);
@@ -436,7 +436,7 @@ public class PatientManagementUI {
         return null;
     }
     
-    // Helper method to display available patient IDs
+    //helper method to display available patient IDs
     private void showAvailablePatientIds() {
         Patient[] patients = patientManagement.getAllPatients();
         

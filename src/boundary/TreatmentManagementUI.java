@@ -1,7 +1,11 @@
 package boundary;
 
 import control.TreatmentManagement;
+import control.PatientManagement;
+import control.DoctorManagement;
 import entity.Treatment;
+import entity.Patient;
+import entity.Doctor;
 import utility.StringUtility;
 import java.util.Scanner;
 import utility.InputValidator;
@@ -9,10 +13,14 @@ import utility.InputValidator;
 public class TreatmentManagementUI {
     private Scanner scanner;
     private TreatmentManagement treatmentManagement;
+    private PatientManagement patientManagement;
+    private DoctorManagement doctorManagement;
     
-    public TreatmentManagementUI(TreatmentManagement treatmentManagement) {
+    public TreatmentManagementUI(TreatmentManagement treatmentManagement, PatientManagement patientManagement, DoctorManagement doctorManagement) {
         this.scanner = new Scanner(System.in);
         this.treatmentManagement = treatmentManagement;
+        this.patientManagement = patientManagement;
+        this.doctorManagement = doctorManagement;
     }
     
     public void displayMainMenu() {
@@ -375,7 +383,7 @@ public class TreatmentManagementUI {
         System.out.println(history);
     }
     
-    // Helper method to display available treatment IDs
+    //helper method to display available treatment IDs
     private void showAvailableTreatmentIds() {
         Treatment[] treatments = treatmentManagement.getAllTreatments();
         
@@ -399,17 +407,50 @@ public class TreatmentManagementUI {
         System.out.println();
     }
     
-    // Helper method to display available patient IDs
+    //helper method to display available patient IDs
     private void showAvailablePatientIds() {
-        // This would need to be implemented in TreatmentManagement or we need to pass PatientManagement
-        // For now, we'll show a message
-        System.out.println("Note: Please ensure the patient ID exists in the patient management system.");
+        Patient[] patients = patientManagement.getAllPatients();
+        
+        if (patients.length == 0) {
+            System.out.println("No patients available in the system.");
+            return;
+        }
+        
+        System.out.println("Available Patient IDs:");
+        System.out.println("ID\t\tName\t\t\tAge\tGender\tContact Number");
+        System.out.println(StringUtility.repeatString("-", 80));
+        
+        for (Patient patient : patients) {
+            System.out.printf("%-10s\t%-20s\t%-5s\t%-8s\t%s\n",
+                patient.getId(),
+                patient.getName(),
+                patient.getAge(),
+                patient.getGender(),
+                patient.getContactNumber());
+        }
+        System.out.println();
     }
     
-    // Helper method to display available doctor IDs
+    //helper method to display available doctor IDs
     private void showAvailableDoctorIds() {
-        // This would need to be implemented in TreatmentManagement or we need to pass DoctorManagement
-        // For now, we'll show a message
-        System.out.println("Note: Please ensure the doctor ID exists in the doctor management system.");
+        Doctor[] doctors = doctorManagement.getAllDoctors();
+        
+        if (doctors.length == 0) {
+            System.out.println("No doctors available in the system.");
+            return;
+        }
+        
+        System.out.println("Available Doctor IDs:");
+        System.out.println("ID\t\tName\t\t\tSpecialization\t\tContact Number");
+        System.out.println(StringUtility.repeatString("-", 80));
+        
+        for (Doctor doctor : doctors) {
+            System.out.printf("%-10s\t%-20s\t%-20s\t%s\n",
+                doctor.getDoctorId(),
+                doctor.getName(),
+                doctor.getSpecialization(),
+                doctor.getContactNumber());
+        }
+        System.out.println();
     }
 } 

@@ -1,6 +1,7 @@
 package control;
 
 import adt.SetAndQueueInterface;
+import adt.SetAndQueue;
 import entity.Doctor;
 import java.text.SimpleDateFormat;
 import java.util.Date;
@@ -173,6 +174,134 @@ public class DoctorManagement {
         return false;
     }
     
+    //get doctors by specialization using set operations
+    public SetAndQueueInterface<Doctor> getDoctorsBySpecializationSet(String specialization) {
+        SetAndQueue<Doctor> specializationDoctors = new SetAndQueue<>();
+        Object[] doctorArray = doctors.toArray();
+        
+        for (Object obj : doctorArray) {
+            if (obj instanceof Doctor) {
+                Doctor doctor = (Doctor) obj;
+                if (doctor.getSpecialization().toLowerCase().contains(specialization.toLowerCase())) {
+                    specializationDoctors.add(doctor);
+                }
+            }
+        }
+        return specializationDoctors;
+    }
+    
+    //get available doctors using set operations
+    public SetAndQueueInterface<Doctor> getAvailableDoctorsSet() {
+        SetAndQueue<Doctor> availableDoctors = new SetAndQueue<>();
+        Object[] doctorArray = doctors.toArray();
+        
+        for (Object obj : doctorArray) {
+            if (obj instanceof Doctor) {
+                Doctor doctor = (Doctor) obj;
+                if (doctor.isIsAvailable() && !doctor.isOnLeave()) {
+                    availableDoctors.add(doctor);
+                }
+            }
+        }
+        return availableDoctors;
+    }
+    
+    //get doctors on leave using set operations
+    public SetAndQueueInterface<Doctor> getDoctorsOnLeaveSet() {
+        SetAndQueue<Doctor> leaveDoctors = new SetAndQueue<>();
+        Object[] doctorArray = doctors.toArray();
+        
+        for (Object obj : doctorArray) {
+            if (obj instanceof Doctor) {
+                Doctor doctor = (Doctor) obj;
+                if (doctor.isOnLeave()) {
+                    leaveDoctors.add(doctor);
+                }
+            }
+        }
+        return leaveDoctors;
+    }
+    
+    //union: available doctors OR doctors with specific specialization
+    public SetAndQueueInterface<Doctor> getAvailableOrSpecializedDoctors(String specialization) {
+        SetAndQueueInterface<Doctor> availableDoctors = getAvailableDoctorsSet();
+        SetAndQueueInterface<Doctor> specializedDoctors = getDoctorsBySpecializationSet(specialization);
+        return availableDoctors.union(specializedDoctors);
+    }
+    
+    //intersection: available doctors AND doctors with specific specialization
+    public SetAndQueueInterface<Doctor> getAvailableAndSpecializedDoctors(String specialization) {
+        SetAndQueueInterface<Doctor> availableDoctors = getAvailableDoctorsSet();
+        SetAndQueueInterface<Doctor> specializedDoctors = getDoctorsBySpecializationSet(specialization);
+        return availableDoctors.intersection(specializedDoctors);
+    }
+    
+    //difference: available doctors but NOT on leave
+    public SetAndQueueInterface<Doctor> getAvailableNotOnLeaveDoctors() {
+        SetAndQueueInterface<Doctor> availableDoctors = getAvailableDoctorsSet();
+        SetAndQueueInterface<Doctor> leaveDoctors = getDoctorsOnLeaveSet();
+        return availableDoctors.difference(leaveDoctors);
+    }
+    
+    //check if all specialized doctors are available (subset operation)
+    public boolean areAllSpecializedDoctorsAvailable(String specialization) {
+        SetAndQueueInterface<Doctor> specializedDoctors = getDoctorsBySpecializationSet(specialization);
+        SetAndQueueInterface<Doctor> availableDoctors = getAvailableDoctorsSet();
+        return specializedDoctors.isSubsetOf(availableDoctors);
+    }
+    
+    //get doctors with multiple specializations using union
+    public SetAndQueueInterface<Doctor> getDoctorsWithMultipleSpecializations(String[] specializations) {
+        SetAndQueue<Doctor> combinedDoctors = new SetAndQueue<>();
+        
+        for (String specialization : specializations) {
+            SetAndQueueInterface<Doctor> specializationDoctors = getDoctorsBySpecializationSet(specialization);
+            combinedDoctors.addAll(specializationDoctors);
+        }
+        return combinedDoctors;
+    }
+    
+    //check if two doctor groups are equal (same doctors)
+    public boolean areDoctorGroupsEqual(Doctor[] group1, Doctor[] group2) {
+        SetAndQueue<Doctor> set1 = new SetAndQueue<>();
+        SetAndQueue<Doctor> set2 = new SetAndQueue<>();
+        
+        for (Doctor doctor : group1) {
+            set1.add(doctor);
+        }
+        for (Doctor doctor : group2) {
+            set2.add(doctor);
+        }
+        
+        return set1.isEqual(set2);
+    }
+    
+    //get doctors with specific characteristics using intersection
+    public SetAndQueueInterface<Doctor> getDoctorsWithMultipleCriteria(String specialization, boolean available, boolean onLeave) {
+        SetAndQueueInterface<Doctor> specializationDoctors = getDoctorsBySpecializationSet(specialization);
+        SetAndQueueInterface<Doctor> availabilityDoctors = new SetAndQueue<>();
+        
+        Object[] doctorArray = doctors.toArray();
+        for (Object obj : doctorArray) {
+            if (obj instanceof Doctor) {
+                Doctor doctor = (Doctor) obj;
+                if (doctor.isIsAvailable() == available && doctor.isOnLeave() == onLeave) {
+                    availabilityDoctors.add(doctor);
+                }
+            }
+        }
+        
+        return specializationDoctors.intersection(availabilityDoctors);
+    }
+    
+    //get emergency doctors (available, not on leave, with emergency specializations)
+    public SetAndQueueInterface<Doctor> getEmergencyDoctors() {
+        String[] emergencySpecializations = {"emergency", "trauma", "critical care", "intensive care"};
+        SetAndQueueInterface<Doctor> emergencySpecialists = getDoctorsWithMultipleSpecializations(emergencySpecializations);
+        SetAndQueueInterface<Doctor> availableDoctors = getAvailableDoctorsSet();
+        return emergencySpecialists.intersection(availableDoctors);
+    }
+    
     //generate doctor report
     public String generateDoctorReport() {
         StringBuilder report = new StringBuilder();
@@ -207,6 +336,22 @@ public class DoctorManagement {
         report.append("Total Doctors: ").append(totalDoctors).append("\n");
         report.append("Available Doctors: ").append(availableDoctors).append("\n");
         report.append("Doctors on Leave: ").append(onLeaveDoctors).append("\n");
+
+        report.append("\n=== ADVANCED ADT ANALYTICS ===\n");
+        SetAndQueueInterface<Doctor> cardiologists = getDoctorsBySpecializationSet("cardiology");
+        report.append("Cardiologists: ").append(cardiologists.size()).append("\n");
+        
+        SetAndQueueInterface<Doctor> availableCardiologists = getAvailableAndSpecializedDoctors("cardiology");
+        report.append("Available Cardiologists: ").append(availableCardiologists.size()).append("\n");
+        
+        SetAndQueueInterface<Doctor> emergencyDoctors = getEmergencyDoctors();
+        report.append("Emergency Doctors: ").append(emergencyDoctors.size()).append("\n");
+        
+        SetAndQueueInterface<Doctor> availableOrCardio = getAvailableOrSpecializedDoctors("cardiology");
+        report.append("Available OR Cardiologists: ").append(availableOrCardio.size()).append("\n");
+        
+        boolean allCardiologistsAvailable = areAllSpecializedDoctorsAvailable("cardiology");
+        report.append("All Cardiologists Available: ").append(allCardiologistsAvailable ? "Yes" : "No").append("\n");
         
         return report.toString();
     }
@@ -229,5 +374,34 @@ public class DoctorManagement {
     //check if doctor exists
     public boolean doctorExists(String doctorId) {
         return findDoctorById(doctorId) != null;
+    }
+    
+    //check if doctors set is empty
+    public boolean isDoctorDatabaseEmpty() {
+        return doctors.isEmpty();
+    }
+    
+    //clear all doctors (use with caution)
+    public void clearAllDoctors() {
+        doctors.clearSet();
+    }
+    
+    //get total number of doctors
+    public int getTotalDoctorCount() {
+        return doctors.size();
+    }
+    
+    //check if all doctors contain specific specialization
+    public boolean containsAllDoctorsWithSpecialization(String specialization) {
+        SetAndQueueInterface<Doctor> allDoctors = new SetAndQueue<>();
+        Object[] doctorArray = doctors.toArray();
+        for (Object obj : doctorArray) {
+            if (obj instanceof Doctor) {
+                allDoctors.add((Doctor) obj);
+            }
+        }
+        
+        SetAndQueueInterface<Doctor> specializedDoctors = getDoctorsBySpecializationSet(specialization);
+        return allDoctors.containsAll(specializedDoctors);
     }
 } 

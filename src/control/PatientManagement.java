@@ -1,6 +1,7 @@
 package control;
 
 import adt.SetAndQueueInterface;
+import adt.SetAndQueue;
 import entity.Patient;
 import java.text.SimpleDateFormat;
 import java.util.Date;
@@ -161,6 +162,130 @@ public class PatientManagement {
         }
         return false;
     }
+
+    //get patients with specific allergies using set operations
+    public SetAndQueueInterface<Patient> getPatientsWithAllergies(String allergy) {
+        SetAndQueue<Patient> allergyPatients = new SetAndQueue<>();
+        Object[] patientArray = patients.toArray();
+        
+        for (Object obj : patientArray) {
+            if (obj instanceof Patient) {
+                Patient patient = (Patient) obj;
+                if (patient.getAllegy() != null && patient.getAllegy().toLowerCase().contains(allergy.toLowerCase())) {
+                    allergyPatients.add(patient);
+                }
+            }
+        }
+        return allergyPatients;
+    }
+    
+    //get patients from specific address area
+    public SetAndQueueInterface<Patient> getPatientsByAddress(String addressArea) {
+        SetAndQueue<Patient> areaPatients = new SetAndQueue<>();
+        Object[] patientArray = patients.toArray();
+        
+        for (Object obj : patientArray) {
+            if (obj instanceof Patient) {
+                Patient patient = (Patient) obj;
+                if (patient.getAddress() != null && patient.getAddress().toLowerCase().contains(addressArea.toLowerCase())) {
+                    areaPatients.add(patient);
+                }
+            }
+        }
+        return areaPatients;
+    }
+    
+    //union of patients with allergies and patients from specific area
+    public SetAndQueueInterface<Patient> getPatientsWithAllergiesOrFromArea(String allergy, String addressArea) {
+        SetAndQueueInterface<Patient> allergyPatients = getPatientsWithAllergies(allergy);
+        SetAndQueueInterface<Patient> areaPatients = getPatientsByAddress(addressArea);
+        return allergyPatients.union(areaPatients);
+    }
+    
+    //intersection of patients with allergies and patients from specific area
+    public SetAndQueueInterface<Patient> getPatientsWithAllergiesAndFromArea(String allergy, String addressArea) {
+        SetAndQueueInterface<Patient> allergyPatients = getPatientsWithAllergies(allergy);
+        SetAndQueueInterface<Patient> areaPatients = getPatientsByAddress(addressArea);
+        return allergyPatients.intersection(areaPatients);
+    }
+    
+    //difference: patients with allergies but not from specific area
+    public SetAndQueueInterface<Patient> getPatientsWithAllergiesNotFromArea(String allergy, String addressArea) {
+        SetAndQueueInterface<Patient> allergyPatients = getPatientsWithAllergies(allergy);
+        SetAndQueueInterface<Patient> areaPatients = getPatientsByAddress(addressArea);
+        return allergyPatients.difference(areaPatients);
+    }
+    
+    //check if all patients with allergies are from a specific area (subset operation)
+    public boolean areAllergicPatientsFromArea(String allergy, String addressArea) {
+        SetAndQueueInterface<Patient> allergyPatients = getPatientsWithAllergies(allergy);
+        SetAndQueueInterface<Patient> areaPatients = getPatientsByAddress(addressArea);
+        return allergyPatients.isSubsetOf(areaPatients);
+    }
+    
+    //get patients in multiple age groups using union
+    public SetAndQueueInterface<Patient> getPatientsInMultipleAgeGroups(int[][] ageRanges) {
+        SetAndQueue<Patient> combinedPatients = new SetAndQueue<>();
+        
+        for (int[] ageRange : ageRanges) {
+            if (ageRange.length == 2) {
+                Patient[] ageGroupPatients = getPatientsByAgeGroup(ageRange[0], ageRange[1]);
+                SetAndQueue<Patient> ageGroupSet = new SetAndQueue<>();
+                for (Patient patient : ageGroupPatients) {
+                    ageGroupSet.add(patient);
+                }
+                combinedPatients.addAll(ageGroupSet);
+            }
+        }
+        return combinedPatients;
+    }
+    
+    //check if two patient groups are equal (same patients)
+    public boolean arePatientGroupsEqual(Patient[] group1, Patient[] group2) {
+        SetAndQueue<Patient> set1 = new SetAndQueue<>();
+        SetAndQueue<Patient> set2 = new SetAndQueue<>();
+        
+        for (Patient patient : group1) {
+            set1.add(patient);
+        }
+        for (Patient patient : group2) {
+            set2.add(patient);
+        }
+        
+        return set1.isEqual(set2);
+    }
+    
+    //get patients with specific characteristics using intersection
+    public SetAndQueueInterface<Patient> getPatientsWithMultipleCriteria(String gender, int minAge, int maxAge, String addressArea) {
+        SetAndQueueInterface<Patient> genderPatients = new SetAndQueue<>();
+        SetAndQueueInterface<Patient> agePatients = new SetAndQueue<>();
+        SetAndQueueInterface<Patient> areaPatients = getPatientsByAddress(addressArea);
+        
+        //create gender set
+        Object[] patientArray = patients.toArray();
+        for (Object obj : patientArray) {
+            if (obj instanceof Patient) {
+                Patient patient = (Patient) obj;
+                if (patient.getGender().toLowerCase().equals(gender.toLowerCase())) {
+                    genderPatients.add(patient);
+                }
+            }
+        }
+        
+        //create age set
+        for (Object obj : patientArray) {
+            if (obj instanceof Patient) {
+                Patient patient = (Patient) obj;
+                if (patient.getAge() >= minAge && patient.getAge() <= maxAge) {
+                    agePatients.add(patient);
+                }
+            }
+        }
+        
+        //intersection of all three criteria
+        SetAndQueueInterface<Patient> temp = genderPatients.intersection(agePatients);
+        return temp.intersection(areaPatients);
+    }
     
     //generate patient report
     public String generatePatientReport() {
@@ -205,6 +330,19 @@ public class PatientManagement {
         report.append("Adult Patients (18+): ").append(adultPatients).append("\n");
         report.append("Child Patients (<18): ").append(childPatients).append("\n");
         
+        report.append("\n=== ADVANCED ADT ANALYTICS ===\n");
+        SetAndQueueInterface<Patient> allergicPatients = getPatientsWithAllergies("penicillin");
+        report.append("Patients with Penicillin Allergy: ").append(allergicPatients.size()).append("\n");
+        
+        SetAndQueueInterface<Patient> cityPatients = getPatientsByAddress("city");
+        report.append("Patients from City Area: ").append(cityPatients.size()).append("\n");
+        
+        SetAndQueueInterface<Patient> allergicOrCity = getPatientsWithAllergiesOrFromArea("penicillin", "city");
+        report.append("Patients with Penicillin Allergy OR from City: ").append(allergicOrCity.size()).append("\n");
+        
+        SetAndQueueInterface<Patient> allergicAndCity = getPatientsWithAllergiesAndFromArea("penicillin", "city");
+        report.append("Patients with Penicillin Allergy AND from City: ").append(allergicAndCity.size()).append("\n");
+        
         return report.toString();
     }
     
@@ -226,5 +364,20 @@ public class PatientManagement {
     //check if patient exists
     public boolean patientExists(int patientId) {
         return findPatientById(patientId) != null;
+    }
+    
+    //check if patients set is empty
+    public boolean isPatientDatabaseEmpty() {
+        return patients.isEmpty();
+    }
+    
+    //clear all patients
+    public void clearAllPatients() {
+        patients.clearSet();
+    }
+    
+    //get total number of patients
+    public int getTotalPatientCount() {
+        return patients.size();
     }
 }

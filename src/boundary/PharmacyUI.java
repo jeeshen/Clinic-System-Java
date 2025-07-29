@@ -94,7 +94,7 @@ public class PharmacyUI {
         //show available medicine IDs
         showAvailableMedicineIds();
         
-        String medicineId = getCaseInsensitiveMedicineId("Enter Medicine ID: ");
+        String medicineId = getMedicineId("Enter Medicine ID: ");
         
         int dispenseQuantity = InputValidator.getValidQuantity(scanner, "Enter Dispense Quantity: ");
 
@@ -114,7 +114,7 @@ public class PharmacyUI {
         //show available medicine IDs
         showAvailableMedicineIds();
         
-        String medicineId = getCaseInsensitiveMedicineId("Enter Medicine ID: ");
+        String medicineId = getMedicineId("Enter Medicine ID: ");
         int newStock = InputValidator.getValidInt(scanner, 0, 10000, "Enter new stock quantity: ");
         
         boolean success = pharmacyManagement.updateMedicineStock(medicineId, newStock);
@@ -132,7 +132,7 @@ public class PharmacyUI {
         //show available medicine IDs
         showAvailableMedicineIds();
         
-        String medicineId = getCaseInsensitiveMedicineId("Enter Medicine ID: ");
+        String medicineId = getMedicineId("Enter Medicine ID: ");
         
         int stock = pharmacyManagement.checkMedicineStock(medicineId);
         
@@ -148,16 +148,20 @@ public class PharmacyUI {
         
         Medicine medicine = new Medicine();
         
-        // Get Medicine ID with retry for duplicates
+        //get medicine ID with retry for duplicates
         String medicineId;
         do {
             medicineId = InputValidator.getValidString(scanner, "Enter Medicine ID: ");
-            medicine.setMedicineId(medicineId);
             
-            // Check if medicine ID already exists (you may need to add this method to PharmacyManagement)
-            // For now, we'll proceed and let the addNewMedicine method handle duplicates
-            break; // Exit loop and proceed
-        } while (false); // This will be updated when duplicate checking is implemented
+            //check if medicine ID already exists
+            if (pharmacyManagement.medicineIdExists(medicineId)) {
+                System.out.println("Medicine ID '" + medicineId + "' already exists. Please enter a different ID.");
+                continue; //ask for input again
+            }
+            
+            medicine.setMedicineId(medicineId);
+            break; //exit loop and proceed
+        } while (true);
         
         String name = InputValidator.getValidString(scanner, "Enter Medicine Name: ");
         medicine.setName(name);
@@ -192,7 +196,7 @@ public class PharmacyUI {
         //show available medicine IDs
         showAvailableMedicineIds();
         
-        String medicineId = getCaseInsensitiveMedicineId("Enter Medicine ID: ");
+        String medicineId = getMedicineId("Enter Medicine ID: ");
         
         boolean success = pharmacyManagement.removeMedicine(medicineId);
         
@@ -229,7 +233,7 @@ public class PharmacyUI {
         System.out.println("\n=== SEARCH MEDICINE ===");
         String searchTerm = InputValidator.getValidString(scanner, "Enter search term (name or ID): ");
         
-        // convert search term to uppercase for case-insensitive search
+        //convert search term to uppercase for case-insensitive search
         searchTerm = searchTerm.toUpperCase();
         
         Medicine[] results = pharmacyManagement.searchMedicine(searchTerm);
@@ -265,7 +269,7 @@ public class PharmacyUI {
         //show available medicine IDs
         showAvailableMedicineIds();
         
-        String medicineId = getCaseInsensitiveMedicineId("Enter Medicine ID: ");
+        String medicineId = getMedicineId("Enter Medicine ID: ");
         
         Medicine[] alternatives = pharmacyManagement.recommendAlternativeMedicine(medicineId);
         
@@ -293,7 +297,7 @@ public class PharmacyUI {
         //show available medicine IDs
         showAvailableMedicineIds();
         
-        String medicineId = getCaseInsensitiveMedicineId("Enter Medicine ID: ");
+        String medicineId = getMedicineId("Enter Medicine ID: ");
         double newPrice = InputValidator.getValidPrice(scanner, "Enter new price (RM): ");
         
         boolean success = pharmacyManagement.updateMedicinePrice(medicineId, newPrice);
@@ -358,16 +362,16 @@ public class PharmacyUI {
         System.out.printf("Total Inventory Value: RM%.2f\n", totalValue);
     }
 
-    // Helper method to get case-insensitive medicine ID input
-    private String getCaseInsensitiveMedicineId(String prompt) {
+    //helper method to get case-insensitive medicine ID input
+    private String getMedicineId(String prompt) {
         System.out.print(prompt);
         String input = scanner.nextLine().trim();
         
-        // convert to uppercase to match the stored format
+        //convert to uppercase to match the stored format
         return input.toUpperCase();
     }
     
-    // Helper method to display available medicine IDs
+    //helper method to display available medicine IDs
     private void showAvailableMedicineIds() {
         Medicine[] medicines = pharmacyManagement.listAllMedicines();
         

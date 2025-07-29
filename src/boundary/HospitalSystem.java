@@ -100,7 +100,7 @@ public class HospitalSystem {
         
         while (running) {
             displayMainMenu();
-            int choice = getUserInputInt(0, 6);
+            int choice = getUserInputInt(0, 7);
             
             switch (choice) {
                 case 1:
@@ -120,6 +120,9 @@ public class HospitalSystem {
                     break;
                 case 6:
                     viewSystemStatistics();
+                    break;
+                case 7:
+                    openComprehensiveReportSystem();
                     break;
                 case 0:
                     System.out.println("Thank you for using Chubby Clinic Management System!");
@@ -142,35 +145,24 @@ public class HospitalSystem {
         System.out.println("4 . Pharmacy Management");
         System.out.println("5 . Medical Treatment Management");
         System.out.println("6 . System Statistics");
+        System.out.println("7 . Comprehensive Reports");
         System.out.println("0 . Exit System");
         System.out.println(StringUtility.repeatString("-", 50));
         System.out.print("Enter your choice: ");
     }
     
     private void openPatientManagementModule() {
-        System.out.println("\n" + StringUtility.repeatString("=", 40));
-        System.out.println("    PATIENT MANAGEMENT MODULE");
-        System.out.println(StringUtility.repeatString("=", 40));
-        
         PatientManagementUI patientUI = new PatientManagementUI(patientManagement);
         patientUI.displayMainMenu();
     }
     
     private void openDoctorManagementModule() {
-        System.out.println("\n" + StringUtility.repeatString("=", 40));
-        System.out.println("    DOCTOR MANAGEMENT MODULE");
-        System.out.println(StringUtility.repeatString("=", 40));
-        
         DoctorManagementUI doctorUI = new DoctorManagementUI(doctorManagement);
         doctorUI.displayMainMenu();
     }
     
     private void openConsultationModule() {
-        System.out.println("\n" + StringUtility.repeatString("=", 40));
-        System.out.println("    CONSULTATION MANAGEMENT MODULE");
-        System.out.println(StringUtility.repeatString("=", 40));
-        
-        ConsultationManagementUI consultationUI = new ConsultationManagementUI(consultationManagement);
+        ConsultationManagementUI consultationUI = new ConsultationManagementUI(consultationManagement, patientManagement, doctorManagement);
         consultationUI.displayMainMenu();
     }
     
@@ -180,11 +172,7 @@ public class HospitalSystem {
     }
     
     private void openTreatmentModule() {
-        System.out.println("\n" + StringUtility.repeatString("=", 40));
-        System.out.println("    MEDICAL TREATMENT MANAGEMENT MODULE");
-        System.out.println(StringUtility.repeatString("=", 40));
-        
-        TreatmentManagementUI treatmentUI = new TreatmentManagementUI(treatmentManagement);
+        TreatmentManagementUI treatmentUI = new TreatmentManagementUI(treatmentManagement, patientManagement, doctorManagement);
         treatmentUI.displayMainMenu();
     }
     
@@ -204,6 +192,11 @@ public class HospitalSystem {
         System.out.println("\nPress Enter to continue...");
         scanner.nextLine();
     }
+    
+    private void openComprehensiveReportSystem() {
+        ReportUI reportUI = new ReportUI();
+        reportUI.displayMainMenu();
+    }
 
     private int getUserInputInt(int min, int max) {
         int input;
@@ -213,7 +206,7 @@ public class HospitalSystem {
                 scanner.next();
             }
             input = scanner.nextInt();
-            scanner.nextLine(); // Consume newline
+            scanner.nextLine();
             
             if (input < min || input > max) {
                 System.out.print("Please enter a number between " + min + " and " + max + ": ");

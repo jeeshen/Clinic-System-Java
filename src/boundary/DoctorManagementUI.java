@@ -86,50 +86,50 @@ public class DoctorManagementUI {
         
         Doctor doctor = new Doctor();
         
-        // Get Doctor ID with retry for duplicates
+        //get doctor ID with retry for duplicates
         String doctorId;
         do {
             doctorId = InputValidator.getValidString(scanner, "Enter Doctor ID: ");
             doctor.setDoctorId(doctorId);
             
-            // Check if doctor ID already exists
+            //check if doctor ID already exists
             if (doctorManagement.doctorExists(doctorId)) {
                 System.out.println("Doctor ID already exists. Please choose a different ID.");
                 System.out.print("Press Enter to try again or '0' to return to menu: ");
                 String choice = scanner.nextLine().trim();
                 if (choice.equals("0")) {
-                    return; // Return to main menu only if user chooses to
+                    return; //return to main menu only if user chooses to
                 }
             } else {
-                break; // Exit loop if ID is unique
+                break; //exit loop if ID is unique
             }
         } while (true);
         
-        // Get Doctor Name
+        //get doctor name
         String name = InputValidator.getValidString(scanner, "Enter Doctor Name: ");
         doctor.setName(name);
         
-        // Get Specialization
+        //get specialization
         String specialization = InputValidator.getValidString(scanner, "Enter Specialization: ");
         doctor.setSpecialization(specialization);
         
-        // Get Contact Number
+        //get contact number
         String contactNumber = InputValidator.getValidPhoneNumber(scanner, "Enter Contact Number: ");
         doctor.setContactNumber(contactNumber);
         
-        // Get Email
+        //get email
         String email = InputValidator.getValidEmail(scanner, "Enter Email: ");
         doctor.setEmail(email);
         
-        // Get Availability
+        //get availability
         boolean isAvailable = InputValidator.getValidBoolean(scanner, "Is Available?");
         doctor.setIsAvailable(isAvailable);
         
-        // Get Duty Schedule
+        //get duty schedule
         String dutySchedule = InputValidator.getValidString(scanner, "Enter Duty Schedule: ");
         doctor.setDutySchedule(dutySchedule);
         
-        // Get Leave Status
+        //get leave status
         boolean onLeave = InputValidator.getValidBoolean(scanner, "On Leave?");
         doctor.setOnLeave(onLeave);
         
@@ -186,17 +186,17 @@ public class DoctorManagementUI {
         Doctor updatedDoctor = new Doctor();
         updatedDoctor.setDoctorId(doctorId);
         
-        // Update Name
+        //update name
         System.out.print("Enter new Doctor Name (current: " + existingDoctor.getName() + "): ");
         String name = scanner.nextLine().trim();
         updatedDoctor.setName(name.isEmpty() ? existingDoctor.getName() : name);
         
-        // Update Specialization
+        //update specialization
         System.out.print("Enter new Specialization (current: " + existingDoctor.getSpecialization() + "): ");
         String specialization = scanner.nextLine().trim();
         updatedDoctor.setSpecialization(specialization.isEmpty() ? existingDoctor.getSpecialization() : specialization);
         
-        // Update Contact Number
+        //update contact number
         System.out.print("Enter new Contact Number (current: " + existingDoctor.getContactNumber() + "): ");
         String contactNumber = scanner.nextLine().trim();
         if (!contactNumber.isEmpty()) {
@@ -210,7 +210,7 @@ public class DoctorManagementUI {
             updatedDoctor.setContactNumber(existingDoctor.getContactNumber());
         }
         
-        // Update Email
+        //update email
         System.out.print("Enter new Email (current: " + existingDoctor.getEmail() + "): ");
         String email = scanner.nextLine().trim();
         if (!email.isEmpty()) {
@@ -224,7 +224,7 @@ public class DoctorManagementUI {
             updatedDoctor.setEmail(existingDoctor.getEmail());
         }
         
-        // Update Availability
+        //update availability
         System.out.print("Enter new Availability (current: " + existingDoctor.isIsAvailable() + "): ");
         String availStr = scanner.nextLine().trim();
         if (!availStr.isEmpty()) {
@@ -238,7 +238,7 @@ public class DoctorManagementUI {
             updatedDoctor.setIsAvailable(existingDoctor.isIsAvailable());
         }
         
-        // Update Duty Schedule
+        //update duty schedule
         System.out.print("Enter new Duty Schedule (current: " + existingDoctor.getDutySchedule() + "): ");
         String dutySchedule = scanner.nextLine().trim();
         updatedDoctor.setDutySchedule(dutySchedule.isEmpty() ? existingDoctor.getDutySchedule() : dutySchedule);
@@ -468,7 +468,7 @@ public class DoctorManagementUI {
         return null;
     }
     
-    // Helper method to display available doctor IDs
+    //helper method to display available doctor IDs
     private void showAvailableDoctorIds() {
         Doctor[] doctors = doctorManagement.getAllDoctors();
         
