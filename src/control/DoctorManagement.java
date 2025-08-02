@@ -7,7 +7,7 @@ import java.text.SimpleDateFormat;
 import java.util.Date;
 
 public class DoctorManagement {
-    private SetAndQueueInterface<Doctor> doctors;
+    private SetAndQueueInterface<Doctor> doctors = new SetAndQueue<>();
     private SimpleDateFormat dateFormat = new SimpleDateFormat("dd-MM-yyyy");
     
     public DoctorManagement(SetAndQueueInterface<Doctor> doctors) {
@@ -176,7 +176,7 @@ public class DoctorManagement {
     
     //get doctors by specialization using set operations
     public SetAndQueueInterface<Doctor> getDoctorsBySpecializationSet(String specialization) {
-        SetAndQueue<Doctor> specializationDoctors = new SetAndQueue<>();
+        SetAndQueueInterface<Doctor> specializationDoctors = new SetAndQueue<>();
         Object[] doctorArray = doctors.toArray();
         
         for (Object obj : doctorArray) {
@@ -192,7 +192,7 @@ public class DoctorManagement {
     
     //get available doctors using set operations
     public SetAndQueueInterface<Doctor> getAvailableDoctorsSet() {
-        SetAndQueue<Doctor> availableDoctors = new SetAndQueue<>();
+        SetAndQueueInterface<Doctor> availableDoctors = new SetAndQueue<>();
         Object[] doctorArray = doctors.toArray();
         
         for (Object obj : doctorArray) {
@@ -208,7 +208,7 @@ public class DoctorManagement {
     
     //get doctors on leave using set operations
     public SetAndQueueInterface<Doctor> getDoctorsOnLeaveSet() {
-        SetAndQueue<Doctor> leaveDoctors = new SetAndQueue<>();
+        SetAndQueueInterface<Doctor> leaveDoctors = new SetAndQueue<>();
         Object[] doctorArray = doctors.toArray();
         
         for (Object obj : doctorArray) {
@@ -252,7 +252,7 @@ public class DoctorManagement {
     
     //get doctors with multiple specializations using union
     public SetAndQueueInterface<Doctor> getDoctorsWithMultipleSpecializations(String[] specializations) {
-        SetAndQueue<Doctor> combinedDoctors = new SetAndQueue<>();
+        SetAndQueueInterface<Doctor> combinedDoctors = new SetAndQueue<>();
         
         for (String specialization : specializations) {
             SetAndQueueInterface<Doctor> specializationDoctors = getDoctorsBySpecializationSet(specialization);
@@ -263,8 +263,8 @@ public class DoctorManagement {
     
     //check if two doctor groups are equal (same doctors)
     public boolean areDoctorGroupsEqual(Doctor[] group1, Doctor[] group2) {
-        SetAndQueue<Doctor> set1 = new SetAndQueue<>();
-        SetAndQueue<Doctor> set2 = new SetAndQueue<>();
+        SetAndQueueInterface<Doctor> set1 = new SetAndQueue<>();
+        SetAndQueueInterface<Doctor> set2 = new SetAndQueue<>();
         
         for (Doctor doctor : group1) {
             set1.add(doctor);

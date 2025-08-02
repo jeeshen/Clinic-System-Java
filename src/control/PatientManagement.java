@@ -7,7 +7,7 @@ import java.text.SimpleDateFormat;
 import java.util.Date;
 
 public class PatientManagement {
-    private SetAndQueueInterface<Patient> patients;
+    private SetAndQueueInterface<Patient> patients = new SetAndQueue<>();
     private SimpleDateFormat dateFormat = new SimpleDateFormat("dd-MM-yyyy");
     
     public PatientManagement(SetAndQueueInterface<Patient> patients) {
@@ -165,7 +165,7 @@ public class PatientManagement {
 
     //get patients with specific allergies using set operations
     public SetAndQueueInterface<Patient> getPatientsWithAllergies(String allergy) {
-        SetAndQueue<Patient> allergyPatients = new SetAndQueue<>();
+        SetAndQueueInterface<Patient> allergyPatients = new SetAndQueue<>();
         Object[] patientArray = patients.toArray();
         
         for (Object obj : patientArray) {
@@ -181,7 +181,7 @@ public class PatientManagement {
     
     //get patients from specific address area
     public SetAndQueueInterface<Patient> getPatientsByAddress(String addressArea) {
-        SetAndQueue<Patient> areaPatients = new SetAndQueue<>();
+        SetAndQueueInterface<Patient> areaPatients = new SetAndQueue<>();
         Object[] patientArray = patients.toArray();
         
         for (Object obj : patientArray) {
@@ -225,12 +225,12 @@ public class PatientManagement {
     
     //get patients in multiple age groups using union
     public SetAndQueueInterface<Patient> getPatientsInMultipleAgeGroups(int[][] ageRanges) {
-        SetAndQueue<Patient> combinedPatients = new SetAndQueue<>();
+        SetAndQueueInterface<Patient> combinedPatients = new SetAndQueue<>();
         
         for (int[] ageRange : ageRanges) {
             if (ageRange.length == 2) {
                 Patient[] ageGroupPatients = getPatientsByAgeGroup(ageRange[0], ageRange[1]);
-                SetAndQueue<Patient> ageGroupSet = new SetAndQueue<>();
+                SetAndQueueInterface<Patient> ageGroupSet = new SetAndQueue<>();
                 for (Patient patient : ageGroupPatients) {
                     ageGroupSet.add(patient);
                 }
@@ -242,8 +242,8 @@ public class PatientManagement {
     
     //check if two patient groups are equal (same patients)
     public boolean arePatientGroupsEqual(Patient[] group1, Patient[] group2) {
-        SetAndQueue<Patient> set1 = new SetAndQueue<>();
-        SetAndQueue<Patient> set2 = new SetAndQueue<>();
+        SetAndQueueInterface<Patient> set1 = new SetAndQueue<>();
+        SetAndQueueInterface<Patient> set2 = new SetAndQueue<>();
         
         for (Patient patient : group1) {
             set1.add(patient);

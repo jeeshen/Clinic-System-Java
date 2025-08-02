@@ -12,7 +12,7 @@ public class ConsultationManagement {
     private SetAndQueueInterface<Consultation> consultations = new SetAndQueue<>();
     private SetAndQueueInterface<Patient> patients = new SetAndQueue<>();
     private SetAndQueueInterface<Doctor> doctors = new SetAndQueue<>();
-    private SetAndQueueInterface<Consultation> appointmentQueue = new SetAndQueue<>(); // Queue for appointments
+    private SetAndQueueInterface<Consultation> appointmentQueue = new SetAndQueue<>(); //queue for appointments
     private SimpleDateFormat dateFormat = new SimpleDateFormat("dd-MM-yyyy");
     
     public ConsultationManagement(SetAndQueueInterface<Consultation> consultations, SetAndQueueInterface<Patient> patients, SetAndQueueInterface<Doctor> doctors) {
@@ -214,7 +214,7 @@ public class ConsultationManagement {
     
     //get consultations by status using set operations
     public SetAndQueueInterface<Consultation> getConsultationsByStatusSet(String status) {
-        SetAndQueue<Consultation> statusConsultations = new SetAndQueue<>();
+        SetAndQueueInterface<Consultation> statusConsultations = new SetAndQueue<>();
         Object[] consultationArray = consultations.toArray();
         
         for (Object obj : consultationArray) {
@@ -230,7 +230,7 @@ public class ConsultationManagement {
     
     //get consultations by doctor using set operations
     public SetAndQueueInterface<Consultation> getConsultationsByDoctorSet(String doctorId) {
-        SetAndQueue<Consultation> doctorConsultations = new SetAndQueue<>();
+        SetAndQueueInterface<Consultation> doctorConsultations = new SetAndQueue<>();
         Object[] consultationArray = consultations.toArray();
         
         for (Object obj : consultationArray) {
@@ -246,7 +246,7 @@ public class ConsultationManagement {
     
     //get consultations by patient using set operations
     public SetAndQueueInterface<Consultation> getConsultationsByPatientSet(String patientId) {
-        SetAndQueue<Consultation> patientConsultations = new SetAndQueue<>();
+        SetAndQueueInterface<Consultation> patientConsultations = new SetAndQueue<>();
         Object[] consultationArray = consultations.toArray();
         
         for (Object obj : consultationArray) {
@@ -319,8 +319,8 @@ public class ConsultationManagement {
     
     //check if consultation sets are equal
     public boolean areConsultationSetsEqual(Consultation[] set1, Consultation[] set2) {
-        SetAndQueue<Consultation> queue1 = new SetAndQueue<>();
-        SetAndQueue<Consultation> queue2 = new SetAndQueue<>();
+        SetAndQueueInterface<Consultation> queue1 = new SetAndQueue<>();
+        SetAndQueueInterface<Consultation> queue2 = new SetAndQueue<>();
         
         for (Consultation consultation : set1) {
             queue1.add(consultation);

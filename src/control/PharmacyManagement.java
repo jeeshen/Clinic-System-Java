@@ -216,7 +216,7 @@ public class PharmacyManagement {
 
     //get medicines by category using set operations
     public SetAndQueueInterface<Medicine> getMedicinesByCategorySet(String category) {
-        SetAndQueue<Medicine> categoryMedicines = new SetAndQueue<>();
+        SetAndQueueInterface<Medicine> categoryMedicines = new SetAndQueue<>();
         Object[] medicineArray = medicineInventory.toArray();
         
         for (Object obj : medicineArray) {
@@ -232,7 +232,7 @@ public class PharmacyManagement {
     
     //get medicines by purpose using set operations
     public SetAndQueueInterface<Medicine> getMedicinesByPurposeSet(String purpose) {
-        SetAndQueue<Medicine> purposeMedicines = new SetAndQueue<>();
+        SetAndQueueInterface<Medicine> purposeMedicines = new SetAndQueue<>();
         Object[] medicineArray = medicineInventory.toArray();
         
         for (Object obj : medicineArray) {
@@ -248,7 +248,7 @@ public class PharmacyManagement {
     
     //get low stock medicines using set operations
     public SetAndQueueInterface<Medicine> getLowStockMedicinesSet() {
-        SetAndQueue<Medicine> lowStockMedicines = new SetAndQueue<>();
+        SetAndQueueInterface<Medicine> lowStockMedicines = new SetAndQueue<>();
         Object[] medicineArray = medicineInventory.toArray();
         
         for (Object obj : medicineArray) {
@@ -264,7 +264,7 @@ public class PharmacyManagement {
     
     //get medicines in stock using set operations
     public SetAndQueueInterface<Medicine> getMedicinesInStockSet() {
-        SetAndQueue<Medicine> inStockMedicines = new SetAndQueue<>();
+        SetAndQueueInterface<Medicine> inStockMedicines = new SetAndQueue<>();
         Object[] medicineArray = medicineInventory.toArray();
         
         for (Object obj : medicineArray) {
@@ -319,7 +319,7 @@ public class PharmacyManagement {
     //get essential medicines (specific categories + in stock)
     public SetAndQueueInterface<Medicine> getEssentialMedicines() {
         String[] essentialCategories = {"antibiotic", "painkiller", "antiviral", "emergency"};
-        SetAndQueue<Medicine> essentialCategoryMedicines = new SetAndQueue<>();
+        SetAndQueueInterface<Medicine> essentialCategoryMedicines = new SetAndQueue<>();
         
         Object[] medicineArray = medicineInventory.toArray();
         for (Object obj : medicineArray) {
@@ -340,7 +340,7 @@ public class PharmacyManagement {
     
     //get medicines by price range
     public SetAndQueueInterface<Medicine> getMedicinesByPriceRange(double minPrice, double maxPrice) {
-        SetAndQueue<Medicine> priceRangeMedicines = new SetAndQueue<>();
+        SetAndQueueInterface<Medicine> priceRangeMedicines = new SetAndQueue<>();
         Object[] medicineArray = medicineInventory.toArray();
         
         for (Object obj : medicineArray) {
@@ -356,8 +356,8 @@ public class PharmacyManagement {
     
     //check if medicine sets are equal
     public boolean areMedicineSetsEqual(Medicine[] set1, Medicine[] set2) {
-        SetAndQueue<Medicine> queue1 = new SetAndQueue<>();
-        SetAndQueue<Medicine> queue2 = new SetAndQueue<>();
+        SetAndQueueInterface<Medicine> queue1 = new SetAndQueue<>();
+        SetAndQueueInterface<Medicine> queue2 = new SetAndQueue<>();
         
         for (Medicine medicine : set1) {
             queue1.add(medicine);

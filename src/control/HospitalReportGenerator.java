@@ -64,10 +64,10 @@ public class HospitalReportGenerator {
         report.append("\n=== ADVANCED ADT ANALYTICS ===\n");
         
         //create sets for different patient categories
-        SetAndQueue<String> malePatients = new SetAndQueue<>();
-        SetAndQueue<String> femalePatients = new SetAndQueue<>();
-        SetAndQueue<String> adultPatients = new SetAndQueue<>();
-        SetAndQueue<String> childPatients = new SetAndQueue<>();
+        SetAndQueueInterface<String> malePatients = new SetAndQueue<>();
+        SetAndQueueInterface<String> femalePatients = new SetAndQueue<>();
+        SetAndQueueInterface<String> adultPatients = new SetAndQueue<>();
+        SetAndQueueInterface<String> childPatients = new SetAndQueue<>();
         
         for (Patient patient : patients) {
             if (patient.getGender().equalsIgnoreCase("Male")) {
@@ -174,10 +174,10 @@ public class HospitalReportGenerator {
         report.append("\n=== ADVANCED ADT ANALYTICS ===\n");
         
         //create sets for different doctor categories
-        SetAndQueue<String> availableDoctors = new SetAndQueue<>();
-        SetAndQueue<String> onLeaveDoctors = new SetAndQueue<>();
-        SetAndQueue<String> cardiologists = new SetAndQueue<>();
-        SetAndQueue<String> emergencyDoctors = new SetAndQueue<>();
+        SetAndQueueInterface<String> availableDoctors = new SetAndQueue<>();
+        SetAndQueueInterface<String> onLeaveDoctors = new SetAndQueue<>();
+        SetAndQueueInterface<String> cardiologists = new SetAndQueue<>();
+        SetAndQueueInterface<String> emergencyDoctors = new SetAndQueue<>();
         
         for (Doctor doctor : doctors) {
             if (doctor.isIsAvailable()) {
@@ -282,10 +282,10 @@ public class HospitalReportGenerator {
         report.append("\n=== ADVANCED ADT ANALYTICS ===\n");
         
         //create queue for appointment processing simulation
-        SetAndQueue<Consultation> appointmentQueue = new SetAndQueue<>();
-        SetAndQueue<String> scheduledConsultations = new SetAndQueue<>();
-        SetAndQueue<String> completedConsultations = new SetAndQueue<>();
-        SetAndQueue<String> urgentConsultations = new SetAndQueue<>();
+        SetAndQueueInterface<Consultation> appointmentQueue = new SetAndQueue<>();
+        SetAndQueueInterface<String> scheduledConsultations = new SetAndQueue<>();
+        SetAndQueueInterface<String> completedConsultations = new SetAndQueue<>();
+        SetAndQueueInterface<String> urgentConsultations = new SetAndQueue<>();
         
         for (Consultation consultation : consultations) {
             //enqueue consultations for processing
@@ -394,10 +394,10 @@ public class HospitalReportGenerator {
         report.append("\n=== ADVANCED ADT ANALYTICS ===\n");
         
         // Create queue for medicine dispensing simulation
-        SetAndQueue<Medicine> dispensingQueue = new SetAndQueue<>();
-        SetAndQueue<String> lowStockMedicines = new SetAndQueue<>();
-        SetAndQueue<String> essentialMedicines = new SetAndQueue<>();
-        SetAndQueue<String> antibioticMedicines = new SetAndQueue<>();
+        SetAndQueueInterface<Medicine> dispensingQueue = new SetAndQueue<>();
+        SetAndQueueInterface<String> lowStockMedicines = new SetAndQueue<>();
+        SetAndQueueInterface<String> essentialMedicines = new SetAndQueue<>();
+        SetAndQueueInterface<String> antibioticMedicines = new SetAndQueue<>();
         
         for (Medicine medicine : medicines) {
             //enqueue medicines for dispensing
@@ -515,10 +515,10 @@ public class HospitalReportGenerator {
         report.append("\n=== ADVANCED ADT ANALYTICS ===\n");
         
         //create sets for different treatment categories
-        SetAndQueue<String> followUpTreatments = new SetAndQueue<>();
-        SetAndQueue<String> urgentTreatments = new SetAndQueue<>();
-        SetAndQueue<String> cardiologyTreatments = new SetAndQueue<>();
-        SetAndQueue<String> emergencyTreatments = new SetAndQueue<>();
+        SetAndQueueInterface<String> followUpTreatments = new SetAndQueue<>();
+        SetAndQueueInterface<String> urgentTreatments = new SetAndQueue<>();
+        SetAndQueueInterface<String> cardiologyTreatments = new SetAndQueue<>();
+        SetAndQueueInterface<String> emergencyTreatments = new SetAndQueue<>();
         
         for (Treatment treatment : treatments) {
             if (treatment.getFollowUpDate() != null && !treatment.getFollowUpDate().isEmpty()) {
@@ -614,11 +614,11 @@ public class HospitalReportGenerator {
         report.append("\n=== COMPREHENSIVE ADT ANALYTICS ===\n");
         
         //create comprehensive sets for cross-module analysis
-        SetAndQueue<String> allPatientNames = new SetAndQueue<>();
-        SetAndQueue<String> allDoctorNames = new SetAndQueue<>();
-        SetAndQueue<String> allConsultationIds = new SetAndQueue<>();
-        SetAndQueue<String> allMedicineIds = new SetAndQueue<>();
-        SetAndQueue<String> allTreatmentIds = new SetAndQueue<>();
+        SetAndQueueInterface<String> allPatientNames = new SetAndQueue<>();
+        SetAndQueueInterface<String> allDoctorNames = new SetAndQueue<>();
+        SetAndQueueInterface<String> allConsultationIds = new SetAndQueue<>();
+        SetAndQueueInterface<String> allMedicineIds = new SetAndQueue<>();
+        SetAndQueueInterface<String> allTreatmentIds = new SetAndQueue<>();
         
         for (Patient patient : patients) {
             allPatientNames.add(patient.getName());
@@ -735,10 +735,10 @@ public class HospitalReportGenerator {
         report.append("\n=== ADVANCED FINANCIAL ADT ANALYTICS ===\n");
         
         //create sets for financial analysis
-        SetAndQueue<String> highValueMedicines = new SetAndQueue<>();
-        SetAndQueue<String> lowValueMedicines = new SetAndQueue<>();
-        SetAndQueue<String> expensiveCategories = new SetAndQueue<>();
-        SetAndQueue<String> affordableCategories = new SetAndQueue<>();
+        SetAndQueueInterface<String> highValueMedicines = new SetAndQueue<>();
+        SetAndQueueInterface<String> lowValueMedicines = new SetAndQueue<>();
+        SetAndQueueInterface<String> expensiveCategories = new SetAndQueue<>();
+        SetAndQueueInterface<String> affordableCategories = new SetAndQueue<>();
         
         double averagePrice = totalInventoryValue / medicines.length;
         
@@ -889,12 +889,12 @@ public class HospitalReportGenerator {
         report.append("\n=== ADVANCED ADT ANALYTICS ===\n");
         
         //create specialized sets
-        SetAndQueue<String> malePatients = new SetAndQueue<>();
-        SetAndQueue<String> femalePatients = new SetAndQueue<>();
-        SetAndQueue<String> adultPatients = new SetAndQueue<>();
-        SetAndQueue<String> childPatients = new SetAndQueue<>();
-        SetAndQueue<String> availableDoctors = new SetAndQueue<>();
-        SetAndQueue<String> onLeaveDoctors = new SetAndQueue<>();
+        SetAndQueueInterface<String> malePatients = new SetAndQueue<>();
+        SetAndQueueInterface<String> femalePatients = new SetAndQueue<>();
+        SetAndQueueInterface<String> adultPatients = new SetAndQueue<>();
+        SetAndQueueInterface<String> childPatients = new SetAndQueue<>();
+        SetAndQueueInterface<String> availableDoctors = new SetAndQueue<>();
+        SetAndQueueInterface<String> onLeaveDoctors = new SetAndQueue<>();
         
         for (Patient patient : patients) {
             if (patient.getGender().equalsIgnoreCase("Male")) {
@@ -1161,11 +1161,11 @@ public class HospitalReportGenerator {
         report.append("\n=== ADVANCED ADT ANALYTICS ===\n");
         
         //create specialized sets for cross-module analysis
-        SetAndQueue<String> lowStockMedicines = new SetAndQueue<>();
-        SetAndQueue<String> expensiveMedicines = new SetAndQueue<>();
-        SetAndQueue<String> followUpTreatments = new SetAndQueue<>();
-        SetAndQueue<String> urgentTreatments = new SetAndQueue<>();
-        SetAndQueue<String> highValueTransactions = new SetAndQueue<>();
+        SetAndQueueInterface<String> lowStockMedicines = new SetAndQueue<>();
+        SetAndQueueInterface<String> expensiveMedicines = new SetAndQueue<>();
+        SetAndQueueInterface<String> followUpTreatments = new SetAndQueue<>();
+        SetAndQueueInterface<String> urgentTreatments = new SetAndQueue<>();
+        SetAndQueueInterface<String> highValueTransactions = new SetAndQueue<>();
         
         for (Medicine medicine : medicines) {
             if (medicine.getStockQuantity() < 10) {
@@ -1379,7 +1379,7 @@ public class HospitalReportGenerator {
             }
             
             //count unique patients for this doctor
-            SetAndQueue<String> uniquePatients = new SetAndQueue<>();
+            SetAndQueueInterface<String> uniquePatients = new SetAndQueue<>();
             for (Consultation consultation : consultations) {
                 if (consultation.getDoctorId().equals(doctorId)) {
                     uniquePatients.add(consultation.getPatientId());
@@ -1415,12 +1415,12 @@ public class HospitalReportGenerator {
         report.append("\n=== ADVANCED ADT ANALYTICS ===\n");
         
         //create specialized sets for load analysis
-        SetAndQueue<String> highLoadDoctors = new SetAndQueue<>();
-        SetAndQueue<String> lowLoadDoctors = new SetAndQueue<>();
-        SetAndQueue<String> availableDoctors = new SetAndQueue<>();
-        SetAndQueue<String> onLeaveDoctors = new SetAndQueue<>();
-        SetAndQueue<String> cardiologists = new SetAndQueue<>();
-        SetAndQueue<String> emergencyDoctors = new SetAndQueue<>();
+        SetAndQueueInterface<String> highLoadDoctors = new SetAndQueue<>();
+        SetAndQueueInterface<String> lowLoadDoctors = new SetAndQueue<>();
+        SetAndQueueInterface<String> availableDoctors = new SetAndQueue<>();
+        SetAndQueueInterface<String> onLeaveDoctors = new SetAndQueue<>();
+        SetAndQueueInterface<String> cardiologists = new SetAndQueue<>();
+        SetAndQueueInterface<String> emergencyDoctors = new SetAndQueue<>();
         
         //calculate average load
         int totalLoad = consultations.length + treatments.length;
@@ -1649,13 +1649,13 @@ public class HospitalReportGenerator {
         report.append("\n=== ADVANCED ADT ANALYTICS ===\n");
         
         //create specialized sets for patient analysis
-        SetAndQueue<String> frequentPatients = new SetAndQueue<>();
-        SetAndQueue<String> occasionalPatients = new SetAndQueue<>();
-        SetAndQueue<String> malePatients = new SetAndQueue<>();
-        SetAndQueue<String> femalePatients = new SetAndQueue<>();
-        SetAndQueue<String> adultPatients = new SetAndQueue<>();
-        SetAndQueue<String> childPatients = new SetAndQueue<>();
-        SetAndQueue<String> patientsWithFollowUp = new SetAndQueue<>();
+        SetAndQueueInterface<String> frequentPatients = new SetAndQueue<>();
+        SetAndQueueInterface<String> occasionalPatients = new SetAndQueue<>();
+        SetAndQueueInterface<String> malePatients = new SetAndQueue<>();
+        SetAndQueueInterface<String> femalePatients = new SetAndQueue<>();
+        SetAndQueueInterface<String> adultPatients = new SetAndQueue<>();
+        SetAndQueueInterface<String> childPatients = new SetAndQueue<>();
+        SetAndQueueInterface<String> patientsWithFollowUp = new SetAndQueue<>();
         
         //calculate average visits
         int totalVisits = consultations.length + treatments.length;

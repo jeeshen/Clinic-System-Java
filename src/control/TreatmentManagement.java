@@ -9,9 +9,9 @@ import java.text.SimpleDateFormat;
 import java.util.Date;
 
 public class TreatmentManagement {
-    private SetAndQueueInterface<Treatment> treatments;
-    private SetAndQueueInterface<Patient> patients;
-    private SetAndQueueInterface<Doctor> doctors;
+    private SetAndQueueInterface<Treatment> treatments = new SetAndQueue<>();
+    private SetAndQueueInterface<Patient> patients = new SetAndQueue<>();
+    private SetAndQueueInterface<Doctor> doctors = new SetAndQueue<>();
     private SimpleDateFormat dateFormat = new SimpleDateFormat("dd-MM-yyyy");
     
     public TreatmentManagement(SetAndQueueInterface<Treatment> treatments, SetAndQueueInterface<Patient> patients, SetAndQueueInterface<Doctor> doctors) {
@@ -184,7 +184,7 @@ public class TreatmentManagement {
     
     //get treatments by diagnosis using set operations
     public SetAndQueueInterface<Treatment> getTreatmentsByDiagnosisSet(String diagnosis) {
-        SetAndQueue<Treatment> diagnosisTreatments = new SetAndQueue<>();
+        SetAndQueueInterface<Treatment> diagnosisTreatments = new SetAndQueue<>();
         Object[] treatmentArray = treatments.toArray();
         
         for (Object obj : treatmentArray) {
@@ -200,7 +200,7 @@ public class TreatmentManagement {
     
     //get treatments by patient using set operations
     public SetAndQueueInterface<Treatment> getTreatmentsByPatientSet(String patientId) {
-        SetAndQueue<Treatment> patientTreatments = new SetAndQueue<>();
+        SetAndQueueInterface<Treatment> patientTreatments = new SetAndQueue<>();
         Object[] treatmentArray = treatments.toArray();
         
         for (Object obj : treatmentArray) {
@@ -216,7 +216,7 @@ public class TreatmentManagement {
     
     //get treatments by doctor using set operations
     public SetAndQueueInterface<Treatment> getTreatmentsByDoctorSet(String doctorId) {
-        SetAndQueue<Treatment> doctorTreatments = new SetAndQueue<>();
+        SetAndQueueInterface<Treatment> doctorTreatments = new SetAndQueue<>();
         Object[] treatmentArray = treatments.toArray();
         
         for (Object obj : treatmentArray) {
@@ -232,7 +232,7 @@ public class TreatmentManagement {
     
     //get treatments with follow-up using set operations
     public SetAndQueueInterface<Treatment> getTreatmentsWithFollowUpSet() {
-        SetAndQueue<Treatment> followUpTreatments = new SetAndQueue<>();
+        SetAndQueueInterface<Treatment> followUpTreatments = new SetAndQueue<>();
         Object[] treatmentArray = treatments.toArray();
         
         for (Object obj : treatmentArray) {
@@ -287,7 +287,7 @@ public class TreatmentManagement {
     //get urgent treatments (specific diagnoses + follow-up required)
     public SetAndQueueInterface<Treatment> getUrgentTreatments() {
         String[] urgentDiagnoses = {"emergency", "critical", "acute", "severe"};
-        SetAndQueue<Treatment> urgentDiagnosisTreatments = new SetAndQueue<>();
+        SetAndQueueInterface<Treatment> urgentDiagnosisTreatments = new SetAndQueue<>();
         
         Object[] treatmentArray = treatments.toArray();
         for (Object obj : treatmentArray) {
@@ -308,7 +308,7 @@ public class TreatmentManagement {
     
     //get treatments by medication type
     public SetAndQueueInterface<Treatment> getTreatmentsByMedication(String medication) {
-        SetAndQueue<Treatment> medicationTreatments = new SetAndQueue<>();
+        SetAndQueueInterface<Treatment> medicationTreatments = new SetAndQueue<>();
         Object[] treatmentArray = treatments.toArray();
         
         for (Object obj : treatmentArray) {
@@ -325,8 +325,8 @@ public class TreatmentManagement {
     
     //check if treatment sets are equal
     public boolean areTreatmentSetsEqual(Treatment[] set1, Treatment[] set2) {
-        SetAndQueue<Treatment> queue1 = new SetAndQueue<>();
-        SetAndQueue<Treatment> queue2 = new SetAndQueue<>();
+        SetAndQueueInterface<Treatment> queue1 = new SetAndQueue<>();
+        SetAndQueueInterface<Treatment> queue2 = new SetAndQueue<>();
         
         for (Treatment treatment : set1) {
             queue1.add(treatment);
