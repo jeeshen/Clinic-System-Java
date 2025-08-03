@@ -3,551 +3,270 @@ package control;
 import adt.SetAndQueueInterface;
 import adt.SetAndQueue;
 import entity.Medicine;
-import entity.PharmacyTransaction;
-import java.text.SimpleDateFormat;
-import java.util.Date;
+import dao.DataInitializer;
+import java.util.Scanner;
 
 public class PharmacyManagement {
-    private SetAndQueueInterface<Medicine> medicineInventory = new SetAndQueue<>();
-    private SetAndQueueInterface<PharmacyTransaction> transactions = new SetAndQueue<>();
-    private SetAndQueueInterface<Medicine> dispensingQueue = new SetAndQueue<>(); //queue for medicine dispensing
-    private SimpleDateFormat dateFormat = new SimpleDateFormat("dd-MM-yyyy");
+    private SetAndQueueInterface<Medicine> medicineList = new SetAndQueue<>();
+    private Scanner scanner;
     
-    public PharmacyManagement(SetAndQueueInterface<Medicine> medicineInventory, SetAndQueueInterface<PharmacyTransaction> transactions) {
-        this.medicineInventory = medicineInventory;
-        this.transactions = transactions;
+    public PharmacyManagement() {
+        scanner = new Scanner(System.in);
+        loadSampleData();
     }
     
-    //record medicine dispensing after consultation
-    public boolean dispenseMedicine(String patientId, String consultationId, String[] medicineList, int quantity) {
-        try {
-            for (String medicineId : medicineList) {
-                Medicine medicine = findMedicineById(medicineId);
-                if (medicine != null && medicine.getStockQuantity() >= quantity) {
-                    //create record
-                    PharmacyTransaction transaction = new PharmacyTransaction(generateTransactionId(), patientId, medicineId, quantity, dateFormat.format(new Date()));
-                    transactions.enqueue(transaction);
-                    
-                    //add to dispensing queue for processing
-                    dispensingQueue.enqueue(medicine);
-                    
-                    //update stock - deduct the actual quantity requested
-                    medicine.setStockQuantity(medicine.getStockQuantity() - quantity);
-                    return true;
-                }
-            }
-            return false;
-        } catch (Exception e) {
-            return false;
+    private void loadSampleData() {
+        Medicine[] sampleMedicines = DataInitializer.initializeSampleMedicines();
+        for (Medicine medicine : sampleMedicines) {
+            medicineList.add(medicine);
         }
     }
     
-    //update medicine stock levels
-    public boolean updateMedicineStock(String medicineId, int quantity) {
+    public void displayAllMedicinesSorted() {
+        System.out.println("\n" + repeatString("-", 80));
+        System.out.println("ALL MEDICINES (SORTED BY ID)");
+        System.out.println(repeatString("-", 80));
+        System.out.printf("%-12s %-20s %-15s %-10s %-8s %-10s\n", "ID", "Name", "Brand", "Stock", "Price", "Purpose");
+        System.out.println(repeatString("-", 80));
+        
+        Object[] medicinesArray = medicineList.toArray();
+        Medicine[] medicineArray = new Medicine[medicinesArray.length];
+        for (int i = 0; i < medicinesArray.length; i++) {
+            medicineArray[i] = (Medicine) medicinesArray[i];
+        }
+        
+        utility.BubbleSort.sort(medicineArray);
+        
+        for (Medicine medicine : medicineArray) {
+            System.out.printf("%-12s %-20s %-15s %-10s %-8s %-10s\n", 
+                medicine.getMedicineId(), medicine.getName(), medicine.getBrand(),
+                medicine.getStockQuantity(), "RM " + medicine.getPrice(), medicine.getPurpose());
+        }
+        System.out.println(repeatString("-", 80));
+        System.out.println("Press Enter to continue...");
+        scanner.nextLine();
+    }
+    
+    public void searchMedicineById() {
+        System.out.print("Enter medicine ID to search: ");
+        String medicineId = scanner.nextLine();
+        
+        Medicine foundMedicine = findMedicineById(medicineId);
+        if (foundMedicine != null) {
+            displayMedicineDetails(foundMedicine);
+        } else {
+            System.out.println("Medicine not found!");
+        }
+    }
+    
+    public void searchMedicineByName() {
+        System.out.print("Enter medicine name to search: ");
+        String name = scanner.nextLine();
+        
+        Object[] medicinesArray = medicineList.toArray();
+        System.out.println("\nMedicines with name containing '" + name + "':");
+        System.out.println(repeatString("-", 80));
+        System.out.printf("%-12s %-20s %-15s %-10s %-8s\n", "ID", "Name", "Brand", "Stock", "Price");
+        System.out.println(repeatString("-", 80));
+        
+        boolean found = false;
+        for (Object obj : medicinesArray) {
+            Medicine medicine = (Medicine) obj;
+            if (medicine.getName().toLowerCase().contains(name.toLowerCase())) {
+                System.out.printf("%-12s %-20s %-15s %-10s %-8s\n", 
+                    medicine.getMedicineId(), medicine.getName(), medicine.getBrand(),
+                    medicine.getStockQuantity(), "RM " + medicine.getPrice());
+                found = true;
+            }
+        }
+        
+        if (!found) {
+            System.out.println("No medicines found with this name.");
+        }
+        System.out.println(repeatString("-", 80));
+        System.out.println("Press Enter to continue...");
+        scanner.nextLine();
+    }
+    
+    public void displayMedicineDetails(Medicine medicine) {
+        System.out.println("\n" + "-".repeat(60));
+        System.out.println("MEDICINE DETAILS");
+        System.out.println("-".repeat(60));
+        System.out.println("ID: " + medicine.getMedicineId());
+        System.out.println("Name: " + medicine.getName());
+        System.out.println("Brand: " + medicine.getBrand());
+        System.out.println("Stock Quantity: " + medicine.getStockQuantity());
+        System.out.println("Price: RM " + String.format("%.2f", medicine.getPrice()));
+        System.out.println("Purpose: " + medicine.getPurpose());
+        System.out.println("Active Ingredient: " + medicine.getActiveIngredient());
+        System.out.println("Category: " + medicine.getCategory());
+        System.out.println("Expiry Date: " + medicine.getExpiryDate());
+        System.out.println("-".repeat(60));
+        System.out.println("Press Enter to continue...");
+        scanner.nextLine();
+    }
+    
+    public void updateMedicineStock() {
+        System.out.print("Enter medicine ID to update stock: ");
+        String medicineId = scanner.nextLine();
+        
         Medicine medicine = findMedicineById(medicineId);
         if (medicine != null) {
-            medicine.setStockQuantity(quantity);
-            return true;
+            System.out.println("Current medicine information:");
+            displayMedicineDetails(medicine);
+            
+            System.out.print("Enter new stock quantity: ");
+            int newStock = getUserInputInt(0, 10000);
+            medicine.setStockQuantity(newStock);
+            
+            System.out.println("Medicine stock updated successfully!");
+        } else {
+            System.out.println("Medicine not found!");
         }
-        return false;
     }
     
-    //check current stock for a medicine
-    public int checkMedicineStock(String medicineId) {
-        Medicine medicine = findMedicineById(medicineId);
-        return medicine != null ? medicine.getStockQuantity() : -1;
-    }
-    
-    //add new medicine to inventory
-    public boolean addNewMedicine(Medicine medicineInfo) {
-        if (medicineInfo != null && !medicineInventory.contains(medicineInfo)) {
-            return medicineInventory.add(medicineInfo);
-        }
-        return false;
-    }
-    
-    //remove medicine from inventory
-    public boolean removeMedicine(String medicineId) {
-        Medicine medicine = findMedicineById(medicineId);
-        if (medicine != null) {
-            return medicineInventory.remove(medicine);
-        }
-        return false;
-    }
-    
-    //retrieve list of all medicines in stock
-    public Medicine[] listAllMedicines() {
-        Object[] medicineArray = medicineInventory.toArray();
-        Medicine[] medicines = new Medicine[medicineArray.length];
+    public void generateMedicineStockReport() {
+        System.out.println("\n" + repeatString("=", 60));
+        System.out.println("        MEDICINE STOCK REPORT");
+        System.out.println(repeatString("=", 60));
         
-        for (int i = 0; i < medicineArray.length; i++) {
-            if (medicineArray[i] instanceof Medicine) {
-                medicines[i] = (Medicine) medicineArray[i];
-            }
-        }
-        return medicines;
-    }
-    
-    //search medicines by name, type, or other attributes
-    public Medicine[] searchMedicine(String criteria) {
-        Object[] medicineArray = medicineInventory.toArray();
-        Medicine[] tempResults = new Medicine[medicineArray.length];
-        int count = 0;
+        Object[] medicinesArray = medicineList.toArray();
+        int totalMedicines = medicinesArray.length;
+        int lowStockCount = 0, outOfStockCount = 0;
+        double totalInventoryValue = 0.0;
         
-        for (Object obj : medicineArray) {
-            if (obj instanceof Medicine) {
-                Medicine medicine = (Medicine) obj;
-                if (medicine.getMedicineId().equalsIgnoreCase(criteria) ||
-                    medicine.getName().toLowerCase().contains(criteria.toLowerCase()) ||
-                    medicine.getBrand().toLowerCase().contains(criteria.toLowerCase()) ||
-                    medicine.getCategory().toLowerCase().contains(criteria.toLowerCase()) ||
-                    medicine.getPurpose().toLowerCase().contains(criteria.toLowerCase()) ||
-                    medicine.getActiveIngredient().toLowerCase().contains(criteria.toLowerCase())) {
-                    tempResults[count++] = medicine;
-                }
-            }
+        System.out.println("📊 Stock Status:");
+        for (Object obj : medicinesArray) {
+            Medicine medicine = (Medicine) obj;
+            int stock = medicine.getStockQuantity();
+            double value = stock * medicine.getPrice();
+            totalInventoryValue += value;
+            
+            if (stock == 0) outOfStockCount++;
+            else if (stock <= 10) lowStockCount++;
         }
         
-        Medicine[] results = new Medicine[count];
-        for (int i = 0; i < count; i++) {
-            results[i] = tempResults[i];
-        }
-        return results;
+        System.out.println("• Total Medicines: " + totalMedicines);
+        System.out.println("• Low Stock (≤10): " + lowStockCount);
+        System.out.println("• Out of Stock: " + outOfStockCount);
+        System.out.println("• Total Inventory Value: RM " + String.format("%.2f", totalInventoryValue));
+        
+        System.out.println("\nPress Enter to continue...");
+        scanner.nextLine();
     }
     
-    //create report on medicine stock status
-    public String generateStockReport() {
-        StringBuilder report = new StringBuilder();
-        report.append("=== MEDICINE STOCK REPORT ===\n");
-        report.append("Generated on: ").append(dateFormat.format(new Date())).append("\n\n");
+    public void generateMedicineCategoryReport() {
+        System.out.println("\n" + repeatString("=", 60));
+        System.out.println("        MEDICINE CATEGORY REPORT");
+        System.out.println(repeatString("=", 60));
         
-        Object[] medicineArray = medicineInventory.toArray();
-        int totalMedicines = 0;
-        int lowStockCount = 0;
+        Object[] medicinesArray = medicineList.toArray();
+        java.util.Map<String, Integer> categoryCount = new java.util.HashMap<>();
         
-        for (Object obj : medicineArray) {
-            if (obj instanceof Medicine) {
-                Medicine medicine = (Medicine) obj;
-                totalMedicines++;
-                
-                report.append(String.format("ID: %s | Name: %s | Stock: %d | Price: $%.2f\n", 
-                    medicine.getMedicineId(), medicine.getName(), 
-                    medicine.getStockQuantity(), medicine.getPrice()));
-                
-                if (medicine.getStockQuantity() < 10) {
-                    lowStockCount++;
-                }
-            }
+        for (Object obj : medicinesArray) {
+            Medicine medicine = (Medicine) obj;
+            String purpose = medicine.getPurpose();
+            categoryCount.put(purpose, categoryCount.getOrDefault(purpose, 0) + 1);
         }
         
-        report.append("\n=== SUMMARY ===\n");
-        report.append("Total Medicines: ").append(totalMedicines).append("\n");
-        report.append("Low Stock Items (< 10): ").append(lowStockCount).append("\n");
-        
-        return report.toString();
-    }
-    
-    //suggest medicines with similar effects or therapeutic uses
-    public Medicine[] recommendAlternativeMedicine(String medicineId) {
-        Medicine requestedMedicine = findMedicineById(medicineId);
-        Object[] medicineArray = medicineInventory.toArray();
-        Medicine[] tempAlternatives = new Medicine[medicineArray.length];
-        int count = 0;
-        
-        if (requestedMedicine != null) {
-            for (Object obj : medicineArray) {
-                if (obj instanceof Medicine) {
-                    Medicine medicine = (Medicine) obj;
-                    if (!medicine.getMedicineId().equalsIgnoreCase(medicineId) && 
-                        medicine.getStockQuantity() > 0) {
-                        
-                        // Check for similar purpose, category, or active ingredient
-                        if (medicine.getPurpose().equals(requestedMedicine.getPurpose()) ||
-                            medicine.getCategory().equals(requestedMedicine.getCategory()) ||
-                            medicine.getActiveIngredient().equals(requestedMedicine.getActiveIngredient())) {
-                            tempAlternatives[count++] = medicine;
-                        }
-                    }
-                }
-            }
+        System.out.println("📊 Medicine Categories:");
+        for (java.util.Map.Entry<String, Integer> entry : categoryCount.entrySet()) {
+            System.out.println("• " + entry.getKey() + ": " + entry.getValue() + " medicines");
         }
         
-        Medicine[] alternatives = new Medicine[count];
-        for (int i = 0; i < count; i++) {
-            alternatives[i] = tempAlternatives[i];
-        }
-        return alternatives;
+        System.out.println("\nPress Enter to continue...");
+        scanner.nextLine();
     }
     
-    //modify pricing details of medicines in stock
-    public boolean updateMedicinePrice(String medicineId, double newPrice) {
-        Medicine medicine = findMedicineById(medicineId);
-        if (medicine != null && newPrice >= 0) {
-            medicine.setPrice(newPrice);
-            return true;
-        }
-        return false;
-    }
-    
-    //get next medicine to be dispensed
-    public Medicine getNextMedicineToDispense() {
-        return dispensingQueue.getFront();
-    }
-    
-    //process next medicine dispensing (dequeue)
-    public Medicine processNextMedicineDispensing() {
-        return dispensingQueue.dequeue();
-    }
-    
-    //check if dispensing queue is empty
-    public boolean isDispensingQueueEmpty() {
-        return dispensingQueue.isQueueEmpty();
-    }
-    
-    //clear dispensing queue
-    public void clearDispensingQueue() {
-        dispensingQueue.clearQueue();
-    }
-    
-    //get dispensing queue size
-    public int getDispensingQueueSize() {
-        return dispensingQueue.size();
-    }
-
-    //get medicines by category using set operations
-    public SetAndQueueInterface<Medicine> getMedicinesByCategorySet(String category) {
-        SetAndQueueInterface<Medicine> categoryMedicines = new SetAndQueue<>();
-        Object[] medicineArray = medicineInventory.toArray();
+    public void generateMedicinePriceAnalysis() {
+        System.out.println("\n" + repeatString("=", 60));
+        System.out.println("        MEDICINE PRICE ANALYSIS");
+        System.out.println(repeatString("=", 60));
         
-        for (Object obj : medicineArray) {
-            if (obj instanceof Medicine) {
-                Medicine medicine = (Medicine) obj;
-                if (medicine.getCategory().toLowerCase().contains(category.toLowerCase())) {
-                    categoryMedicines.add(medicine);
-                }
-            }
-        }
-        return categoryMedicines;
-    }
-    
-    //get medicines by purpose using set operations
-    public SetAndQueueInterface<Medicine> getMedicinesByPurposeSet(String purpose) {
-        SetAndQueueInterface<Medicine> purposeMedicines = new SetAndQueue<>();
-        Object[] medicineArray = medicineInventory.toArray();
+        Object[] medicinesArray = medicineList.toArray();
+        double totalValue = 0.0, minPrice = Double.MAX_VALUE, maxPrice = 0.0;
         
-        for (Object obj : medicineArray) {
-            if (obj instanceof Medicine) {
-                Medicine medicine = (Medicine) obj;
-                if (medicine.getPurpose().toLowerCase().contains(purpose.toLowerCase())) {
-                    purposeMedicines.add(medicine);
-                }
-            }
-        }
-        return purposeMedicines;
-    }
-    
-    //get low stock medicines using set operations
-    public SetAndQueueInterface<Medicine> getLowStockMedicinesSet() {
-        SetAndQueueInterface<Medicine> lowStockMedicines = new SetAndQueue<>();
-        Object[] medicineArray = medicineInventory.toArray();
-        
-        for (Object obj : medicineArray) {
-            if (obj instanceof Medicine) {
-                Medicine medicine = (Medicine) obj;
-                if (medicine.getStockQuantity() < 10) {
-                    lowStockMedicines.add(medicine);
-                }
-            }
-        }
-        return lowStockMedicines;
-    }
-    
-    //get medicines in stock using set operations
-    public SetAndQueueInterface<Medicine> getMedicinesInStockSet() {
-        SetAndQueueInterface<Medicine> inStockMedicines = new SetAndQueue<>();
-        Object[] medicineArray = medicineInventory.toArray();
-        
-        for (Object obj : medicineArray) {
-            if (obj instanceof Medicine) {
-                Medicine medicine = (Medicine) obj;
-                if (medicine.getStockQuantity() > 0) {
-                    inStockMedicines.add(medicine);
-                }
-            }
-        }
-        return inStockMedicines;
-    }
-    
-    //union: medicines by category OR by purpose
-    public SetAndQueueInterface<Medicine> getMedicinesByCategoryOrPurpose(String category, String purpose) {
-        SetAndQueueInterface<Medicine> categoryMedicines = getMedicinesByCategorySet(category);
-        SetAndQueueInterface<Medicine> purposeMedicines = getMedicinesByPurposeSet(purpose);
-        return categoryMedicines.union(purposeMedicines);
-    }
-    
-    //intersection: medicines by category AND by purpose
-    public SetAndQueueInterface<Medicine> getMedicinesByCategoryAndPurpose(String category, String purpose) {
-        SetAndQueueInterface<Medicine> categoryMedicines = getMedicinesByCategorySet(category);
-        SetAndQueueInterface<Medicine> purposeMedicines = getMedicinesByPurposeSet(purpose);
-        return categoryMedicines.intersection(purposeMedicines);
-    }
-    
-    //difference: medicines by category but NOT low stock
-    public SetAndQueueInterface<Medicine> getMedicinesByCategoryNotLowStock(String category) {
-        SetAndQueueInterface<Medicine> categoryMedicines = getMedicinesByCategorySet(category);
-        SetAndQueueInterface<Medicine> lowStockMedicines = getLowStockMedicinesSet();
-        return categoryMedicines.difference(lowStockMedicines);
-    }
-    
-    //check if all medicines in category are in stock (subset operation)
-    public boolean areAllCategoryMedicinesInStock(String category) {
-        SetAndQueueInterface<Medicine> categoryMedicines = getMedicinesByCategorySet(category);
-        SetAndQueueInterface<Medicine> inStockMedicines = getMedicinesInStockSet();
-        return categoryMedicines.isSubsetOf(inStockMedicines);
-    }
-    
-    //get medicines with multiple criteria using intersection
-    public SetAndQueueInterface<Medicine> getMedicinesWithMultipleCriteria(String category, String purpose, boolean inStock) {
-        SetAndQueueInterface<Medicine> categoryMedicines = getMedicinesByCategorySet(category);
-        SetAndQueueInterface<Medicine> purposeMedicines = getMedicinesByPurposeSet(purpose);
-        SetAndQueueInterface<Medicine> stockMedicines = inStock ? getMedicinesInStockSet() : getLowStockMedicinesSet();
-        
-        SetAndQueueInterface<Medicine> temp = categoryMedicines.intersection(purposeMedicines);
-        return temp.intersection(stockMedicines);
-    }
-    
-    //get essential medicines (specific categories + in stock)
-    public SetAndQueueInterface<Medicine> getEssentialMedicines() {
-        String[] essentialCategories = {"antibiotic", "painkiller", "antiviral", "emergency"};
-        SetAndQueueInterface<Medicine> essentialCategoryMedicines = new SetAndQueue<>();
-        
-        Object[] medicineArray = medicineInventory.toArray();
-        for (Object obj : medicineArray) {
-            if (obj instanceof Medicine) {
-                Medicine medicine = (Medicine) obj;
-                for (String essentialCategory : essentialCategories) {
-                    if (medicine.getCategory().toLowerCase().contains(essentialCategory.toLowerCase())) {
-                        essentialCategoryMedicines.add(medicine);
-                        break;
-                    }
-                }
-            }
+        for (Object obj : medicinesArray) {
+            Medicine medicine = (Medicine) obj;
+            double price = medicine.getPrice();
+            totalValue += price * medicine.getStockQuantity();
+            if (price < minPrice) minPrice = price;
+            if (price > maxPrice) maxPrice = price;
         }
         
-        SetAndQueueInterface<Medicine> inStockMedicines = getMedicinesInStockSet();
-        return essentialCategoryMedicines.intersection(inStockMedicines);
+        System.out.println("📊 Price Analysis:");
+        System.out.println("• Minimum Price: RM " + String.format("%.2f", minPrice));
+        System.out.println("• Maximum Price: RM " + String.format("%.2f", maxPrice));
+        System.out.println("• Total Inventory Value: RM " + String.format("%.2f", totalValue));
+        
+        System.out.println("\nPress Enter to continue...");
+        scanner.nextLine();
     }
     
-    //get medicines by price range
-    public SetAndQueueInterface<Medicine> getMedicinesByPriceRange(double minPrice, double maxPrice) {
-        SetAndQueueInterface<Medicine> priceRangeMedicines = new SetAndQueue<>();
-        Object[] medicineArray = medicineInventory.toArray();
+    public void generateComprehensivePharmacyReport() {
+        System.out.println("\n" + repeatString("=", 60));
+        System.out.println("        COMPREHENSIVE PHARMACY REPORT");
+        System.out.println(repeatString("=", 60));
         
-        for (Object obj : medicineArray) {
-            if (obj instanceof Medicine) {
-                Medicine medicine = (Medicine) obj;
-                if (medicine.getPrice() >= minPrice && medicine.getPrice() <= maxPrice) {
-                    priceRangeMedicines.add(medicine);
-                }
-            }
-        }
-        return priceRangeMedicines;
-    }
-    
-    //check if medicine sets are equal
-    public boolean areMedicineSetsEqual(Medicine[] set1, Medicine[] set2) {
-        SetAndQueueInterface<Medicine> queue1 = new SetAndQueue<>();
-        SetAndQueueInterface<Medicine> queue2 = new SetAndQueue<>();
+        Object[] medicinesArray = medicineList.toArray();
+        int totalMedicines = medicinesArray.length;
+        int totalStock = 0;
+        double totalValue = 0.0;
         
-        for (Medicine medicine : set1) {
-            queue1.add(medicine);
-        }
-        for (Medicine medicine : set2) {
-            queue2.add(medicine);
+        for (Object obj : medicinesArray) {
+            Medicine medicine = (Medicine) obj;
+            totalStock += medicine.getStockQuantity();
+            totalValue += medicine.getPrice() * medicine.getStockQuantity();
         }
         
-        return queue1.isEqual(queue2);
+        System.out.println("📊 Pharmacy Overview:");
+        System.out.println("• Total Medicines: " + totalMedicines);
+        System.out.println("• Total Stock Items: " + totalStock);
+        System.out.println("• Total Inventory Value: RM " + String.format("%.2f", totalValue));
+        System.out.println("• Average Stock per Medicine: " + String.format("%.1f", (double)totalStock/totalMedicines));
+        
+        System.out.println("\nPress Enter to continue...");
+        scanner.nextLine();
     }
     
-    //get medicine inventory statistics using set operations
-    public String getMedicineInventoryStatistics() {
-        StringBuilder stats = new StringBuilder();
-        stats.append("=== MEDICINE INVENTORY STATISTICS ===\n");
-        
-        SetAndQueueInterface<Medicine> lowStockMedicines = getLowStockMedicinesSet();
-        SetAndQueueInterface<Medicine> inStockMedicines = getMedicinesInStockSet();
-        SetAndQueueInterface<Medicine> essentialMedicines = getEssentialMedicines();
-        
-        stats.append("Low Stock Medicines: ").append(lowStockMedicines.size()).append("\n");
-        stats.append("Medicines In Stock: ").append(inStockMedicines.size()).append("\n");
-        stats.append("Essential Medicines: ").append(essentialMedicines.size()).append("\n");
-        
-        //union of in stock and essential medicines
-        SetAndQueueInterface<Medicine> priorityMedicines = inStockMedicines.union(essentialMedicines);
-        stats.append("Priority Medicines (In Stock OR Essential): ").append(priorityMedicines.size()).append("\n");
-        
-        return stats.toString();
-    }
-    
-    //get medicine by ID
-    private Medicine findMedicineById(String medicineId) {
-        Object[] medicineArray = medicineInventory.toArray();
-        
-        for (Object obj : medicineArray) {
-            if (obj instanceof Medicine) {
-                Medicine medicine = (Medicine) obj;
-                if (medicine.getMedicineId().equalsIgnoreCase(medicineId)) {
-                    return medicine;
-                }
+    public Medicine findMedicineById(String medicineId) {
+        Object[] medicinesArray = medicineList.toArray();
+        for (Object obj : medicinesArray) {
+            Medicine medicine = (Medicine) obj;
+            if (medicine.getMedicineId().equals(medicineId)) {
+                return medicine;
             }
         }
         return null;
     }
     
-    //check if medicine ID already exists
-    public boolean medicineIdExists(String medicineId) {
-        return findMedicineById(medicineId) != null;
+    public Object[] getAllMedicines() {
+        return medicineList.toArray();
     }
     
-    //generate unique transaction ID
-    private String generateTransactionId() {
-        return "TXN" + System.currentTimeMillis();
-    }
-    
-    //get low stock medicines (stock < 10)
-    public Medicine[] getLowStockMedicines() {
-        Object[] medicineArray = medicineInventory.toArray();
-        Medicine[] tempLowStock = new Medicine[medicineArray.length];
-        int count = 0;
-        
-        for (Object obj : medicineArray) {
-            if (obj instanceof Medicine) {
-                Medicine medicine = (Medicine) obj;
-                if (medicine.getStockQuantity() < 10) {
-                    tempLowStock[count++] = medicine;
-                }
+    private int getUserInputInt(int min, int max) {
+        int input;
+        do {
+            while (!scanner.hasNextInt()) {
+                System.out.print("Invalid input! Please enter a number between " + min + " and " + max + ": ");
+                scanner.next();
             }
-        }
-        
-        Medicine[] lowStockMedicines = new Medicine[count];
-        for (int i = 0; i < count; i++) {
-            lowStockMedicines[i] = tempLowStock[i];
-        }
-        return lowStockMedicines;
-    }   
-    
-    //get medicines expiring soon (within 30 days)
-    public Medicine[] getExpiringMedicines() {
-        Object[] medicineArray = medicineInventory.toArray();
-        Medicine[] tempExpiring = new Medicine[medicineArray.length];
-        int count = 0;
-        
-        for (Object obj : medicineArray) {
-            if (obj instanceof Medicine) {
-                Medicine medicine = (Medicine) obj;
-                //sample check for expiry date
-                if (medicine.getExpiryDate() != null && 
-                    medicine.getExpiryDate().contains("2024")) {
-                    tempExpiring[count++] = medicine;
-                }
+            input = scanner.nextInt();
+            scanner.nextLine();
+            
+            if (input < min || input > max) {
+                System.out.print("Please enter a number between " + min + " and " + max + ": ");
             }
-        }
+        } while (input < min || input > max);
         
-        Medicine[] expiringMedicines = new Medicine[count];
-        for (int i = 0; i < count; i++) {
-            expiringMedicines[i] = tempExpiring[i];
-        }
-        return expiringMedicines;
+        return input;
     }
-    
-    //get total inventory value
-    public double getTotalInventoryValue() {
-        double totalValue = 0.0;
-        Object[] medicineArray = medicineInventory.toArray();
-        
-        for (Object obj : medicineArray) {
-            if (obj instanceof Medicine) {
-                Medicine medicine = (Medicine) obj;
-                totalValue += medicine.getPrice() * medicine.getStockQuantity();
-            }
-        }
-        return totalValue;
-    }
-    
-    //check if medicine inventory is empty
-    public boolean isMedicineInventoryEmpty() {
-        return medicineInventory.isEmpty();
-    }
-    
-    //clear all medicines
-    public void clearAllMedicines() {
-        medicineInventory.clearSet();
-        dispensingQueue.clearQueue();
-    }
-    
-    //get total number of medicines
-    public int getTotalMedicineCount() {
-        return medicineInventory.size();
-    }
-    
-    //check if all medicines contain specific category
-    public boolean containsAllMedicinesWithCategory(String category) {
-        SetAndQueueInterface<Medicine> allMedicines = new SetAndQueue<>();
-        Object[] medicineArray = medicineInventory.toArray();
-        for (Object obj : medicineArray) {
-            if (obj instanceof Medicine) {
-                allMedicines.add((Medicine) obj);
-            }
-        }
-        
-        SetAndQueueInterface<Medicine> categoryMedicines = getMedicinesByCategorySet(category);
-        return allMedicines.containsAll(categoryMedicines);
-    }
-    
-    //enhanced stock report with ADT analytics
-    public String generateEnhancedStockReport() {
-        StringBuilder report = new StringBuilder();
-        report.append("=== ENHANCED MEDICINE STOCK REPORT ===\n");
-        report.append("Generated on: ").append(dateFormat.format(new Date())).append("\n\n");
-        
-        Object[] medicineArray = medicineInventory.toArray();
-        int totalMedicines = 0;
-        int lowStockCount = 0;
-        
-        for (Object obj : medicineArray) {
-            if (obj instanceof Medicine) {
-                Medicine medicine = (Medicine) obj;
-                totalMedicines++;
-                
-                report.append(String.format("ID: %s | Name: %s | Stock: %d | Price: $%.2f\n", 
-                    medicine.getMedicineId(), medicine.getName(), 
-                    medicine.getStockQuantity(), medicine.getPrice()));
-                
-                if (medicine.getStockQuantity() < 10) {
-                    lowStockCount++;
-                }
-            }
-        }
-        
-        report.append("\n=== SUMMARY ===\n");
-        report.append("Total Medicines: ").append(totalMedicines).append("\n");
-        report.append("Low Stock Items (< 10): ").append(lowStockCount).append("\n");
 
-        report.append("\n=== ADVANCED ADT ANALYTICS ===\n");
-        report.append("Dispensing Queue Size: ").append(getDispensingQueueSize()).append("\n");
-        report.append("Queue Empty: ").append(isDispensingQueueEmpty() ? "Yes" : "No").append("\n");
-        
-        SetAndQueueInterface<Medicine> essentialMedicines = getEssentialMedicines();
-        report.append("Essential Medicines: ").append(essentialMedicines.size()).append("\n");
-        
-        SetAndQueueInterface<Medicine> inStockOrEssential = getMedicinesInStockSet().union(getEssentialMedicines());
-        report.append("In Stock OR Essential: ").append(inStockOrEssential.size()).append("\n");
-        
-        SetAndQueueInterface<Medicine> inStockAndEssential = getMedicinesInStockSet().intersection(getEssentialMedicines());
-        report.append("In Stock AND Essential: ").append(inStockAndEssential.size()).append("\n");
-        
-        report.append(getMedicineInventoryStatistics());
-        
-        return report.toString();
+    private String repeatString(String str, int count) {
+        StringBuilder sb = new StringBuilder();
+        for (int i = 0; i < count; i++) {
+            sb.append(str);
+        }
+        return sb.toString();
     }
 }

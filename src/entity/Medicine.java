@@ -1,7 +1,7 @@
 package entity;
 
 //pharmarcy module
-public class Medicine {
+public class Medicine implements Comparable<Medicine> {
     private String medicineId;
     private String name;
     private String brand;
@@ -129,5 +129,10 @@ public class Medicine {
                 java.util.Objects.equals(purpose, medicine.purpose) &&
                 java.util.Objects.equals(activeIngredient, medicine.activeIngredient) &&
                 java.util.Objects.equals(category, medicine.category);
+    }
+    
+    @Override
+    public int compareTo(Medicine other) {
+        return this.medicineId.compareTo(other.medicineId);
     }
 }

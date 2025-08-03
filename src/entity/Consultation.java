@@ -1,6 +1,6 @@
 package entity;
 
-public class Consultation {
+public class Consultation implements Comparable<Consultation> {
     private String consultationId;
     private String patientId;
     private String doctorId;
@@ -104,5 +104,10 @@ public class Consultation {
                 java.util.Objects.equals(status, that.status) &&
                 java.util.Objects.equals(notes, that.notes) &&
                 java.util.Objects.equals(nextAppointmentDate, that.nextAppointmentDate);
+    }
+    
+    @Override
+    public int compareTo(Consultation other) {
+        return this.consultationId.compareTo(other.consultationId);
     }
 }

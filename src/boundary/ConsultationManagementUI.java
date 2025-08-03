@@ -3,433 +3,102 @@ package boundary;
 import control.ConsultationManagement;
 import control.PatientManagement;
 import control.DoctorManagement;
-import entity.Consultation;
-import entity.Patient;
-import entity.Doctor;
-import utility.StringUtility;
+import control.TreatmentManagement;
 import java.util.Scanner;
-import utility.InputValidator;
 
 public class ConsultationManagementUI {
-    private Scanner scanner;
     private ConsultationManagement consultationManagement;
     private PatientManagement patientManagement;
     private DoctorManagement doctorManagement;
+    private TreatmentManagement treatmentManagement;
+    private Scanner scanner;
     
-    public ConsultationManagementUI(ConsultationManagement consultationManagement, PatientManagement patientManagement, DoctorManagement doctorManagement) {
-        this.scanner = new Scanner(System.in);
+    public ConsultationManagementUI(ConsultationManagement consultationManagement) {
         this.consultationManagement = consultationManagement;
-        this.patientManagement = patientManagement;
-        this.doctorManagement = doctorManagement;
+        this.scanner = new Scanner(System.in);
     }
     
-    public void displayMainMenu() {
-        while (true) {
-            System.out.println("\n=== CONSULTATION MANAGEMENT SYSTEM ===");
-            System.out.println("1  . Schedule New Consultation");
-            System.out.println("2  . Update Consultation Status");
-            System.out.println("3  . Update Consultation Notes");
-            System.out.println("4  . Schedule Follow-up Appointment");
-            System.out.println("5  . List All Consultations");
-            System.out.println("6  . View Consultations by Status");
-            System.out.println("7  . View Consultations by Doctor");
-            System.out.println("8  . View Consultations by Patient");
-            System.out.println("9  . View Scheduled Consultations");
-            System.out.println("10 . View Completed Consultations");
-            System.out.println("11 . Generate Consultation Report");
-            System.out.println("0  . Return to Main Menu");
+    public void setDependencies(PatientManagement patientManagement, DoctorManagement doctorManagement, TreatmentManagement treatmentManagement) {
+        this.patientManagement = patientManagement;
+        this.doctorManagement = doctorManagement;
+        this.treatmentManagement = treatmentManagement;
+    }
+    
+    public void conductConsultation() {
+        if (patientManagement == null || doctorManagement == null || treatmentManagement == null) {
+            System.out.println("Error: Dependencies not set!");
+            return;
+        }
+        consultationManagement.conductConsultation(patientManagement, doctorManagement, treatmentManagement);
+    }
+    
+    public void manageConsultationHistory() {
+        boolean back = false;
+        while (!back) {
+            System.out.println("\n" + repeatString("=", 50));
+            System.out.println("        CONSULTATION HISTORY MANAGEMENT");
+            System.out.println(repeatString("=", 50));
+            System.out.println("1 . View All Consultations (Sorted by Date)");
+            System.out.println("2 . Search Consultation by ID");
+            System.out.println("3 . Search Consultations by Doctor");
+            System.out.println("4 . Search Consultations by Patient");
+            System.out.println("5 . Consultation Statistics Report");
+            System.out.println("6 . Doctor Performance Report");
+            System.out.println("0 . Back to Main Menu");
+            System.out.println(repeatString("-", 50));
             System.out.print("Enter your choice: ");
             
-            int choice = InputValidator.getValidInt(scanner, 0, 11, "");
+            int choice = getUserInputInt(0, 6);
             
             switch (choice) {
                 case 1:
-                    scheduleConsultationMenu();
+                    consultationManagement.displayAllConsultationsSorted();
                     break;
                 case 2:
-                    updateStatusMenu();
+                    consultationManagement.searchConsultationById();
                     break;
                 case 3:
-                    updateNotesMenu();
+                    consultationManagement.searchConsultationsByDoctor();
                     break;
                 case 4:
-                    scheduleFollowUpMenu();
+                    consultationManagement.searchConsultationsByPatient();
                     break;
                 case 5:
-                    listConsultationsMenu();
+                    consultationManagement.generateConsultationStatisticsReport();
                     break;
                 case 6:
-                    viewByStatusMenu();
-                    break;
-                case 7:
-                    viewByDoctorMenu();
-                    break;
-                case 8:
-                    viewByPatientMenu();
-                    break;
-                case 9:
-                    viewScheduledConsultationsMenu();
-                    break;
-                case 10:
-                    viewCompletedConsultationsMenu();
-                    break;
-                case 11:
-                    generateReportMenu();
+                    consultationManagement.generateDoctorPerformanceReport();
                     break;
                 case 0:
-                    System.out.println("Returning to Main Menu...");
-                    return;
-                default:
-                    System.out.println("Invalid choice. Please try again.");
+                    back = true;
+                    break;
             }
         }
     }
     
-    private void scheduleConsultationMenu() {
-        System.out.println("\n=== SCHEDULE NEW CONSULTATION ===");
-        
-        Consultation consultation = new Consultation();
-        
-        System.out.print("Enter Consultation ID: ");
-        consultation.setConsultationId(scanner.nextLine());
-        
-        //show available patient IDs
-        showAvailablePatientIds();
-        
-        System.out.print("Enter Patient ID: ");
-        String patientId = scanner.nextLine();
-        consultation.setPatientId(patientId);
-        
-        //check if patient exists
-        if (!consultationManagement.patientExists(patientId)) {
-            System.out.println("Patient not found. Please register the patient first.");
-            return;
-        }
-        
-        //show available doctor IDs
-        showAvailableDoctorIds();
-        
-        System.out.print("Enter Doctor ID: ");
-        String doctorId = scanner.nextLine();
-        consultation.setDoctorId(doctorId);
-        
-        //check if doctor exists
-        if (!consultationManagement.doctorExists(doctorId)) {
-            System.out.println("Doctor not found. Please register the doctor first.");
-            return;
-        }
-        
-        System.out.print("Enter Consultation Date (dd-MM-yyyy): ");
-        consultation.setConsultationDate(scanner.nextLine());
-        
-        System.out.print("Enter Status (Scheduled/In Progress/Completed/Cancelled): ");
-        consultation.setStatus(scanner.nextLine());
-        
-        System.out.print("Enter Notes: ");
-        consultation.setNotes(scanner.nextLine());
-        
-        System.out.print("Enter Next Appointment Date (dd-MM-yyyy) or leave empty: ");
-        String nextAppointment = scanner.nextLine();
-        consultation.setNextAppointmentDate(nextAppointment.isEmpty() ? null : nextAppointment);
-        
-        boolean success = consultationManagement.scheduleConsultation(consultation);
-        
-        if (success) {
-            System.out.println("Consultation scheduled successfully!");
-        } else {
-            System.out.println("Failed to schedule consultation. Consultation ID may already exist.");
-        }
-    }
-    
-    private void updateStatusMenu() {
-        System.out.println("\n=== UPDATE CONSULTATION STATUS ===");
-        
-        //show available consultation IDs
-        showAvailableConsultationIds();
-        
-        System.out.print("Enter Consultation ID: ");
-        String consultationId = scanner.nextLine();
-        
-        System.out.print("Enter new Status (Scheduled/In Progress/Completed/Cancelled): ");
-        String status = scanner.nextLine();
-        
-        boolean success = consultationManagement.updateConsultationStatus(consultationId, status);
-        
-        if (success) {
-            System.out.println("Consultation status updated successfully!");
-        } else {
-            System.out.println("Failed to update consultation status. Consultation not found.");
-        }
-    }
-    
-    private void updateNotesMenu() {
-        System.out.println("\n=== UPDATE CONSULTATION NOTES ===");
-        
-        //show available consultation IDs
-        showAvailableConsultationIds();
-        
-        System.out.print("Enter Consultation ID: ");
-        String consultationId = scanner.nextLine();
-        
-        System.out.print("Enter new Notes: ");
-        String notes = scanner.nextLine();
-        
-        boolean success = consultationManagement.updateConsultationNotes(consultationId, notes);
-        
-        if (success) {
-            System.out.println("Consultation notes updated successfully!");
-        } else {
-            System.out.println("Failed to update consultation notes. Consultation not found.");
-        }
-    }
-    
-    private void scheduleFollowUpMenu() {
-        System.out.println("\n=== SCHEDULE FOLLOW-UP APPOINTMENT ===");
-        
-        //show available consultation IDs
-        showAvailableConsultationIds();
-        
-        System.out.print("Enter Consultation ID: ");
-        String consultationId = scanner.nextLine();
-        
-        System.out.print("Enter Follow-up Date (dd-MM-yyyy): ");
-        String followUpDate = scanner.nextLine();
-        
-        boolean success = consultationManagement.scheduleFollowUp(consultationId, followUpDate);
-        
-        if (success) {
-            System.out.println("Follow-up appointment scheduled successfully!");
-        } else {
-            System.out.println("Failed to schedule follow-up appointment. Consultation not found.");
-        }
-    }
-    
-    private void listConsultationsMenu() {
-        System.out.println("\n=== LIST ALL CONSULTATIONS ===");
-        
-        Consultation[] consultations = consultationManagement.getAllConsultations();
-        
-        if (consultations.length == 0) {
-            System.out.println("No consultations found.");
-        } else {
-            System.out.println("ID\t\tPatient ID\tDoctor ID\tDate\t\tStatus\t\tNext Appointment");
-            System.out.println(StringUtility.repeatString("-", 100));
-            for (Consultation consultation : consultations) {
-                System.out.printf("%-10s\t%-10s\t%-10s\t%-10s\t%-15s\t%s\n",
-                    consultation.getConsultationId(),
-                    consultation.getPatientId(),
-                    consultation.getDoctorId(),
-                    consultation.getConsultationDate(),
-                    consultation.getStatus(),
-                    consultation.getNextAppointmentDate() != null ? consultation.getNextAppointmentDate() : "None");
+    private int getUserInputInt(int min, int max) {
+        int input;
+        do {
+            while (!scanner.hasNextInt()) {
+                System.out.print("Invalid input! Please enter a number between " + min + " and " + max + ": ");
+                scanner.next();
             }
-        }
-    }
-    
-    private void viewByStatusMenu() {
-        System.out.println("\n=== VIEW CONSULTATIONS BY STATUS ===");
-        System.out.print("Enter Status to search (Scheduled/In Progress/Completed/Cancelled): ");
-        String status = scanner.nextLine();
-        
-        Consultation[] results = consultationManagement.getConsultationsByStatus(status);
-        
-        if (results.length == 0) {
-            System.out.println("No consultations found with this status.");
-        } else {
-            System.out.println("Consultations with Status: " + status);
-            System.out.println("ID\t\tPatient ID\tDoctor ID\tDate\t\tStatus\t\tNext Appointment");
-            System.out.println(StringUtility.repeatString("-", 100));
-            for (Consultation consultation : results) {
-                System.out.printf("%-10s\t%-10s\t%-10s\t%-10s\t%-15s\t%s\n",
-                    consultation.getConsultationId(),
-                    consultation.getPatientId(),
-                    consultation.getDoctorId(),
-                    consultation.getConsultationDate(),
-                    consultation.getStatus(),
-                    consultation.getNextAppointmentDate() != null ? consultation.getNextAppointmentDate() : "None");
+            input = scanner.nextInt();
+            scanner.nextLine();
+            
+            if (input < min || input > max) {
+                System.out.print("Please enter a number between " + min + " and " + max + ": ");
             }
-        }
+        } while (input < min || input > max);
+        
+        return input;
     }
-    
-    private void viewByDoctorMenu() {
-        System.out.println("\n=== VIEW CONSULTATIONS BY DOCTOR ===");
-        
-        //show available doctor IDs
-        showAvailableDoctorIds();
-        
-        System.out.print("Enter Doctor ID: ");
-        String doctorId = scanner.nextLine();
-        
-        Consultation[] results = consultationManagement.getConsultationsByDoctor(doctorId);
-        
-        if (results.length == 0) {
-            System.out.println("No consultations found for this doctor.");
-        } else {
-            System.out.println("Consultations for Doctor ID: " + doctorId);
-            System.out.println("ID\t\tPatient ID\tDoctor ID\tDate\t\tStatus\t\tNext Appointment");
-            System.out.println(StringUtility.repeatString("-", 100));
-            for (Consultation consultation : results) {
-                System.out.printf("%-10s\t%-10s\t%-10s\t%-10s\t%-15s\t%s\n",
-                    consultation.getConsultationId(),
-                    consultation.getPatientId(),
-                    consultation.getDoctorId(),
-                    consultation.getConsultationDate(),
-                    consultation.getStatus(),
-                    consultation.getNextAppointmentDate() != null ? consultation.getNextAppointmentDate() : "None");
-            }
+
+    private String repeatString(String str, int count) {
+        StringBuilder sb = new StringBuilder();
+        for (int i = 0; i < count; i++) {
+            sb.append(str);
         }
-    }
-    
-    private void viewByPatientMenu() {
-        System.out.println("\n=== VIEW CONSULTATIONS BY PATIENT ===");
-        
-        //show available patient IDs
-        showAvailablePatientIds();
-        
-        System.out.print("Enter Patient ID: ");
-        String patientId = scanner.nextLine();
-        
-        Consultation[] results = consultationManagement.getConsultationsByPatient(patientId);
-        
-        if (results.length == 0) {
-            System.out.println("No consultations found for this patient.");
-        } else {
-            System.out.println("Consultations for Patient ID: " + patientId);
-            System.out.println("ID\t\tPatient ID\tDoctor ID\tDate\t\tStatus\t\tNext Appointment");
-            System.out.println(StringUtility.repeatString("-", 100));
-            for (Consultation consultation : results) {
-                System.out.printf("%-10s\t%-10s\t%-10s\t%-10s\t%-15s\t%s\n",
-                    consultation.getConsultationId(),
-                    consultation.getPatientId(),
-                    consultation.getDoctorId(),
-                    consultation.getConsultationDate(),
-                    consultation.getStatus(),
-                    consultation.getNextAppointmentDate() != null ? consultation.getNextAppointmentDate() : "None");
-            }
-        }
-    }
-    
-    private void viewScheduledConsultationsMenu() {
-        System.out.println("\n=== SCHEDULED CONSULTATIONS ===");
-        
-        Consultation[] scheduledConsultations = consultationManagement.getScheduledConsultations();
-        
-        if (scheduledConsultations.length == 0) {
-            System.out.println("No scheduled consultations found.");
-        } else {
-            System.out.println("Scheduled Consultations:");
-            System.out.println("ID\t\tPatient ID\tDoctor ID\tDate\t\tStatus\t\tNext Appointment");
-            System.out.println(StringUtility.repeatString("-", 100));
-            for (Consultation consultation : scheduledConsultations) {
-                System.out.printf("%-10s\t%-10s\t%-10s\t%-10s\t%-15s\t%s\n",
-                    consultation.getConsultationId(),
-                    consultation.getPatientId(),
-                    consultation.getDoctorId(),
-                    consultation.getConsultationDate(),
-                    consultation.getStatus(),
-                    consultation.getNextAppointmentDate() != null ? consultation.getNextAppointmentDate() : "None");
-            }
-        }
-    }
-    
-    private void viewCompletedConsultationsMenu() {
-        System.out.println("\n=== COMPLETED CONSULTATIONS ===");
-        
-        Consultation[] completedConsultations = consultationManagement.getCompletedConsultations();
-        
-        if (completedConsultations.length == 0) {
-            System.out.println("No completed consultations found.");
-        } else {
-            System.out.println("Completed Consultations:");
-            System.out.println("ID\t\tPatient ID\tDoctor ID\tDate\t\tStatus\t\tNext Appointment");
-            System.out.println(StringUtility.repeatString("-", 100));
-            for (Consultation consultation : completedConsultations) {
-                System.out.printf("%-10s\t%-10s\t%-10s\t%-10s\t%-15s\t%s\n",
-                    consultation.getConsultationId(),
-                    consultation.getPatientId(),
-                    consultation.getDoctorId(),
-                    consultation.getConsultationDate(),
-                    consultation.getStatus(),
-                    consultation.getNextAppointmentDate() != null ? consultation.getNextAppointmentDate() : "None");
-            }
-        }
-    }
-    
-    private void generateReportMenu() {
-        System.out.println("\n=== GENERATE CONSULTATION REPORT ===");
-        
-        String report = consultationManagement.generateConsultationReport();
-        System.out.println(report);
-    }
-    
-    //helper method to display available consultation IDs
-    private void showAvailableConsultationIds() {
-        Consultation[] consultations = consultationManagement.getAllConsultations();
-        
-        if (consultations.length == 0) {
-            System.out.println("No consultations available in the system.");
-            return;
-        }
-        
-        System.out.println("Available Consultation IDs:");
-        System.out.println("ID\t\tPatient ID\tDoctor ID\tDate\t\tStatus");
-        System.out.println(StringUtility.repeatString("-", 80));
-        
-        for (Consultation consultation : consultations) {
-            System.out.printf("%-10s\t%-10s\t%-10s\t%-10s\t%s\n",
-                consultation.getConsultationId(),
-                consultation.getPatientId(),
-                consultation.getDoctorId(),
-                consultation.getConsultationDate(),
-                consultation.getStatus());
-        }
-        System.out.println();
-    }
-    
-    //helper method to display available patient IDs
-    private void showAvailablePatientIds() {
-        Patient[] patients = patientManagement.getAllPatients();
-        
-        if (patients.length == 0) {
-            System.out.println("No patients available in the system.");
-            return;
-        }
-        
-        System.out.println("Available Patient IDs:");
-        System.out.println("ID\t\tName\t\t\tAge\tGender\tContact Number");
-        System.out.println(StringUtility.repeatString("-", 80));
-        
-        for (Patient patient : patients) {
-            System.out.printf("%-10s\t%-20s\t%-5s\t%-8s\t%s\n",
-                patient.getId(),
-                patient.getName(),
-                patient.getAge(),
-                patient.getGender(),
-                patient.getContactNumber());
-        }
-        System.out.println();
-    }
-    
-    //helper method to display available doctor IDs
-    private void showAvailableDoctorIds() {
-        Doctor[] doctors = doctorManagement.getAllDoctors();
-        
-        if (doctors.length == 0) {
-            System.out.println("No doctors available in the system.");
-            return;
-        }
-        
-        System.out.println("Available Doctor IDs:");
-        System.out.println("ID\t\tName\t\t\tSpecialization\t\tContact Number");
-        System.out.println(StringUtility.repeatString("-", 80));
-        
-        for (Doctor doctor : doctors) {
-            System.out.printf("%-10s\t%-20s\t%-20s\t%s\n",
-                doctor.getDoctorId(),
-                doctor.getName(),
-                doctor.getSpecialization(),
-                doctor.getContactNumber());
-        }
-        System.out.println();
+        return sb.toString();
     }
 } 

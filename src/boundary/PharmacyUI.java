@@ -1,398 +1,254 @@
 package boundary;
 
-import entity.Medicine;
 import control.PharmacyManagement;
-import utility.StringUtility;
-import utility.InputValidator;
+import control.TreatmentManagement;
+import entity.Prescription;
+import entity.PrescribedMedicine;
+import entity.Medicine;
 import java.util.Scanner;
 
 public class PharmacyUI {
-    private Scanner scanner;
     private PharmacyManagement pharmacyManagement;
+    private TreatmentManagement treatmentManagement;
+    private Scanner scanner;
     
     public PharmacyUI(PharmacyManagement pharmacyManagement) {
-        this.scanner = new Scanner(System.in);
         this.pharmacyManagement = pharmacyManagement;
+        this.scanner = new Scanner(System.in);
     }
     
-    public void displayMainMenu() {
-        while (true) {
-            System.out.println("\n=== PHARMACY MANAGEMENT SYSTEM ===");
-            System.out.println("1  . Dispense Medicine");
-            System.out.println("2  . Update Medicine Stock");
-            System.out.println("3  . Check Medicine Stock");
-            System.out.println("4  . Add New Medicine");
-            System.out.println("5  . Remove Medicine");
-            System.out.println("6  . List All Medicines");
-            System.out.println("7  . Search Medicine");
-            System.out.println("8  . Generate Stock Report");
-            System.out.println("9  . Recommend Alternative Medicine");
-            System.out.println("10 . Update Medicine Price");
-            System.out.println("11 . View Low Stock Medicines");
-            System.out.println("12 . View Expiring Medicines");
-            System.out.println("13 . View Total Inventory Value");
-            System.out.println("0  . Return to Main Menu");
+    public void setDependencies(TreatmentManagement treatmentManagement) {
+        this.treatmentManagement = treatmentManagement;
+    }
+    
+    public void managePharmacyOperations() {
+        boolean back = false;
+        while (!back) {
+            System.out.println("\n" + repeatString("=", 50));
+            System.out.println("        PHARMACY OPERATIONS MANAGEMENT");
+            System.out.println(repeatString("=", 50));
+            System.out.println("1 . View All Medicines (Sorted by ID)");
+            System.out.println("2 . Search Medicine by ID");
+            System.out.println("3 . Search Medicine by Name");
+            System.out.println("4 . Update Medicine Stock");
+            System.out.println("5 . Dispense Medicines");
+            System.out.println("6 . Medicine Stock Report");
+            System.out.println("7 . Process Payment");
+            System.out.println("0 . Back to Main Menu");
+            System.out.println(repeatString("-", 50));
             System.out.print("Enter your choice: ");
             
-            int choice = InputValidator.getValidInt(scanner, 0, 13, "");
+            int choice = getUserInputInt(0, 7);
             
             switch (choice) {
                 case 1:
-                    dispenseMedicineMenu();
+                    pharmacyManagement.displayAllMedicinesSorted();
                     break;
                 case 2:
-                    updateStockMenu();
+                    pharmacyManagement.searchMedicineById();
                     break;
                 case 3:
-                    checkStockMenu();
+                    pharmacyManagement.searchMedicineByName();
                     break;
                 case 4:
-                    addMedicineMenu();
+                    pharmacyManagement.updateMedicineStock();
                     break;
                 case 5:
-                    removeMedicineMenu();
+                    dispenseMedicines();
                     break;
                 case 6:
-                    listMedicinesMenu();
+                    pharmacyManagement.generateMedicineStockReport();
                     break;
                 case 7:
-                    searchMedicineMenu();
-                    break;
-                case 8:
-                    generateReportMenu();
-                    break;
-                case 9:
-                    recommendAlternativeMenu();
-                    break;
-                case 10:
-                    updatePriceMenu();
-                    break;
-                case 11:
-                    viewLowStockMenu();
-                    break;
-                case 12:
-                    viewExpiringMenu();
-                    break;
-                case 13:
-                    viewInventoryValueMenu();
+                    processPayment();
                     break;
                 case 0:
-                    System.out.println("Returning to Main Menu...");
-                    return;
-                default:
-                    System.out.println("Invalid choice. Please try again.");
+                    back = true;
+                    break;
             }
         }
     }
     
-    private void dispenseMedicineMenu() {
-        System.out.println("\n=== DISPENSE MEDICINE ===");
-        
-        String patientId = InputValidator.getValidString(scanner, "Enter Patient ID: ");
-        String consultationId = InputValidator.getValidString(scanner, "Enter Consultation ID: ");
-        
-        //show available medicine IDs
-        showAvailableMedicineIds();
-        
-        String medicineId = getMedicineId("Enter Medicine ID: ");
-        
-        int dispenseQuantity = InputValidator.getValidQuantity(scanner, "Enter Dispense Quantity: ");
-
-        String[] medicineList = {medicineId};
-        boolean success = pharmacyManagement.dispenseMedicine(patientId, consultationId, medicineList, dispenseQuantity);
-        
-        if (success) {
-            System.out.println("Medicine dispensed successfully!");
-        } else {
-            System.out.println("Failed to dispense medicine. Please check stock availability.");
-        }
-    }
-    
-    private void updateStockMenu() {
-        System.out.println("\n=== UPDATE MEDICINE STOCK ===");
-        
-        //show available medicine IDs
-        showAvailableMedicineIds();
-        
-        String medicineId = getMedicineId("Enter Medicine ID: ");
-        int newStock = InputValidator.getValidInt(scanner, 0, 10000, "Enter new stock quantity: ");
-        
-        boolean success = pharmacyManagement.updateMedicineStock(medicineId, newStock);
-        
-        if (success) {
-            System.out.println("Medicine stock updated successfully!");
-        } else {
-            System.out.println("Failed to update medicine stock. Medicine not found.");
-        }
-    }
-    
-    private void checkStockMenu() {
-        System.out.println("\n=== CHECK MEDICINE STOCK ===");
-        
-        //show available medicine IDs
-        showAvailableMedicineIds();
-        
-        String medicineId = getMedicineId("Enter Medicine ID: ");
-        
-        int stock = pharmacyManagement.checkMedicineStock(medicineId);
-        
-        if (stock >= 0) {
-            System.out.println("Current stock for Medicine ID " + medicineId + ": " + stock + " units");
-        } else {
-            System.out.println("Medicine not found.");
-        }
-    }
-    
-    private void addMedicineMenu() {
-        System.out.println("\n=== ADD NEW MEDICINE ===");
-        
-        Medicine medicine = new Medicine();
-        
-        //get medicine ID with retry for duplicates
-        String medicineId;
-        do {
-            medicineId = InputValidator.getValidString(scanner, "Enter Medicine ID: ");
+    public void generatePharmacyReports() {
+        boolean back = false;
+        while (!back) {
+            System.out.println("\n" + repeatString("=", 50));
+            System.out.println("        PHARMACY REPORTS & INVENTORY");
+            System.out.println(repeatString("=", 50));
+            System.out.println("1 . Medicine Stock Report");
+            System.out.println("2 . Medicine Category Report");
+            System.out.println("3 . Medicine Price Analysis");
+            System.out.println("4 . Dispensing Statistics Report");
+            System.out.println("5 . Inventory Value Report");
+            System.out.println("6 . Comprehensive Pharmacy Report");
+            System.out.println("0 . Back to Main Menu");
+            System.out.println(repeatString("-", 50));
+            System.out.print("Enter your choice: ");
             
-            //check if medicine ID already exists
-            if (pharmacyManagement.medicineIdExists(medicineId)) {
-                System.out.println("Medicine ID '" + medicineId + "' already exists. Please enter a different ID.");
-                continue; //ask for input again
-            }
+            int choice = getUserInputInt(0, 6);
             
-            medicine.setMedicineId(medicineId);
-            break; //exit loop and proceed
-        } while (true);
-        
-        String name = InputValidator.getValidString(scanner, "Enter Medicine Name: ");
-        medicine.setName(name);
-        
-        String brand = InputValidator.getValidString(scanner, "Enter Brand: ");
-        medicine.setBrand(brand);
-        
-        int stock = InputValidator.getValidInt(scanner, 0, 10000, "Enter Stock Quantity: ");
-        medicine.setStockQuantity(stock);
-        
-        double price = InputValidator.getValidPrice(scanner, "Enter Price (RM): ");
-        medicine.setPrice(price);
-        
-        String purpose = InputValidator.getValidString(scanner, "Enter Purpose: ");
-        medicine.setPurpose(purpose);
-        
-        String expiryDate = InputValidator.getValidDate(scanner, "Enter Expiry Date");
-        medicine.setExpiryDate(expiryDate);
-        
-        boolean success = pharmacyManagement.addNewMedicine(medicine);
-        
-        if (success) {
-            System.out.println("Medicine added successfully!");
-        } else {
-            System.out.println("Failed to add medicine. Medicine ID may already exist.");
-        }
-    }
-    
-    private void removeMedicineMenu() {
-        System.out.println("\n=== REMOVE MEDICINE ===");
-        
-        //show available medicine IDs
-        showAvailableMedicineIds();
-        
-        String medicineId = getMedicineId("Enter Medicine ID: ");
-        
-        boolean success = pharmacyManagement.removeMedicine(medicineId);
-        
-        if (success) {
-            System.out.println("Medicine removed successfully!");
-        } else {
-            System.out.println("Failed to remove medicine. Medicine not found.");
-        }
-    }
-    
-    private void listMedicinesMenu() {
-        System.out.println("\n=== LIST ALL MEDICINES ===");
-        
-        Medicine[] medicines = pharmacyManagement.listAllMedicines();
-        
-        if (medicines.length == 0) {
-            System.out.println("No medicines found.");
-        } else {
-            System.out.println("ID\t\tName\t\t\tBrand\t\tStock\tPrice\t\tPurpose");
-            System.out.println(StringUtility.repeatString("-", 80));
-            for (Medicine medicine : medicines) {
-                System.out.printf("%-10s\t%-20s\t%-15s\t%-5d\tRM%.2f\t\t%s\n",
-                    medicine.getMedicineId(),
-                    medicine.getName(),
-                    medicine.getBrand(),
-                    medicine.getStockQuantity(),
-                    medicine.getPrice(),
-                    medicine.getPurpose());
+            switch (choice) {
+                case 1:
+                    pharmacyManagement.generateMedicineStockReport();
+                    break;
+                case 2:
+                    pharmacyManagement.generateMedicineCategoryReport();
+                    break;
+                case 3:
+                    pharmacyManagement.generateMedicinePriceAnalysis();
+                    break;
+                case 4:
+                    generateDispensingStatisticsReport();
+                    break;
+                case 5:
+                    generateInventoryValueReport();
+                    break;
+                case 6:
+                    pharmacyManagement.generateComprehensivePharmacyReport();
+                    break;
+                case 0:
+                    back = true;
+                    break;
             }
         }
     }
     
-    private void searchMedicineMenu() {
-        System.out.println("\n=== SEARCH MEDICINE ===");
-        String searchTerm = InputValidator.getValidString(scanner, "Enter search term (name or ID): ");
-        
-        //convert search term to uppercase for case-insensitive search
-        searchTerm = searchTerm.toUpperCase();
-        
-        Medicine[] results = pharmacyManagement.searchMedicine(searchTerm);
-        
-        if (results.length == 0) {
-            System.out.println("No medicines found.");
-        } else {
-            System.out.println("Search Results:");
-            System.out.println("ID\t\tName\t\t\tBrand\t\tStock\tPrice\t\tPurpose");
-            System.out.println(StringUtility.repeatString("-", 80));
-            for (Medicine medicine : results) {
-                System.out.printf("%-10s\t%-20s\t%-15s\t%-5d\tRM%.2f\t\t%s\n",
-                    medicine.getMedicineId(),
-                    medicine.getName(),
-                    medicine.getBrand(),
-                    medicine.getStockQuantity(),
-                    medicine.getPrice(),
-                    medicine.getPurpose());
-            }
-        }
-    }
-    
-    private void generateReportMenu() {
-        System.out.println("\n=== GENERATE STOCK REPORT ===");
-        
-        String report = pharmacyManagement.generateStockReport();
-        System.out.println(report);
-    }
-    
-    private void recommendAlternativeMenu() {
-        System.out.println("\n=== RECOMMEND ALTERNATIVE MEDICINE ===");
-        
-        //show available medicine IDs
-        showAvailableMedicineIds();
-        
-        String medicineId = getMedicineId("Enter Medicine ID: ");
-        
-        Medicine[] alternatives = pharmacyManagement.recommendAlternativeMedicine(medicineId);
-        
-        if (alternatives.length == 0) {
-            System.out.println("No alternative medicines found.");
-        } else {
-            System.out.println("Alternative Medicines:");
-            System.out.println("ID\t\tName\t\t\tBrand\t\tStock\tPrice\t\tPurpose");
-            System.out.println(StringUtility.repeatString("-", 80));
-            for (Medicine medicine : alternatives) {
-                System.out.printf("%-10s\t%-20s\t%-15s\t%-5d\tRM%.2f\t\t%s\n",
-                    medicine.getMedicineId(),
-                    medicine.getName(),
-                    medicine.getBrand(),
-                    medicine.getStockQuantity(),
-                    medicine.getPrice(),
-                    medicine.getPurpose());
-            }
-        }
-    }
-    
-    private void updatePriceMenu() {
-        System.out.println("\n=== UPDATE MEDICINE PRICE ===");
-        
-        //show available medicine IDs
-        showAvailableMedicineIds();
-        
-        String medicineId = getMedicineId("Enter Medicine ID: ");
-        double newPrice = InputValidator.getValidPrice(scanner, "Enter new price (RM): ");
-        
-        boolean success = pharmacyManagement.updateMedicinePrice(medicineId, newPrice);
-        
-        if (success) {
-            System.out.println("Medicine price updated successfully!");
-        } else {
-            System.out.println("Failed to update medicine price. Medicine not found.");
-        }
-    }
-    
-    private void viewLowStockMenu() {
-        System.out.println("\n=== VIEW LOW STOCK MEDICINES ===");
-        
-        Medicine[] lowStockMedicines = pharmacyManagement.getLowStockMedicines();
-        
-        if (lowStockMedicines.length == 0) {
-            System.out.println("No low stock medicines found.");
-        } else {
-            System.out.println("Low Stock Medicines (< 10 units):");
-            System.out.println("ID\t\tName\t\t\tBrand\t\tStock\tPrice\t\tPurpose");
-            System.out.println(StringUtility.repeatString("-", 80));
-            for (Medicine medicine : lowStockMedicines) {
-                System.out.printf("%-10s\t%-20s\t%-15s\t%-5d\tRM%.2f\t\t%s\n",
-                    medicine.getMedicineId(),
-                    medicine.getName(),
-                    medicine.getBrand(),
-                    medicine.getStockQuantity(),
-                    medicine.getPrice(),
-                    medicine.getPurpose());
-            }
-        }
-    }
-    
-    private void viewExpiringMenu() {
-        System.out.println("\n=== VIEW EXPIRING MEDICINES ===");
-        
-        Medicine[] expiringMedicines = pharmacyManagement.getExpiringMedicines();
-        
-        if (expiringMedicines.length == 0) {
-            System.out.println("No expiring medicines found.");
-        } else {
-            System.out.println("Expiring Medicines:");
-            System.out.println("ID\t\tName\t\t\tBrand\t\tStock\tPrice\t\tExpiry Date");
-            System.out.println(StringUtility.repeatString("-", 80));
-            for (Medicine medicine : expiringMedicines) {
-                System.out.printf("%-10s\t%-20s\t%-15s\t%-5d\tRM%.2f\t\t%s\n",
-                    medicine.getMedicineId(),
-                    medicine.getName(),
-                    medicine.getBrand(),
-                    medicine.getStockQuantity(),
-                    medicine.getPrice(),
-                    medicine.getExpiryDate());
-            }
-        }
-    }
-    
-    private void viewInventoryValueMenu() {
-        System.out.println("\n=== VIEW TOTAL INVENTORY VALUE ===");
-        
-        double totalValue = pharmacyManagement.getTotalInventoryValue();
-        System.out.printf("Total Inventory Value: RM%.2f\n", totalValue);
-    }
-
-    //helper method to get case-insensitive medicine ID input
-    private String getMedicineId(String prompt) {
-        System.out.print(prompt);
-        String input = scanner.nextLine().trim();
-        
-        //convert to uppercase to match the stored format
-        return input.toUpperCase();
-    }
-    
-    //helper method to display available medicine IDs
-    private void showAvailableMedicineIds() {
-        Medicine[] medicines = pharmacyManagement.listAllMedicines();
-        
-        if (medicines.length == 0) {
-            System.out.println("No medicines available in the system.");
+    public void processPayment() {
+        if (treatmentManagement == null) {
+            System.out.println("Treatment management not available!");
             return;
         }
         
-        System.out.println("Available Medicine IDs:");
-        System.out.println("ID\t\tName\t\t\tBrand\t\tStock\tPrice\t\tPurpose");
-        System.out.println(StringUtility.repeatString("-", 80));
-        
-        for (Medicine medicine : medicines) {
-            System.out.printf("%-10s\t%-20s\t%-15s\t%-5d\tRM%.2f\t\t%s\n",
-                medicine.getMedicineId(),
-                medicine.getName(),
-                medicine.getBrand(),
-                medicine.getStockQuantity(),
-                medicine.getPrice(),
-                medicine.getPurpose());
+        treatmentManagement.processPayment();
+    }
+    
+    private void dispenseMedicines() {
+        if (treatmentManagement == null) {
+            System.out.println("Treatment management not available!");
+            return;
         }
-        System.out.println();
+        
+        treatmentManagement.dispenseMedicines();
+    }
+    
+    private void generateDispensingStatisticsReport() {
+        if (treatmentManagement == null) {
+            System.out.println("Treatment management not available!");
+            return;
+        }
+        
+        System.out.println("\n" + repeatString("=", 60));
+        System.out.println("        DISPENSING STATISTICS REPORT");
+        System.out.println(repeatString("=", 60));
+        
+        Object[] prescriptionsArray = treatmentManagement.getAllPrescriptions();
+        int totalPrescriptions = prescriptionsArray.length;
+        int totalMedicines = 0;
+        int dispensedMedicines = 0;
+        double totalRevenue = 0.0;
+        
+        for (Object obj : prescriptionsArray) {
+            Prescription prescription = (Prescription) obj;
+            Object[] prescribedMedicinesArray = prescription.getPrescribedMedicines().toArray();
+            
+            for (Object pmObj : prescribedMedicinesArray) {
+                PrescribedMedicine pm = (PrescribedMedicine) pmObj;
+                totalMedicines++;
+                if (pm.isDispensed()) {
+                    dispensedMedicines++;
+                }
+                if (prescription.isPaid()) {
+                    totalRevenue += pm.getTotalPrice();
+                }
+            }
+        }
+        
+        System.out.println("📊 Dispensing Statistics:");
+        System.out.println("• Total Prescriptions: " + totalPrescriptions);
+        System.out.println("• Total Medicines Prescribed: " + totalMedicines);
+        System.out.println("• Medicines Dispensed: " + dispensedMedicines);
+        System.out.println("• Medicines Pending: " + (totalMedicines - dispensedMedicines));
+        System.out.println("• Dispensing Rate: " + String.format("%.1f", (double)dispensedMedicines/totalMedicines*100) + "%");
+        System.out.println("• Total Revenue from Dispensed Medicines: RM " + String.format("%.2f", totalRevenue));
+        
+        if (totalMedicines > 0) {
+            System.out.println("• Average Medicines per Prescription: " + String.format("%.1f", (double)totalMedicines/totalPrescriptions));
+        }
+        
+        System.out.println("\nPress Enter to continue...");
+        scanner.nextLine();
+    }
+    
+    private void generateInventoryValueReport() {
+        System.out.println("\n" + repeatString("=", 60));
+        System.out.println("        INVENTORY VALUE REPORT");
+        System.out.println(repeatString("=", 60));
+        
+        Object[] medicinesArray = pharmacyManagement.getAllMedicines();
+        double totalInventoryValue = 0.0;
+        int totalItems = 0;
+        int lowStockItems = 0;
+        
+        System.out.println("📊 Inventory Value Analysis:");
+        System.out.println(repeatString("-", 80));
+        System.out.printf("%-20s %-10s %-10s %-15s %-15s\n", "Medicine", "Stock", "Unit Price", "Total Value", "Status");
+        System.out.println(repeatString("-", 80));
+        
+        for (Object obj : medicinesArray) {
+            Medicine medicine = (Medicine) obj;
+            double itemValue = medicine.getStockQuantity() * medicine.getPrice();
+            totalInventoryValue += itemValue;
+            totalItems += medicine.getStockQuantity();
+            
+            String status = medicine.getStockQuantity() <= 10 ? "LOW STOCK" : "OK";
+            if (medicine.getStockQuantity() <= 10) {
+                lowStockItems++;
+            }
+            
+            System.out.printf("%-20s %-10s %-10s %-15s %-15s\n", 
+                medicine.getName(), medicine.getStockQuantity(), 
+                "RM " + String.format("%.2f", medicine.getPrice()),
+                "RM " + String.format("%.2f", itemValue), status);
+        }
+        
+        System.out.println(repeatString("-", 80));
+        System.out.println("\n📈 Summary:");
+        System.out.println("• Total Inventory Value: RM " + String.format("%.2f", totalInventoryValue));
+        System.out.println("• Total Items in Stock: " + totalItems);
+        System.out.println("• Low Stock Items (≤10): " + lowStockItems);
+        System.out.println("• Average Item Value: RM " + String.format("%.2f", totalInventoryValue/totalItems));
+        
+        if (lowStockItems > 0) {
+            System.out.println("\n⚠️  WARNING: " + lowStockItems + " items are running low on stock!");
+        }
+        
+        System.out.println("\nPress Enter to continue...");
+        scanner.nextLine();
+    }
+    
+    private int getUserInputInt(int min, int max) {
+        int input;
+        do {
+            while (!scanner.hasNextInt()) {
+                System.out.print("Invalid input! Please enter a number between " + min + " and " + max + ": ");
+                scanner.next();
+            }
+            input = scanner.nextInt();
+            scanner.nextLine();
+            
+            if (input < min || input > max) {
+                System.out.print("Please enter a number between " + min + " and " + max + ": ");
+            }
+        } while (input < min || input > max);
+        
+        return input;
+    }
+    
+    private String repeatString(String str, int count) {
+        StringBuilder sb = new StringBuilder();
+        for (int i = 0; i < count; i++) {
+            sb.append(str);
+        }
+        return sb.toString();
     }
 }

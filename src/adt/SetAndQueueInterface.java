@@ -12,12 +12,12 @@ public interface SetAndQueueInterface<T> {
     
     public void clearSet();
     public int size();
-    public Object[] toArray();  
+    public Object[] toArray(); //to translate set to array for displaying
     
     public SetAndQueueInterface<T> union(SetAndQueueInterface<T> otherSet);
     public SetAndQueueInterface<T> intersection(SetAndQueueInterface<T> otherSet);
     public SetAndQueueInterface<T> difference(SetAndQueueInterface<T> otherSet);
-    public boolean isSubsetOf(SetAndQueueInterface<T> otherSet);
+    public boolean isSubsetOf(SetAndQueueInterface<T> otherSet); //check if this set is a subset of another set
     
     //queue
     public void enqueue(T newEntry);
@@ -25,4 +25,5 @@ public interface SetAndQueueInterface<T> {
     public T getFront();
     public boolean isQueueEmpty();
     public void clearQueue();
+    public Object[] toQueueArray(); //to translate queue to array for displaying
 }

@@ -1,248 +1,135 @@
 package boundary;
 
-import utility.StringUtility;
+import control.ReportManagement;
+import control.PatientManagement;
+import control.DoctorManagement;
+import control.ConsultationManagement;
+import control.TreatmentManagement;
 import java.util.Scanner;
-import control.HospitalReportGenerator;
 
 public class ReportUI {
+    private ReportManagement reportManagement;
+    private PatientManagement patientManagement;
+    private DoctorManagement doctorManagement;
+    private ConsultationManagement consultationManagement;
+    private TreatmentManagement treatmentManagement;
     private Scanner scanner;
     
-    public ReportUI() {
+    public ReportUI(ReportManagement reportManagement) {
+        this.reportManagement = reportManagement;
         this.scanner = new Scanner(System.in);
     }
     
-    public void displayMainMenu() {
-        while (true) {
-            System.out.println("\n" + StringUtility.repeatString("=", 60));
-            System.out.println("    CHUBBY CLINIC COMPREHENSIVE REPORT SYSTEM");
-            System.out.println(StringUtility.repeatString("=", 60));
-            System.out.println("1  . Patient Management Report");
-            System.out.println("2  . Doctor Management Report");
-            System.out.println("3  . Consultation Management Report");
-            System.out.println("4  . Pharmacy Management Report");
-            System.out.println("5  . Treatment Management Report");
-            System.out.println("6  . System Summary Report");
-            System.out.println("7  . Financial Summary Report");
-            System.out.println("8  . Doctor-Patient Load Report");
-            System.out.println("9  . Patient Consultation & Treatment Summary Report");
-            System.out.println("10 . Generate All Reports");
-            System.out.println("0  . Return to Main Menu");
-            System.out.println(StringUtility.repeatString("-", 60));
+    public void setDependencies(PatientManagement patientManagement, DoctorManagement doctorManagement, ConsultationManagement consultationManagement, TreatmentManagement treatmentManagement) {
+        this.patientManagement = patientManagement;
+        this.doctorManagement = doctorManagement;
+        this.consultationManagement = consultationManagement;
+        this.treatmentManagement = treatmentManagement;
+    }
+    
+    public void generateMedicalReports() {
+        boolean back = false;
+        while (!back) {
+            System.out.println("\n" + repeatString("=", 50));
+            System.out.println("        MEDICAL REPORTS & ANALYTICS");
+            System.out.println(repeatString("=", 50));
+            System.out.println("1 . Patient Statistics Report");
+            System.out.println("2 . Doctor Performance Report");
+            System.out.println("3 . Consultation Statistics Report");
+            System.out.println("4 . Treatment Statistics Report");
+            System.out.println("5 . Diagnosis Analysis Report");
+            System.out.println("6 . Comprehensive Medical Report");
+            System.out.println("0 . Back to Main Menu");
+            System.out.println(repeatString("-", 50));
             System.out.print("Enter your choice: ");
             
-            int choice = getValidChoice(0, 10);
-                
+            int choice = getUserInputInt(0, 6);
+            
             switch (choice) {
                 case 1:
-                    displayPatientReport();
+                    if (patientManagement != null) {
+                        patientManagement.generatePatientStatisticsReport();
+                    } else {
+                        System.out.println("Patient management not available!");
+                    }
                     break;
                 case 2:
-                    displayDoctorReport();
+                    if (consultationManagement != null) {
+                        consultationManagement.generateDoctorPerformanceReport();
+                    } else {
+                        System.out.println("Consultation management not available!");
+                    }
                     break;
                 case 3:
-                    displayConsultationReport();
+                    if (consultationManagement != null) {
+                        consultationManagement.generateConsultationStatisticsReport();
+                    } else {
+                        System.out.println("Consultation management not available!");
+                    }
                     break;
                 case 4:
-                    displayPharmacyReport();
+                    if (treatmentManagement != null) {
+                        treatmentManagement.generateTreatmentStatisticsReport();
+                    } else {
+                        System.out.println("Treatment management not available!");
+                    }
                     break;
                 case 5:
-                    displayTreatmentReport();
+                    if (treatmentManagement != null) {
+                        treatmentManagement.generateDiagnosisAnalysisReport();
+                    } else {
+                        System.out.println("Treatment management not available!");
+                    }
                     break;
                 case 6:
-                    displaySystemSummaryReport();
-                    break;
-                case 7:
-                    displayFinancialReport();
-                    break;
-                case 8:
-                    displayDoctorPatientLoadReport();
-                    break;
-                case 9:
-                    displayPatientConsultationTreatmentSummaryReport();
-                    break;
-                case 10:
-                    generateAllReports();
+                    if (patientManagement != null && doctorManagement != null && 
+                        consultationManagement != null && treatmentManagement != null) {
+                        reportManagement.generateComprehensiveMedicalReport(
+                            patientManagement, doctorManagement, consultationManagement, treatmentManagement);
+                    } else {
+                        System.out.println("All management systems not available!");
+                    }
                     break;
                 case 0:
-                    System.out.println("Returning to Main Menu...");
-                    return;
-                default:
-                    System.out.println("Invalid choice. Please try again.");
+                    back = true;
+                    break;
             }
         }
     }
     
-    private void displayPatientReport() {
-        System.out.println("\n" + StringUtility.repeatString("=", 80));
-        System.out.println("    GENERATING PATIENT MANAGEMENT REPORT");
-        System.out.println(StringUtility.repeatString("=", 80));
-        
-        String report = HospitalReportGenerator.generatePatientReport();
-        System.out.println(report);
-        
-        System.out.println("Press Enter to continue...");
-        scanner.nextLine();
-    }
-    
-    private void displayDoctorReport() {
-        System.out.println("\n" + StringUtility.repeatString("=", 80));
-        System.out.println("    GENERATING DOCTOR MANAGEMENT REPORT");
-        System.out.println(StringUtility.repeatString("=", 80));
-        
-        String report = HospitalReportGenerator.generateDoctorReport();
-        System.out.println(report);
-        
-        System.out.println("Press Enter to continue...");
-        scanner.nextLine();
-    }
-    
-    private void displayConsultationReport() {
-        System.out.println("\n" + StringUtility.repeatString("=", 80));
-        System.out.println("    GENERATING CONSULTATION MANAGEMENT REPORT");
-        System.out.println(StringUtility.repeatString("=", 80));
-        
-        String report = HospitalReportGenerator.generateConsultationReport();
-        System.out.println(report);
-        
-        System.out.println("Press Enter to continue...");
-        scanner.nextLine();
-    }
-    
-    private void displayPharmacyReport() {
-        System.out.println("\n" + StringUtility.repeatString("=", 80));
-        System.out.println("    GENERATING PHARMACY MANAGEMENT REPORT");
-        System.out.println(StringUtility.repeatString("=", 80));
-        
-        String report = HospitalReportGenerator.generatePharmacyReport();
-        System.out.println(report);
-        
-        System.out.println("Press Enter to continue...");
-        scanner.nextLine();
-    }
-    
-    private void displayTreatmentReport() {
-        System.out.println("\n" + StringUtility.repeatString("=", 80));
-        System.out.println("    GENERATING TREATMENT MANAGEMENT REPORT");
-        System.out.println(StringUtility.repeatString("=", 80));
-        
-        String report = HospitalReportGenerator.generateTreatmentReport();
-        System.out.println(report);
-        
-        System.out.println("Press Enter to continue...");
-        scanner.nextLine();
-    }
-    
-    private void displaySystemSummaryReport() {
-        System.out.println("\n" + StringUtility.repeatString("=", 80));
-        System.out.println("    GENERATING SYSTEM SUMMARY REPORT");
-        System.out.println(StringUtility.repeatString("=", 80));
-        
-        String report = HospitalReportGenerator.generateSystemSummaryReport();
-        System.out.println(report);
-        
-        System.out.println("Press Enter to continue...");
-        scanner.nextLine();
-    }
-    
-    private void displayFinancialReport() {
-        System.out.println("\n" + StringUtility.repeatString("=", 80));
-        System.out.println("    GENERATING FINANCIAL SUMMARY REPORT");
-        System.out.println(StringUtility.repeatString("=", 80));
-        
-        String report = HospitalReportGenerator.generateFinancialReport();
-        System.out.println(report);
-        
-        System.out.println("Press Enter to continue...");
-        scanner.nextLine();
-    }
-    
-    private void displayDoctorPatientLoadReport() {
-        System.out.println("\n" + StringUtility.repeatString("=", 80));
-        System.out.println("    GENERATING DOCTOR-PATIENT LOAD REPORT");
-        System.out.println(StringUtility.repeatString("=", 80));
-        
-        String report = HospitalReportGenerator.generateDoctorPatientLoadReport();
-        System.out.println(report);
-        
-        System.out.println("Press Enter to continue...");
-        scanner.nextLine();
-    }
-    
-    private void displayPatientConsultationTreatmentSummaryReport() {
-        System.out.println("\n" + StringUtility.repeatString("=", 80));
-        System.out.println("    GENERATING PATIENT CONSULTATION & TREATMENT SUMMARY REPORT");
-        System.out.println(StringUtility.repeatString("=", 80));
-        
-        String report = HospitalReportGenerator.generatePatientConsultationTreatmentSummaryReport();
-        System.out.println(report);
-        
-        System.out.println("Press Enter to continue...");
-        scanner.nextLine();
-    }
-    
-    private void generateAllReports() {
-        System.out.println("\n" + StringUtility.repeatString("=", 80));
-        System.out.println("    GENERATING ALL COMPREHENSIVE REPORTS");
-        System.out.println(StringUtility.repeatString("=", 80));
-        
-        System.out.println("Generating reports... Please wait...\n");
-        
-        String[] reports = {
-            HospitalReportGenerator.generatePatientReport(),
-            HospitalReportGenerator.generateDoctorReport(),
-            HospitalReportGenerator.generateConsultationReport(),
-            HospitalReportGenerator.generatePharmacyReport(),
-            HospitalReportGenerator.generateTreatmentReport(),
-            HospitalReportGenerator.generateSystemSummaryReport(),
-            HospitalReportGenerator.generateFinancialReport(),
-            HospitalReportGenerator.generateDoctorPatientLoadReport(),
-            HospitalReportGenerator.generatePatientConsultationTreatmentSummaryReport()
-        };
-        
-        String[] reportNames = {
-            "PATIENT MANAGEMENT REPORT",
-            "DOCTOR MANAGEMENT REPORT", 
-            "CONSULTATION MANAGEMENT REPORT",
-            "PHARMACY MANAGEMENT REPORT",
-            "TREATMENT MANAGEMENT REPORT",
-            "SYSTEM SUMMARY REPORT",
-            "FINANCIAL SUMMARY REPORT",
-            "DOCTOR-PATIENT LOAD REPORT",
-            "PATIENT CONSULTATION & TREATMENT SUMMARY REPORT"
-        };
-        
-        for (int i = 0; i < reports.length; i++) {
-            System.out.println("\n" + StringUtility.repeatString("=", 80));
-            System.out.println("    " + reportNames[i]);
-            System.out.println(StringUtility.repeatString("=", 80));
-            System.out.println(reports[i]);
-            
-            if (i < reports.length - 1) {
-                System.out.println("\nPress Enter to view next report...");
-                scanner.nextLine();
-            }
+    public void viewSystemStatus() {
+        if (patientManagement != null && doctorManagement != null && 
+            consultationManagement != null && treatmentManagement != null) {
+            reportManagement.viewSystemStatus(
+                patientManagement, doctorManagement, consultationManagement, treatmentManagement);
+        } else {
+            System.out.println("All management systems not available!");
         }
-        
-        System.out.println("\nAll reports generated successfully!");
-        System.out.println("Press Enter to continue...");
-        scanner.nextLine();
     }
     
-    private int getValidChoice(int min, int max) {
-        int choice;
+    private int getUserInputInt(int min, int max) {
+        int input;
         do {
             while (!scanner.hasNextInt()) {
                 System.out.print("Invalid input! Please enter a number between " + min + " and " + max + ": ");
                 scanner.next();
             }
-            choice = scanner.nextInt();
+            input = scanner.nextInt();
             scanner.nextLine();
             
-            if (choice < min || choice > max) {
+            if (input < min || input > max) {
                 System.out.print("Please enter a number between " + min + " and " + max + ": ");
             }
-        } while (choice < min || choice > max);
+        } while (input < min || input > max);
         
-        return choice;
+        return input;
+    }
+
+    private String repeatString(String str, int count) {
+        StringBuilder sb = new StringBuilder();
+        for (int i = 0; i < count; i++) {
+            sb.append(str);
+        }
+        return sb.toString();
     }
 } 

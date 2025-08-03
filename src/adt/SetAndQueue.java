@@ -28,7 +28,7 @@ public class SetAndQueue<T> implements SetAndQueueInterface<T> {
         //queue
         array = (T[]) new Object[initialCapacity];
         frontIndex = 0;
-        backIndex = 0;
+        backIndex = -1;
         queueSize = 0;
     }
     
@@ -176,7 +176,7 @@ public class SetAndQueue<T> implements SetAndQueueInterface<T> {
     @Override
     public void enqueue(T newEntry) {
         if (!isArrayFull()) {
-          frontIndex = (frontIndex + 1) % array.length; //this is for circular indexing, so we can reuse empty spots
+          backIndex = (backIndex + 1) % array.length; //this is for circular indexing, so we can reuse empty spots
           array[backIndex] = newEntry;
           queueSize++;
         }
@@ -211,6 +211,23 @@ public class SetAndQueue<T> implements SetAndQueueInterface<T> {
         frontIndex = 0;
         backIndex = -1;
         queueSize = 0;
+    }
+    
+    @Override
+    public Object[] toQueueArray() {
+        if (isQueueEmpty()) {
+            return new Object[0];
+        }
+        
+        Object[] result = new Object[queueSize];
+        int currentIndex = frontIndex;
+        
+        for (int i = 0; i < queueSize; i++) {
+            result[i] = array[currentIndex];
+            currentIndex = (currentIndex + 1) % array.length;
+        }
+        
+        return result;
     }
 
     private boolean isArrayFull() {

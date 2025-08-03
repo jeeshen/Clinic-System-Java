@@ -5,476 +5,277 @@ import adt.SetAndQueue;
 import entity.Consultation;
 import entity.Patient;
 import entity.Doctor;
-import java.text.SimpleDateFormat;
-import java.util.Date;
+import java.time.LocalDateTime;
+import java.time.format.DateTimeFormatter;
+import java.util.Scanner;
 
 public class ConsultationManagement {
-    private SetAndQueueInterface<Consultation> consultations = new SetAndQueue<>();
-    private SetAndQueueInterface<Patient> patients = new SetAndQueue<>();
-    private SetAndQueueInterface<Doctor> doctors = new SetAndQueue<>();
-    private SetAndQueueInterface<Consultation> appointmentQueue = new SetAndQueue<>(); //queue for appointments
-    private SimpleDateFormat dateFormat = new SimpleDateFormat("dd-MM-yyyy");
+    private SetAndQueueInterface<Consultation> consultationList = new SetAndQueue<>();
+    private Scanner scanner;
+    private int consultationIdCounter = 2001;
     
-    public ConsultationManagement(SetAndQueueInterface<Consultation> consultations, SetAndQueueInterface<Patient> patients, SetAndQueueInterface<Doctor> doctors) {
-        this.consultations = consultations;
-        this.patients = patients;
-        this.doctors = doctors;
+    public ConsultationManagement() {
+        scanner = new Scanner(System.in);
     }
     
-    //schedule new consultation
-    public boolean scheduleConsultation(Consultation consultation) {
-        if (consultation != null && !consultations.contains(consultation)) {
-            boolean added = consultations.add(consultation);
-            if (added) {
-                //add to appointment queue for scheduling
-                appointmentQueue.enqueue(consultation);
-            }
-            return added;
-        }
-        return false;
-    }
-    
-    //update consultation status
-    public boolean updateConsultationStatus(String consultationId, String status) {
-        Consultation consultation = findConsultationById(consultationId);
-        if (consultation != null) {
-            consultation.setStatus(status);
-            return true;
-        }
-        return false;
-    }
-    
-    //update consultation notes
-    public boolean updateConsultationNotes(String consultationId, String notes) {
-        Consultation consultation = findConsultationById(consultationId);
-        if (consultation != null) {
-            consultation.setNotes(notes);
-            return true;
-        }
-        return false;
-    }
-    
-    //schedule follow-up appointment
-    public boolean scheduleFollowUp(String consultationId, String nextAppointmentDate) {
-        Consultation consultation = findConsultationById(consultationId);
-        if (consultation != null) {
-            consultation.setNextAppointmentDate(nextAppointmentDate);
-            return true;
-        }
-        return false;
-    }
-    
-    //get all consultations
-    public Consultation[] getAllConsultations() {
-        Object[] consultationArray = consultations.toArray();
-        Consultation[] consultationList = new Consultation[consultationArray.length];
-        
-        for (int i = 0; i < consultationArray.length; i++) {
-            if (consultationArray[i] instanceof Consultation) {
-                consultationList[i] = (Consultation) consultationArray[i];
-            }
-        }
-        return consultationList;
-    }
-    
-    //get consultations by status
-    public Consultation[] getConsultationsByStatus(String status) {
-        Object[] consultationArray = consultations.toArray();
-        Consultation[] tempResults = new Consultation[consultationArray.length];
-        int count = 0;
-        
-        for (Object obj : consultationArray) {
-            if (obj instanceof Consultation) {
-                Consultation consultation = (Consultation) obj;
-                if (consultation.getStatus().toLowerCase().contains(status.toLowerCase())) {
-                    tempResults[count++] = consultation;
-                }
-            }
+    public void conductConsultation(PatientManagement patientManagement, DoctorManagement doctorManagement, TreatmentManagement treatmentManagement) {
+        if (doctorManagement.getDoctorsOnDutyCount() == 0) {
+            System.out.println("No doctors on duty! Please add doctors to duty first.");
+            return;
         }
         
-        Consultation[] results = new Consultation[count];
-        for (int i = 0; i < count; i++) {
-            results[i] = tempResults[i];
+        if (patientManagement.isQueueEmpty()) {
+            System.out.println("No patients in waiting queue! Please add patients to queue first.");
+            return;
         }
-        return results;
+        
+        System.out.println("\n=== CONDUCT CONSULTATION ===");
+        
+        // Select doctor
+        System.out.println("Doctors on duty:");
+        Doctor[] doctorsArray = doctorManagement.getDoctorsOnDuty();
+        for (int i = 0; i < doctorsArray.length; i++) {
+            Doctor doctor = doctorsArray[i];
+            System.out.println((i + 1) + ". " + doctor.getName() + " (" + doctor.getSpecialization() + ")");
+        }
+        
+        System.out.print("Select doctor (1-" + doctorsArray.length + "): ");
+        int doctorChoice = getUserInputInt(1, doctorsArray.length);
+        Doctor selectedDoctor = doctorsArray[doctorChoice - 1];
+        
+        // Get next patient from queue
+        Patient currentPatient = patientManagement.getNextPatientFromQueue();
+        if (currentPatient == null) {
+            System.out.println("Error: No patient available in queue!");
+            return;
+        }
+        currentPatient.setIsInWaiting(false);
+        currentPatient.setCurrentStatus("in consultation");
+        
+        System.out.println("\nConsulting with patient: " + currentPatient.getName());
+        System.out.println("Doctor: " + selectedDoctor.getName());
+        
+        // Get diagnosis
+        System.out.print("Enter diagnosis: ");
+        String diagnosis = scanner.nextLine();
+        
+        // Create consultation
+        String consultationId = "CONS" + consultationIdCounter++;
+        String consultationDate = LocalDateTime.now().format(DateTimeFormatter.ofPattern("yyyy-MM-dd HH:mm"));
+        
+        Consultation consultation = new Consultation(consultationId, 
+                                                 String.valueOf(currentPatient.getId()),
+                                                 selectedDoctor.getDoctorId(),
+                                                 consultationDate, "completed", diagnosis, "");
+        
+        consultationList.add(consultation);
+        
+        // Create prescription through treatment management
+        treatmentManagement.createPrescription(consultationId, currentPatient, selectedDoctor, diagnosis, consultationDate);
+        
+        currentPatient.setCurrentStatus("consulted");
+        
+        System.out.println("\nConsultation completed successfully!");
+        System.out.println("Consultation ID: " + consultationId);
     }
     
-    //get consultations by doctor
-    public Consultation[] getConsultationsByDoctor(String doctorId) {
-        Object[] consultationArray = consultations.toArray();
-        Consultation[] tempResults = new Consultation[consultationArray.length];
-        int count = 0;
+    public void displayAllConsultationsSorted() {
+        System.out.println("\n" + repeatString("-", 80));
+        System.out.println("ALL CONSULTATIONS (SORTED BY DATE)");
+        System.out.println(repeatString("-", 80));
+        System.out.printf("%-15s %-10s %-10s %-20s %-15s\n", "Consultation ID", "Patient ID", "Doctor ID", "Date", "Status");
+        System.out.println(repeatString("-", 80));
         
-        for (Object obj : consultationArray) {
-            if (obj instanceof Consultation) {
-                Consultation consultation = (Consultation) obj;
-                if (consultation.getDoctorId().equals(doctorId)) {
-                    tempResults[count++] = consultation;
-                }
-            }
+        Object[] consultationsArray = consultationList.toArray();
+        Consultation[] consultationArray = new Consultation[consultationsArray.length];
+        for (int i = 0; i < consultationsArray.length; i++) {
+            consultationArray[i] = (Consultation) consultationsArray[i];
         }
         
-        Consultation[] results = new Consultation[count];
-        for (int i = 0; i < count; i++) {
-            results[i] = tempResults[i];
+        utility.BubbleSort.sort(consultationArray);
+        
+        for (Consultation consultation : consultationArray) {
+            System.out.printf("%-15s %-10s %-10s %-20s %-15s\n", 
+                consultation.getConsultationId(), consultation.getPatientId(),
+                consultation.getDoctorId(), consultation.getConsultationDate(),
+                consultation.getStatus());
         }
-        return results;
+        System.out.println(repeatString("-", 80));
+        System.out.println("Press Enter to continue...");
+        scanner.nextLine();
     }
     
-    //get consultations by patient
-    public Consultation[] getConsultationsByPatient(String patientId) {
-        Object[] consultationArray = consultations.toArray();
-        Consultation[] tempResults = new Consultation[consultationArray.length];
-        int count = 0;
+    public void searchConsultationById() {
+        System.out.print("Enter consultation ID to search: ");
+        String consultationId = scanner.nextLine();
         
-        for (Object obj : consultationArray) {
-            if (obj instanceof Consultation) {
-                Consultation consultation = (Consultation) obj;
-                if (consultation.getPatientId().equals(patientId)) {
-                    tempResults[count++] = consultation;
-                }
+        Object[] consultationsArray = consultationList.toArray();
+        Consultation foundConsultation = null;
+        
+        for (Object obj : consultationsArray) {
+            Consultation consultation = (Consultation) obj;
+            if (consultation.getConsultationId().equals(consultationId)) {
+                foundConsultation = consultation;
+                break;
             }
         }
         
-        Consultation[] results = new Consultation[count];
-        for (int i = 0; i < count; i++) {
-            results[i] = tempResults[i];
+        if (foundConsultation != null) {
+            displayConsultationDetails(foundConsultation);
+        } else {
+            System.out.println("Consultation not found!");
         }
-        return results;
     }
     
-    //get scheduled consultations (not completed)
-    public Consultation[] getScheduledConsultations() {
-        Object[] consultationArray = consultations.toArray();
-        Consultation[] tempResults = new Consultation[consultationArray.length];
-        int count = 0;
+    public void searchConsultationsByDoctor() {
+        System.out.print("Enter doctor ID to search consultations: ");
+        String doctorId = scanner.nextLine();
         
-        for (Object obj : consultationArray) {
-            if (obj instanceof Consultation) {
-                Consultation consultation = (Consultation) obj;
-                if (consultation.getStatus().toLowerCase().contains("scheduled")) {
-                    tempResults[count++] = consultation;
-                }
+        Object[] consultationsArray = consultationList.toArray();
+        System.out.println("\nConsultations by Doctor ID: " + doctorId);
+        System.out.println(repeatString("-", 80));
+        System.out.printf("%-15s %-10s %-20s %-15s\n", "Consultation ID", "Patient ID", "Date", "Status");
+        System.out.println(repeatString("-", 80));
+        
+        boolean found = false;
+        for (Object obj : consultationsArray) {
+            Consultation consultation = (Consultation) obj;
+            if (consultation.getDoctorId().equals(doctorId)) {
+                System.out.printf("%-15s %-10s %-20s %-15s\n", 
+                    consultation.getConsultationId(), consultation.getPatientId(),
+                    consultation.getConsultationDate(), consultation.getStatus());
+                found = true;
             }
         }
         
-        Consultation[] results = new Consultation[count];
-        for (int i = 0; i < count; i++) {
-            results[i] = tempResults[i];
+        if (!found) {
+            System.out.println("No consultations found for this doctor.");
         }
-        return results;
+        System.out.println(repeatString("-", 80));
+        System.out.println("Press Enter to continue...");
+        scanner.nextLine();
     }
     
-    //get completed consultations
-    public Consultation[] getCompletedConsultations() {
-        Object[] consultationArray = consultations.toArray();
-        Consultation[] tempResults = new Consultation[consultationArray.length];
-        int count = 0;
+    public void searchConsultationsByPatient() {
+        System.out.print("Enter patient ID to search consultations: ");
+        String patientId = scanner.nextLine();
         
-        for (Object obj : consultationArray) {
-            if (obj instanceof Consultation) {
-                Consultation consultation = (Consultation) obj;
-                if (consultation.getStatus().toLowerCase().contains("completed")) {
-                    tempResults[count++] = consultation;
-                }
+        Object[] consultationsArray = consultationList.toArray();
+        System.out.println("\nConsultations by Patient ID: " + patientId);
+        System.out.println(repeatString("-", 80));
+        System.out.printf("%-15s %-10s %-20s %-15s\n", "Consultation ID", "Doctor ID", "Date", "Status");
+        System.out.println(repeatString("-", 80));
+        
+        boolean found = false;
+        for (Object obj : consultationsArray) {
+            Consultation consultation = (Consultation) obj;
+            if (consultation.getPatientId().equals(patientId)) {
+                System.out.printf("%-15s %-10s %-20s %-15s\n", 
+                    consultation.getConsultationId(), consultation.getDoctorId(),
+                    consultation.getConsultationDate(), consultation.getStatus());
+                found = true;
             }
         }
         
-        Consultation[] results = new Consultation[count];
-        for (int i = 0; i < count; i++) {
-            results[i] = tempResults[i];
+        if (!found) {
+            System.out.println("No consultations found for this patient.");
         }
-        return results;
+        System.out.println(repeatString("-", 80));
+        System.out.println("Press Enter to continue...");
+        scanner.nextLine();
     }
     
-    //get next appointment from queue
-    public Consultation getNextAppointment() {
-        return appointmentQueue.getFront();
+    public void displayConsultationDetails(Consultation consultation) {
+        System.out.println("\n" + repeatString("-", 60));
+        System.out.println("CONSULTATION DETAILS");
+        System.out.println(repeatString("-", 60));
+        System.out.println("Consultation ID: " + consultation.getConsultationId());
+        System.out.println("Patient ID: " + consultation.getPatientId());
+        System.out.println("Doctor ID: " + consultation.getDoctorId());
+        System.out.println("Date: " + consultation.getConsultationDate());
+        System.out.println("Status: " + consultation.getStatus());
+        System.out.println("Notes: " + (consultation.getNotes().isEmpty() ? "None" : consultation.getNotes()));
+        System.out.println("Next Appointment: " + (consultation.getNextAppointmentDate().isEmpty() ? "None" : consultation.getNextAppointmentDate()));
+        System.out.println(repeatString("-", 60));
+        System.out.println("Press Enter to continue...");
+        scanner.nextLine();
     }
     
-    //process next appointment (dequeue)
-    public Consultation processNextAppointment() {
-        return appointmentQueue.dequeue();
-    }
-    
-    //check if appointment queue is empty
-    public boolean isAppointmentQueueEmpty() {
-        return appointmentQueue.isQueueEmpty();
-    }
-    
-    //clear appointment queue
-    public void clearAppointmentQueue() {
-        appointmentQueue.clearQueue();
-    }
-    
-    //get appointment queue size
-    public int getAppointmentQueueSize() {
-        return appointmentQueue.size();
-    }
-    
-    //get consultations by status using set operations
-    public SetAndQueueInterface<Consultation> getConsultationsByStatusSet(String status) {
-        SetAndQueueInterface<Consultation> statusConsultations = new SetAndQueue<>();
-        Object[] consultationArray = consultations.toArray();
+    public void generateConsultationStatisticsReport() {
+        System.out.println("\n" + repeatString("=", 60));
+        System.out.println("        CONSULTATION STATISTICS REPORT");
+        System.out.println(repeatString("=", 60));
         
-        for (Object obj : consultationArray) {
-            if (obj instanceof Consultation) {
-                Consultation consultation = (Consultation) obj;
-                if (consultation.getStatus().toLowerCase().contains(status.toLowerCase())) {
-                    statusConsultations.add(consultation);
-                }
-            }
-        }
-        return statusConsultations;
-    }
-    
-    //get consultations by doctor using set operations
-    public SetAndQueueInterface<Consultation> getConsultationsByDoctorSet(String doctorId) {
-        SetAndQueueInterface<Consultation> doctorConsultations = new SetAndQueue<>();
-        Object[] consultationArray = consultations.toArray();
+        Object[] consultationsArray = consultationList.toArray();
+        int totalConsultations = consultationsArray.length;
+        int completedCount = 0, scheduledCount = 0;
         
-        for (Object obj : consultationArray) {
-            if (obj instanceof Consultation) {
-                Consultation consultation = (Consultation) obj;
-                if (consultation.getDoctorId().equals(doctorId)) {
-                    doctorConsultations.add(consultation);
-                }
-            }
-        }
-        return doctorConsultations;
-    }
-    
-    //get consultations by patient using set operations
-    public SetAndQueueInterface<Consultation> getConsultationsByPatientSet(String patientId) {
-        SetAndQueueInterface<Consultation> patientConsultations = new SetAndQueue<>();
-        Object[] consultationArray = consultations.toArray();
-        
-        for (Object obj : consultationArray) {
-            if (obj instanceof Consultation) {
-                Consultation consultation = (Consultation) obj;
-                if (consultation.getPatientId().equals(patientId)) {
-                    patientConsultations.add(consultation);
-                }
-            }
-        }
-        return patientConsultations;
-    }
-    
-    //union: consultations by doctor OR by status
-    public SetAndQueueInterface<Consultation> getConsultationsByDoctorOrStatus(String doctorId, String status) {
-        SetAndQueueInterface<Consultation> doctorConsultations = getConsultationsByDoctorSet(doctorId);
-        SetAndQueueInterface<Consultation> statusConsultations = getConsultationsByStatusSet(status);
-        return doctorConsultations.union(statusConsultations);
-    }
-    
-    //intersection: consultations by doctor AND by status
-    public SetAndQueueInterface<Consultation> getConsultationsByDoctorAndStatus(String doctorId, String status) {
-        SetAndQueueInterface<Consultation> doctorConsultations = getConsultationsByDoctorSet(doctorId);
-        SetAndQueueInterface<Consultation> statusConsultations = getConsultationsByStatusSet(status);
-        return doctorConsultations.intersection(statusConsultations);
-    }
-    
-    //difference: consultations by doctor but NOT with specific status
-    public SetAndQueueInterface<Consultation> getConsultationsByDoctorNotStatus(String doctorId, String status) {
-        SetAndQueueInterface<Consultation> doctorConsultations = getConsultationsByDoctorSet(doctorId);
-        SetAndQueueInterface<Consultation> statusConsultations = getConsultationsByStatusSet(status);
-        return doctorConsultations.difference(statusConsultations);
-    }
-    
-    //check if all doctor consultations are completed (subset operation)
-    public boolean areAllDoctorConsultationsCompleted(String doctorId) {
-        SetAndQueueInterface<Consultation> doctorConsultations = getConsultationsByDoctorSet(doctorId);
-        SetAndQueueInterface<Consultation> completedConsultations = getConsultationsByStatusSet("completed");
-        return doctorConsultations.isSubsetOf(completedConsultations);
-    }
-    
-    //get consultations with multiple criteria using intersection
-    public SetAndQueueInterface<Consultation> getConsultationsWithMultipleCriteria(String doctorId, String patientId, String status) {
-        SetAndQueueInterface<Consultation> doctorConsultations = getConsultationsByDoctorSet(doctorId);
-        SetAndQueueInterface<Consultation> patientConsultations = getConsultationsByPatientSet(patientId);
-        SetAndQueueInterface<Consultation> statusConsultations = getConsultationsByStatusSet(status);
-        
-        SetAndQueueInterface<Consultation> temp = doctorConsultations.intersection(patientConsultations);
-        return temp.intersection(statusConsultations);
-    }
-    
-    //get urgent consultations (scheduled + specific criteria)
-    public SetAndQueueInterface<Consultation> getUrgentConsultations() {
-        SetAndQueueInterface<Consultation> scheduledConsultations = getConsultationsByStatusSet("scheduled");
-        SetAndQueueInterface<Consultation> urgentConsultations = new SetAndQueue<>();
-        
-        Object[] consultationArray = consultations.toArray();
-        for (Object obj : consultationArray) {
-            if (obj instanceof Consultation) {
-                Consultation consultation = (Consultation) obj;
-                //check for urgent indicators in notes or other fields
-                if (consultation.getNotes() != null && consultation.getNotes().toLowerCase().contains("urgent")) {
-                    urgentConsultations.add(consultation);
-                }
-            }
+        for (Object obj : consultationsArray) {
+            Consultation consultation = (Consultation) obj;
+            if (consultation.getStatus().equals("completed")) completedCount++;
+            else if (consultation.getStatus().equals("scheduled")) scheduledCount++;
         }
         
-        return scheduledConsultations.intersection(urgentConsultations);
+        System.out.println("📊 Consultation Statistics:");
+        System.out.println("• Total Consultations: " + totalConsultations);
+        System.out.println("• Completed Consultations: " + completedCount);
+        System.out.println("• Scheduled Consultations: " + scheduledCount);
+        System.out.println("• Completion Rate: " + String.format("%.1f", (double)completedCount/totalConsultations*100) + "%");
+        
+        System.out.println("\nPress Enter to continue...");
+        scanner.nextLine();
     }
     
-    //check if consultation sets are equal
-    public boolean areConsultationSetsEqual(Consultation[] set1, Consultation[] set2) {
-        SetAndQueueInterface<Consultation> queue1 = new SetAndQueue<>();
-        SetAndQueueInterface<Consultation> queue2 = new SetAndQueue<>();
+    public void generateDoctorPerformanceReport() {
+        System.out.println("\n" + repeatString("=", 60));
+        System.out.println("        DOCTOR PERFORMANCE REPORT");
+        System.out.println(repeatString("=", 60));
         
-        for (Consultation consultation : set1) {
-            queue1.add(consultation);
-        }
-        for (Consultation consultation : set2) {
-            queue2.add(consultation);
-        }
+        Object[] consultationsArray = consultationList.toArray();
+        java.util.Map<String, Integer> doctorConsultationCount = new java.util.HashMap<>();
         
-        return queue1.isEqual(queue2);
-    }
-    
-    //get consultation statistics using set operations
-    public String getConsultationStatistics() {
-        StringBuilder stats = new StringBuilder();
-        stats.append("=== CONSULTATION STATISTICS ===\n");
-        
-        SetAndQueueInterface<Consultation> scheduledConsultations = getConsultationsByStatusSet("scheduled");
-        SetAndQueueInterface<Consultation> completedConsultations = getConsultationsByStatusSet("completed");
-        SetAndQueueInterface<Consultation> cancelledConsultations = getConsultationsByStatusSet("cancelled");
-        
-        stats.append("Scheduled Consultations: ").append(scheduledConsultations.size()).append("\n");
-        stats.append("Completed Consultations: ").append(completedConsultations.size()).append("\n");
-        stats.append("Cancelled Consultations: ").append(cancelledConsultations.size()).append("\n");
-        
-        //union of all status types
-        SetAndQueueInterface<Consultation> allStatusConsultations = scheduledConsultations.union(completedConsultations);
-        allStatusConsultations = allStatusConsultations.union(cancelledConsultations);
-        stats.append("Total Consultations with Status: ").append(allStatusConsultations.size()).append("\n");
-        
-        return stats.toString();
-    }
-    
-    //generate consultation report
-    public String generateConsultationReport() {
-        StringBuilder report = new StringBuilder();
-        report.append("=== CONSULTATION MANAGEMENT REPORT ===\n");
-        report.append("Generated on: ").append(dateFormat.format(new Date())).append("\n\n");
-        
-        Object[] consultationArray = consultations.toArray();
-        int totalConsultations = 0;
-        int scheduledConsultations = 0;
-        int completedConsultations = 0;
-        
-        for (Object obj : consultationArray) {
-            if (obj instanceof Consultation) {
-                Consultation consultation = (Consultation) obj;
-                totalConsultations++;
-                
-                report.append(String.format("ID: %s | Patient: %s | Doctor: %s | Date: %s | Status: %s\n", 
-                    consultation.getConsultationId(), consultation.getPatientId(), 
-                    consultation.getDoctorId(), consultation.getConsultationDate(),
-                    consultation.getStatus()));
-                
-                if (consultation.getStatus().toLowerCase().contains("scheduled")) {
-                    scheduledConsultations++;
-                }
-                if (consultation.getStatus().toLowerCase().contains("completed")) {
-                    completedConsultations++;
-                }
-            }
+        for (Object obj : consultationsArray) {
+            Consultation consultation = (Consultation) obj;
+            String doctorId = consultation.getDoctorId();
+            doctorConsultationCount.put(doctorId, doctorConsultationCount.getOrDefault(doctorId, 0) + 1);
         }
         
-        report.append("\n=== SUMMARY ===\n");
-        report.append("Total Consultations: ").append(totalConsultations).append("\n");
-        report.append("Scheduled Consultations: ").append(scheduledConsultations).append("\n");
-        report.append("Completed Consultations: ").append(completedConsultations).append("\n");
-
-        report.append("\n=== ADVANCED ADT ANALYTICS ===\n");
-        report.append("Appointment Queue Size: ").append(getAppointmentQueueSize()).append("\n");
-        report.append("Queue Empty: ").append(isAppointmentQueueEmpty() ? "Yes" : "No").append("\n");
-        
-        SetAndQueueInterface<Consultation> urgentConsultations = getUrgentConsultations();
-        report.append("Urgent Consultations: ").append(urgentConsultations.size()).append("\n");
-        
-        SetAndQueueInterface<Consultation> scheduledOrCompleted = getConsultationsByStatusSet("scheduled").union(getConsultationsByStatusSet("completed"));
-        report.append("Scheduled OR Completed: ").append(scheduledOrCompleted.size()).append("\n");
-        
-        report.append(getConsultationStatistics());
-        
-        return report.toString();
-    }
-    
-    //find consultation by ID
-    private Consultation findConsultationById(String consultationId) {
-        Object[] consultationArray = consultations.toArray();
-        
-        for (Object obj : consultationArray) {
-            if (obj instanceof Consultation) {
-                Consultation consultation = (Consultation) obj;
-                if (consultation.getConsultationId().equalsIgnoreCase(consultationId)) {
-                    return consultation;
-                }
-            }
+        System.out.println("📊 Doctor Performance (Consultations per Doctor):");
+        for (java.util.Map.Entry<String, Integer> entry : doctorConsultationCount.entrySet()) {
+            System.out.println("• Doctor ID " + entry.getKey() + ": " + entry.getValue() + " consultations");
         }
-        return null;
-    }
-    
-    //check if patient exists
-    public boolean patientExists(String patientId) {
-        Object[] patientArray = patients.toArray();
         
-        for (Object obj : patientArray) {
-            if (obj instanceof Patient) {
-                Patient patient = (Patient) obj;
-                if (patient.getId() == Integer.parseInt(patientId)) {
-                    return true;
-                }
-            }
-        }
-        return false;
+        System.out.println("\nPress Enter to continue...");
+        scanner.nextLine();
     }
     
-    //check if doctor exists
-    public boolean doctorExists(String doctorId) {
-        Object[] doctorArray = doctors.toArray();
-        
-        for (Object obj : doctorArray) {
-            if (obj instanceof Doctor) {
-                Doctor doctor = (Doctor) obj;
-                if (doctor.getDoctorId().equals(doctorId)) {
-                    return true;
-                }
-            }
-        }
-        return false;
-    }
-    
-    //check if consultations set is empty
-    public boolean isConsultationDatabaseEmpty() {
-        return consultations.isEmpty();
-    }
-    
-    //clear all consultations (use with caution)
-    public void clearAllConsultations() {
-        consultations.clearSet();
-        appointmentQueue.clearQueue();
-    }
-    
-    //get total number of consultations
     public int getTotalConsultationCount() {
-        return consultations.size();
+        return consultationList.size();
     }
     
-    //check if all consultations contain specific status
-    public boolean containsAllConsultationsWithStatus(String status) {
-        SetAndQueueInterface<Consultation> allConsultations = new SetAndQueue<>();
-        Object[] consultationArray = consultations.toArray();
-        for (Object obj : consultationArray) {
-            if (obj instanceof Consultation) {
-                allConsultations.add((Consultation) obj);
+    private int getUserInputInt(int min, int max) {
+        int input;
+        do {
+            while (!scanner.hasNextInt()) {
+                System.out.print("Invalid input! Please enter a number between " + min + " and " + max + ": ");
+                scanner.next();
             }
-        }
+            input = scanner.nextInt();
+            scanner.nextLine();
+            
+            if (input < min || input > max) {
+                System.out.print("Please enter a number between " + min + " and " + max + ": ");
+            }
+        } while (input < min || input > max);
         
-        SetAndQueueInterface<Consultation> statusConsultations = getConsultationsByStatusSet(status);
-        return allConsultations.containsAll(statusConsultations);
+        return input;
+    }
+
+    private String repeatString(String str, int count) {
+        StringBuilder sb = new StringBuilder();
+        for (int i = 0; i < count; i++) {
+            sb.append(str);
+        }
+        return sb.toString();
     }
 } 

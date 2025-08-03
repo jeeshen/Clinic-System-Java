@@ -2,504 +2,709 @@ package control;
 
 import adt.SetAndQueueInterface;
 import adt.SetAndQueue;
-import entity.Treatment;
+import entity.Prescription;
+import entity.PrescribedMedicine;
 import entity.Patient;
 import entity.Doctor;
-import java.text.SimpleDateFormat;
-import java.util.Date;
+import entity.Medicine;
+import dao.DataInitializer;
+import java.util.Scanner;
 
 public class TreatmentManagement {
-    private SetAndQueueInterface<Treatment> treatments = new SetAndQueue<>();
-    private SetAndQueueInterface<Patient> patients = new SetAndQueue<>();
-    private SetAndQueueInterface<Doctor> doctors = new SetAndQueue<>();
-    private SimpleDateFormat dateFormat = new SimpleDateFormat("dd-MM-yyyy");
+    private SetAndQueueInterface<Prescription> prescriptionList = new SetAndQueue<>();
+    private SetAndQueueInterface<Medicine> medicineList = new SetAndQueue<>();
+    private PharmacyManagement pharmacyManagement;
+    private Scanner scanner;
+    private int prescriptionIdCounter = 3001;
+    private int prescribedMedicineIdCounter = 4001;
     
-    public TreatmentManagement(SetAndQueueInterface<Treatment> treatments, SetAndQueueInterface<Patient> patients, SetAndQueueInterface<Doctor> doctors) {
-        this.treatments = treatments;
-        this.patients = patients;
-        this.doctors = doctors;
+    public TreatmentManagement() {
+        scanner = new Scanner(System.in);
+        loadSampleData();
     }
     
-    //add new treatment record
-    public boolean addTreatment(Treatment treatment) {
-        if (treatment != null && !treatments.contains(treatment)) {
-            return treatments.add(treatment);
+    public void setPharmacyManagement(PharmacyManagement pharmacyManagement) {
+        this.pharmacyManagement = pharmacyManagement;
+    }
+    
+    private void loadSampleData() {
+        Medicine[] sampleMedicines = DataInitializer.initializeSampleMedicines();
+        for (Medicine medicine : sampleMedicines) {
+            medicineList.add(medicine);
         }
-        return false;
     }
     
-    //update treatment diagnosis
-    public boolean updateDiagnosis(String treatmentId, String diagnosis) {
-        Treatment treatment = findTreatmentById(treatmentId);
-        if (treatment != null) {
-            treatment.setDiagnosis(diagnosis);
-            return true;
-        }
-        return false;
-    }
-    
-    //update prescribed medications
-    public boolean updatePrescribedMedications(String treatmentId, String medications) {
-        Treatment treatment = findTreatmentById(treatmentId);
-        if (treatment != null) {
-            treatment.setPrescribedMedications(medications);
-            return true;
-        }
-        return false;
-    }
-    
-    //schedule follow-up appointment
-    public boolean scheduleFollowUp(String treatmentId, String followUpDate) {
-        Treatment treatment = findTreatmentById(treatmentId);
-        if (treatment != null) {
-            treatment.setFollowUpDate(followUpDate);
-            return true;
-        }
-        return false;
-    }
-    
-    //get all treatments
-    public Treatment[] getAllTreatments() {
-        Object[] treatmentArray = treatments.toArray();
-        Treatment[] treatmentList = new Treatment[treatmentArray.length];
+    public void createPrescription(String consultationId, Patient currentPatient, Doctor selectedDoctor, String diagnosis, String consultationDate) {
+        String prescriptionId = "PRESC" + prescriptionIdCounter++;
+        Prescription prescription = new Prescription(prescriptionId, consultationId, String.valueOf(currentPatient.getId()), selectedDoctor.getDoctorId(), diagnosis, new SetAndQueue<>(), consultationDate, "active", 0.0, false);
         
-        for (int i = 0; i < treatmentArray.length; i++) {
-            if (treatmentArray[i] instanceof Treatment) {
-                treatmentList[i] = (Treatment) treatmentArray[i];
+        // Prescribe medicines
+        System.out.println("\n=== PRESCRIBE MEDICINES ===");
+        System.out.println("Available medicines:");
+        displayAvailableMedicines();
+        
+        boolean addMoreMedicines = true;
+        while (addMoreMedicines) {
+            System.out.print("Enter medicine ID to prescribe (or 'done' to finish): ");
+            String medicineId = scanner.nextLine();
+            
+            if (medicineId.equalsIgnoreCase("done")) {
+                addMoreMedicines = false;
+                break;
             }
-        }
-        return treatmentList;
-    }
-    
-    //get treatments by patient
-    public Treatment[] getTreatmentsByPatient(String patientId) {
-        Object[] treatmentArray = treatments.toArray();
-        Treatment[] tempResults = new Treatment[treatmentArray.length];
-        int count = 0;
-        
-        for (Object obj : treatmentArray) {
-            if (obj instanceof Treatment) {
-                Treatment treatment = (Treatment) obj;
-                if (treatment.getPatientId().equals(patientId)) {
-                    tempResults[count++] = treatment;
-                }
-            }
-        }
-        
-        Treatment[] results = new Treatment[count];
-        for (int i = 0; i < count; i++) {
-            results[i] = tempResults[i];
-        }
-        return results;
-    }
-    
-    //get treatments by doctor
-    public Treatment[] getTreatmentsByDoctor(String doctorId) {
-        Object[] treatmentArray = treatments.toArray();
-        Treatment[] tempResults = new Treatment[treatmentArray.length];
-        int count = 0;
-        
-        for (Object obj : treatmentArray) {
-            if (obj instanceof Treatment) {
-                Treatment treatment = (Treatment) obj;
-                if (treatment.getDoctorId().equals(doctorId)) {
-                    tempResults[count++] = treatment;
-                }
-            }
-        }
-        
-        Treatment[] results = new Treatment[count];
-        for (int i = 0; i < count; i++) {
-            results[i] = tempResults[i];
-        }
-        return results;
-    }
-    
-    //search treatments by diagnosis
-    public Treatment[] searchTreatmentsByDiagnosis(String diagnosis) {
-        Object[] treatmentArray = treatments.toArray();
-        Treatment[] tempResults = new Treatment[treatmentArray.length];
-        int count = 0;
-        
-        for (Object obj : treatmentArray) {
-            if (obj instanceof Treatment) {
-                Treatment treatment = (Treatment) obj;
-                if (treatment.getDiagnosis().toLowerCase().contains(diagnosis.toLowerCase())) {
-                    tempResults[count++] = treatment;
-                }
-            }
-        }
-        
-        Treatment[] results = new Treatment[count];
-        for (int i = 0; i < count; i++) {
-            results[i] = tempResults[i];
-        }
-        return results;
-    }
-    
-    //get treatments with follow-up appointments
-    public Treatment[] getTreatmentsWithFollowUp() {
-        Object[] treatmentArray = treatments.toArray();
-        Treatment[] tempResults = new Treatment[treatmentArray.length];
-        int count = 0;
-        
-        for (Object obj : treatmentArray) {
-            if (obj instanceof Treatment) {
-                Treatment treatment = (Treatment) obj;
-                if (treatment.getFollowUpDate() != null && !treatment.getFollowUpDate().isEmpty()) {
-                    tempResults[count++] = treatment;
-                }
-            }
-        }
-        
-        Treatment[] results = new Treatment[count];
-        for (int i = 0; i < count; i++) {
-            results[i] = tempResults[i];
-        }
-        return results;
-    }
-    
-    //get recent treatments (within last 30 days)
-    public Treatment[] getRecentTreatments() {
-        Object[] treatmentArray = treatments.toArray();
-        Treatment[] tempResults = new Treatment[treatmentArray.length];
-        int count = 0;
-        
-        //simple check for recent treatments (in real implementation, parse dates)
-        for (Object obj : treatmentArray) {
-            if (obj instanceof Treatment) {
-                Treatment treatment = (Treatment) obj;
-                if (treatment.getTreatmentDate() != null && treatment.getTreatmentDate().contains("2024")) {
-                    tempResults[count++] = treatment;
-                }
-            }
-        }
-        
-        Treatment[] results = new Treatment[count];
-        for (int i = 0; i < count; i++) {
-            results[i] = tempResults[i];
-        }
-        return results;
-    }
-    
-    //get treatments by diagnosis using set operations
-    public SetAndQueueInterface<Treatment> getTreatmentsByDiagnosisSet(String diagnosis) {
-        SetAndQueueInterface<Treatment> diagnosisTreatments = new SetAndQueue<>();
-        Object[] treatmentArray = treatments.toArray();
-        
-        for (Object obj : treatmentArray) {
-            if (obj instanceof Treatment) {
-                Treatment treatment = (Treatment) obj;
-                if (treatment.getDiagnosis().toLowerCase().contains(diagnosis.toLowerCase())) {
-                    diagnosisTreatments.add(treatment);
-                }
-            }
-        }
-        return diagnosisTreatments;
-    }
-    
-    //get treatments by patient using set operations
-    public SetAndQueueInterface<Treatment> getTreatmentsByPatientSet(String patientId) {
-        SetAndQueueInterface<Treatment> patientTreatments = new SetAndQueue<>();
-        Object[] treatmentArray = treatments.toArray();
-        
-        for (Object obj : treatmentArray) {
-            if (obj instanceof Treatment) {
-                Treatment treatment = (Treatment) obj;
-                if (treatment.getPatientId().equals(patientId)) {
-                    patientTreatments.add(treatment);
-                }
-            }
-        }
-        return patientTreatments;
-    }
-    
-    //get treatments by doctor using set operations
-    public SetAndQueueInterface<Treatment> getTreatmentsByDoctorSet(String doctorId) {
-        SetAndQueueInterface<Treatment> doctorTreatments = new SetAndQueue<>();
-        Object[] treatmentArray = treatments.toArray();
-        
-        for (Object obj : treatmentArray) {
-            if (obj instanceof Treatment) {
-                Treatment treatment = (Treatment) obj;
-                if (treatment.getDoctorId().equals(doctorId)) {
-                    doctorTreatments.add(treatment);
-                }
-            }
-        }
-        return doctorTreatments;
-    }
-    
-    //get treatments with follow-up using set operations
-    public SetAndQueueInterface<Treatment> getTreatmentsWithFollowUpSet() {
-        SetAndQueueInterface<Treatment> followUpTreatments = new SetAndQueue<>();
-        Object[] treatmentArray = treatments.toArray();
-        
-        for (Object obj : treatmentArray) {
-            if (obj instanceof Treatment) {
-                Treatment treatment = (Treatment) obj;
-                if (treatment.getFollowUpDate() != null && !treatment.getFollowUpDate().isEmpty()) {
-                    followUpTreatments.add(treatment);
-                }
-            }
-        }
-        return followUpTreatments;
-    }
-    
-    //union: treatments by patient OR by diagnosis
-    public SetAndQueueInterface<Treatment> getTreatmentsByPatientOrDiagnosis(String patientId, String diagnosis) {
-        SetAndQueueInterface<Treatment> patientTreatments = getTreatmentsByPatientSet(patientId);
-        SetAndQueueInterface<Treatment> diagnosisTreatments = getTreatmentsByDiagnosisSet(diagnosis);
-        return patientTreatments.union(diagnosisTreatments);
-    }
-    
-    //intersection: treatments by patient AND by diagnosis
-    public SetAndQueueInterface<Treatment> getTreatmentsByPatientAndDiagnosis(String patientId, String diagnosis) {
-        SetAndQueueInterface<Treatment> patientTreatments = getTreatmentsByPatientSet(patientId);
-        SetAndQueueInterface<Treatment> diagnosisTreatments = getTreatmentsByDiagnosisSet(diagnosis);
-        return patientTreatments.intersection(diagnosisTreatments);
-    }
-    
-    //difference: treatments by patient but NOT with specific diagnosis
-    public SetAndQueueInterface<Treatment> getTreatmentsByPatientNotDiagnosis(String patientId, String diagnosis) {
-        SetAndQueueInterface<Treatment> patientTreatments = getTreatmentsByPatientSet(patientId);
-        SetAndQueueInterface<Treatment> diagnosisTreatments = getTreatmentsByDiagnosisSet(diagnosis);
-        return patientTreatments.difference(diagnosisTreatments);
-    }
-    
-    //check if all patient's treatments have follow-up (subset operation)
-    public boolean areAllPatientTreatmentsWithFollowUp(String patientId) {
-        SetAndQueueInterface<Treatment> patientTreatments = getTreatmentsByPatientSet(patientId);
-        SetAndQueueInterface<Treatment> followUpTreatments = getTreatmentsWithFollowUpSet();
-        return patientTreatments.isSubsetOf(followUpTreatments);
-    }
-    
-    //get treatments with multiple criteria using intersection
-    public SetAndQueueInterface<Treatment> getTreatmentsWithMultipleCriteria(String patientId, String doctorId, String diagnosis) {
-        SetAndQueueInterface<Treatment> patientTreatments = getTreatmentsByPatientSet(patientId);
-        SetAndQueueInterface<Treatment> doctorTreatments = getTreatmentsByDoctorSet(doctorId);
-        SetAndQueueInterface<Treatment> diagnosisTreatments = getTreatmentsByDiagnosisSet(diagnosis);
-        
-        SetAndQueueInterface<Treatment> temp = patientTreatments.intersection(doctorTreatments);
-        return temp.intersection(diagnosisTreatments);
-    }
-    
-    //get urgent treatments (specific diagnoses + follow-up required)
-    public SetAndQueueInterface<Treatment> getUrgentTreatments() {
-        String[] urgentDiagnoses = {"emergency", "critical", "acute", "severe"};
-        SetAndQueueInterface<Treatment> urgentDiagnosisTreatments = new SetAndQueue<>();
-        
-        Object[] treatmentArray = treatments.toArray();
-        for (Object obj : treatmentArray) {
-            if (obj instanceof Treatment) {
-                Treatment treatment = (Treatment) obj;
-                for (String urgentDiagnosis : urgentDiagnoses) {
-                    if (treatment.getDiagnosis().toLowerCase().contains(urgentDiagnosis.toLowerCase())) {
-                        urgentDiagnosisTreatments.add(treatment);
-                        break;
+            
+            Medicine medicine = findMedicineById(medicineId);
+            if (medicine != null) {
+                // Check for allergies
+                if (currentPatient.getAllegy() != null && !currentPatient.getAllegy().isEmpty()) {
+                    if (medicine.getActiveIngredient().toLowerCase().contains(currentPatient.getAllegy().toLowerCase()) ||
+                        medicine.getName().toLowerCase().contains(currentPatient.getAllegy().toLowerCase())) {
+                        System.out.println("WARNING: Patient is allergic to " + currentPatient.getAllegy() + 
+                                         "! This medicine contains " + medicine.getActiveIngredient());
+                        System.out.print("Do you want to prescribe it anyway? (y/n): ");
+                        String continueChoice = scanner.nextLine();
+                        if (!continueChoice.equalsIgnoreCase("y")) {
+                            continue;
+                        }
                     }
                 }
-            }
-        }
-        
-        SetAndQueueInterface<Treatment> followUpTreatments = getTreatmentsWithFollowUpSet();
-        return urgentDiagnosisTreatments.union(followUpTreatments);
-    }
-    
-    //get treatments by medication type
-    public SetAndQueueInterface<Treatment> getTreatmentsByMedication(String medication) {
-        SetAndQueueInterface<Treatment> medicationTreatments = new SetAndQueue<>();
-        Object[] treatmentArray = treatments.toArray();
-        
-        for (Object obj : treatmentArray) {
-            if (obj instanceof Treatment) {
-                Treatment treatment = (Treatment) obj;
-                if (treatment.getPrescribedMedications() != null && 
-                    treatment.getPrescribedMedications().toLowerCase().contains(medication.toLowerCase())) {
-                    medicationTreatments.add(treatment);
-                }
-            }
-        }
-        return medicationTreatments;
-    }
-    
-    //check if treatment sets are equal
-    public boolean areTreatmentSetsEqual(Treatment[] set1, Treatment[] set2) {
-        SetAndQueueInterface<Treatment> queue1 = new SetAndQueue<>();
-        SetAndQueueInterface<Treatment> queue2 = new SetAndQueue<>();
-        
-        for (Treatment treatment : set1) {
-            queue1.add(treatment);
-        }
-        for (Treatment treatment : set2) {
-            queue2.add(treatment);
-        }
-        
-        return queue1.isEqual(queue2);
-    }
-    
-    //get treatment statistics using set operations
-    public String getTreatmentStatistics() {
-        StringBuilder stats = new StringBuilder();
-        stats.append("=== TREATMENT STATISTICS ===\n");
-        
-        SetAndQueueInterface<Treatment> followUpTreatments = getTreatmentsWithFollowUpSet();
-        SetAndQueueInterface<Treatment> urgentTreatments = getUrgentTreatments();
-        
-        stats.append("Treatments with Follow-up: ").append(followUpTreatments.size()).append("\n");
-        stats.append("Urgent Treatments: ").append(urgentTreatments.size()).append("\n");
-        
-        //union of follow-up and urgent treatments
-        SetAndQueueInterface<Treatment> priorityTreatments = followUpTreatments.union(urgentTreatments);
-        stats.append("Priority Treatments (Follow-up OR Urgent): ").append(priorityTreatments.size()).append("\n");
-        
-        return stats.toString();
-    }
-    
-    //generate treatment report
-    public String generateTreatmentReport() {
-        StringBuilder report = new StringBuilder();
-        report.append("=== MEDICAL TREATMENT MANAGEMENT REPORT ===\n");
-        report.append("Generated on: ").append(dateFormat.format(new Date())).append("\n\n");
-        
-        Object[] treatmentArray = treatments.toArray();
-        int totalTreatments = 0;
-        int treatmentsWithFollowUp = 0;
-        
-        for (Object obj : treatmentArray) {
-            if (obj instanceof Treatment) {
-                Treatment treatment = (Treatment) obj;
-                totalTreatments++;
                 
-                report.append(String.format("ID: %s | Patient: %s | Doctor: %s | Diagnosis: %s | Date: %s\n", 
-                    treatment.getTreatmentId(), treatment.getPatientId(), 
-                    treatment.getDoctorId(), treatment.getDiagnosis(),
-                    treatment.getTreatmentDate()));
+                System.out.print("Enter quantity: ");
+                int quantity = getUserInputInt(1, 100);
                 
-                if (treatment.getFollowUpDate() != null && !treatment.getFollowUpDate().isEmpty()) {
-                    treatmentsWithFollowUp++;
-                }
+                System.out.print("Enter dosage (e.g., '1 tablet twice daily'): ");
+                String dosage = scanner.nextLine();
+                
+                System.out.print("Enter instructions (e.g., 'Take with food'): ");
+                String instructions = scanner.nextLine();
+                
+                // Create prescribed medicine
+                String prescribedMedicineId = "PM" + prescribedMedicineIdCounter++;
+                double totalPrice = medicine.getPrice() * quantity;
+                
+                PrescribedMedicine prescribedMedicine = new PrescribedMedicine(
+                    prescribedMedicineId, prescriptionId, medicineId, medicine.getName(),
+                    quantity, dosage, instructions, medicine.getPrice(), totalPrice, false
+                );
+                
+                prescription.getPrescribedMedicines().add(prescribedMedicine);
+                prescription.setTotalCost(prescription.getTotalCost() + totalPrice);
+                
+                System.out.println("Medicine " + medicine.getName() + " prescribed successfully!");
+            } else {
+                System.out.println("Medicine not found!");
             }
         }
         
-        report.append("\n=== SUMMARY ===\n");
-        report.append("Total Treatments: ").append(totalTreatments).append("\n");
-        report.append("Treatments with Follow-up: ").append(treatmentsWithFollowUp).append("\n");
-        
-        report.append("\n=== ADVANCED ADT ANALYTICS ===\n");
-        SetAndQueueInterface<Treatment> urgentTreatments = getUrgentTreatments();
-        report.append("Urgent Treatments: ").append(urgentTreatments.size()).append("\n");
-        
-        SetAndQueueInterface<Treatment> followUpOrUrgent = getTreatmentsWithFollowUpSet().union(getUrgentTreatments());
-        report.append("Follow-up OR Urgent Treatments: ").append(followUpOrUrgent.size()).append("\n");
-        
-        SetAndQueueInterface<Treatment> followUpAndUrgent = getTreatmentsWithFollowUpSet().intersection(getUrgentTreatments());
-        report.append("Follow-up AND Urgent Treatments: ").append(followUpAndUrgent.size()).append("\n");
-        
-        report.append(getTreatmentStatistics());
-        
-        return report.toString();
+        prescriptionList.add(prescription);
+        System.out.println("Prescription ID: " + prescriptionId);
+        System.out.println("Total cost: RM " + String.format("%.2f", prescription.getTotalCost()));
     }
     
-    //generate patient treatment history
-    public String generatePatientTreatmentHistory(String patientId) {
-        StringBuilder report = new StringBuilder();
-        report.append("=== PATIENT TREATMENT HISTORY ===\n");
-        report.append("Patient ID: ").append(patientId).append("\n");
-        report.append("Generated on: ").append(dateFormat.format(new Date())).append("\n\n");
+    public void displayAllPrescriptionsSorted() {
+        System.out.println("\n" + repeatString("-", 80));
+        System.out.println("ALL PRESCRIPTIONS (SORTED BY ID)");
+        System.out.println(repeatString("-", 80));
+        System.out.printf("%-15s %-10s %-10s %-20s %-15s %-10s\n", "Prescription ID", "Patient ID", "Doctor ID", "Diagnosis", "Total Cost", "Status");
+        System.out.println(repeatString("-", 80));
         
-        Treatment[] patientTreatments = getTreatmentsByPatient(patientId);
+        Object[] prescriptionsArray = prescriptionList.toArray();
+        Prescription[] prescriptionArray = new Prescription[prescriptionsArray.length];
+        for (int i = 0; i < prescriptionsArray.length; i++) {
+            prescriptionArray[i] = (Prescription) prescriptionsArray[i];
+        }
         
-        if (patientTreatments.length == 0) {
-            report.append("No treatment records found for this patient.\n");
+        utility.BubbleSort.sort(prescriptionArray);
+        
+        for (Prescription prescription : prescriptionArray) {
+            System.out.printf("%-15s %-10s %-10s %-20s %-15s %-10s\n", 
+                prescription.getPrescriptionId(), prescription.getPatientId(),
+                prescription.getDoctorId(), prescription.getDiagnosis(),
+                "RM " + String.format("%.2f", prescription.getTotalCost()),
+                prescription.getStatus());
+        }
+        System.out.println(repeatString("-", 80));
+        System.out.println("Press Enter to continue...");
+        scanner.nextLine();
+    }
+    
+    public void searchPrescriptionById() {
+        System.out.print("Enter prescription ID to search: ");
+        String prescriptionId = scanner.nextLine();
+        
+        Prescription foundPrescription = findPrescriptionById(prescriptionId);
+        if (foundPrescription != null) {
+            displayPrescriptionDetails(foundPrescription);
         } else {
-            for (Treatment treatment : patientTreatments) {
-                report.append(String.format("Treatment ID: %s\n", treatment.getTreatmentId()));
-                report.append(String.format("Date: %s\n", treatment.getTreatmentDate()));
-                report.append(String.format("Doctor: %s\n", treatment.getDoctorId()));
-                report.append(String.format("Diagnosis: %s\n", treatment.getDiagnosis()));
-                report.append(String.format("Medications: %s\n", treatment.getPrescribedMedications()));
-                if (treatment.getFollowUpDate() != null && !treatment.getFollowUpDate().isEmpty()) {
-                    report.append(String.format("Follow-up: %s\n", treatment.getFollowUpDate()));
-                }
-                report.append("----------------------------------------").append("\n");
+            System.out.println("Prescription not found!");
+        }
+    }
+    
+    public void searchPrescriptionsByPatient() {
+        System.out.print("Enter patient ID to search prescriptions: ");
+        String patientId = scanner.nextLine();
+        
+        Object[] prescriptionsArray = prescriptionList.toArray();
+        System.out.println("\nPrescriptions by Patient ID: " + patientId);
+        System.out.println(repeatString("-", 80));
+        System.out.printf("%-15s %-10s %-20s %-15s %-10s\n", "Prescription ID", "Doctor ID", "Diagnosis", "Total Cost", "Status");
+        System.out.println(repeatString("-", 80));
+        
+        boolean found = false;
+        for (Object obj : prescriptionsArray) {
+            Prescription prescription = (Prescription) obj;
+            if (prescription.getPatientId().equals(patientId)) {
+                System.out.printf("%-15s %-10s %-20s %-15s %-10s\n", 
+                    prescription.getPrescriptionId(), prescription.getDoctorId(),
+                    prescription.getDiagnosis(), "RM " + String.format("%.2f", prescription.getTotalCost()),
+                    prescription.getStatus());
+                found = true;
             }
         }
         
-        return report.toString();
+        if (!found) {
+            System.out.println("No prescriptions found for this patient.");
+        }
+        System.out.println(repeatString("-", 80));
+        System.out.println("Press Enter to continue...");
+        scanner.nextLine();
     }
     
-    //find treatment by ID
-    private Treatment findTreatmentById(String treatmentId) {
-        Object[] treatmentArray = treatments.toArray();
+    public void searchPrescriptionsByDoctor() {
+        System.out.print("Enter doctor ID to search prescriptions: ");
+        String doctorId = scanner.nextLine();
         
-        for (Object obj : treatmentArray) {
-            if (obj instanceof Treatment) {
-                Treatment treatment = (Treatment) obj;
-                if (treatment.getTreatmentId().equals(treatmentId)) {
-                    return treatment;
-                }
+        Object[] prescriptionsArray = prescriptionList.toArray();
+        System.out.println("\nPrescriptions by Doctor ID: " + doctorId);
+        System.out.println(repeatString("-", 80));
+        System.out.printf("%-15s %-10s %-20s %-15s %-10s\n", "Prescription ID", "Patient ID", "Diagnosis", "Total Cost", "Status");
+        System.out.println(repeatString("-", 80));
+        
+        boolean found = false;
+        for (Object obj : prescriptionsArray) {
+            Prescription prescription = (Prescription) obj;
+            if (prescription.getDoctorId().equals(doctorId)) {
+                System.out.printf("%-15s %-10s %-20s %-15s %-10s\n", 
+                    prescription.getPrescriptionId(), prescription.getPatientId(),
+                    prescription.getDiagnosis(), "RM " + String.format("%.2f", prescription.getTotalCost()),
+                    prescription.getStatus());
+                found = true;
+            }
+        }
+        
+        if (!found) {
+            System.out.println("No prescriptions found for this doctor.");
+        }
+        System.out.println(repeatString("-", 80));
+        System.out.println("Press Enter to continue...");
+        scanner.nextLine();
+    }
+    
+    public void displayPrescriptionDetails(Prescription prescription) {
+        System.out.println("\n" + repeatString("-", 60));
+        System.out.println("PRESCRIPTION DETAILS");
+        System.out.println(repeatString("-", 60));
+        System.out.println("Prescription ID: " + prescription.getPrescriptionId());
+        System.out.println("Consultation ID: " + prescription.getConsultationId());
+        System.out.println("Patient ID: " + prescription.getPatientId());
+        System.out.println("Doctor ID: " + prescription.getDoctorId());
+        System.out.println("Diagnosis: " + prescription.getDiagnosis());
+        System.out.println("Date: " + prescription.getPrescriptionDate());
+        System.out.println("Status: " + prescription.getStatus());
+        System.out.println("Total Cost: RM " + String.format("%.2f", prescription.getTotalCost()));
+        System.out.println("Paid: " + (prescription.isPaid() ? "Yes" : "No"));
+        
+        System.out.println("\nPrescribed Medicines:");
+        Object[] prescribedMedicinesArray = prescription.getPrescribedMedicines().toArray();
+        if (prescribedMedicinesArray.length > 0) {
+            System.out.printf("%-20s %-10s %-20s %-10s\n", "Medicine", "Quantity", "Dosage", "Dispensed");
+            System.out.println(repeatString("-", 60));
+            for (Object obj : prescribedMedicinesArray) {
+                PrescribedMedicine pm = (PrescribedMedicine) obj;
+                System.out.printf("%-20s %-10s %-20s %-10s\n", 
+                    pm.getMedicineName(), pm.getQuantity(), pm.getDosage(),
+                    pm.isDispensed() ? "Yes" : "No");
+            }
+        } else {
+            System.out.println("No medicines prescribed.");
+        }
+        
+        System.out.println(repeatString("-", 60));
+        System.out.println("Press Enter to continue...");
+        scanner.nextLine();
+    }
+    
+    public void generateTreatmentStatisticsReport() {
+        System.out.println("\n" + repeatString("=", 60));
+        System.out.println("        TREATMENT STATISTICS REPORT");
+        System.out.println(repeatString("=", 60));
+        
+        Object[] prescriptionsArray = prescriptionList.toArray();
+        int totalPrescriptions = prescriptionsArray.length;
+        int activeCount = 0, completedCount = 0, paidCount = 0;
+        double totalRevenue = 0.0;
+        
+        for (Object obj : prescriptionsArray) {
+            Prescription prescription = (Prescription) obj;
+            if (prescription.getStatus().equals("active")) activeCount++;
+            else if (prescription.getStatus().equals("completed")) completedCount++;
+            if (prescription.isPaid()) {
+                paidCount++;
+                totalRevenue += prescription.getTotalCost();
+            }
+        }
+        
+        System.out.println("📊 Treatment Statistics:");
+        System.out.println("• Total Prescriptions: " + totalPrescriptions);
+        System.out.println("• Active Prescriptions: " + activeCount);
+        System.out.println("• Completed Prescriptions: " + completedCount);
+        System.out.println("• Paid Prescriptions: " + paidCount);
+        System.out.println("• Total Revenue: RM " + String.format("%.2f", totalRevenue));
+        System.out.println("• Average Prescription Cost: RM " + String.format("%.2f", totalRevenue/totalPrescriptions));
+        
+        System.out.println("\nPress Enter to continue...");
+        scanner.nextLine();
+    }
+    
+    public void generateDiagnosisAnalysisReport() {
+        System.out.println("\n" + repeatString("=", 60));
+        System.out.println("        DIAGNOSIS ANALYSIS REPORT");
+        System.out.println(repeatString("=", 60));
+        
+        Object[] prescriptionsArray = prescriptionList.toArray();
+        java.util.Map<String, Integer> diagnosisCount = new java.util.HashMap<>();
+        
+        for (Object obj : prescriptionsArray) {
+            Prescription prescription = (Prescription) obj;
+            String diagnosis = prescription.getDiagnosis();
+            diagnosisCount.put(diagnosis, diagnosisCount.getOrDefault(diagnosis, 0) + 1);
+        }
+        
+        System.out.println("📊 Diagnosis Distribution:");
+        for (java.util.Map.Entry<String, Integer> entry : diagnosisCount.entrySet()) {
+            System.out.println("• " + entry.getKey() + ": " + entry.getValue() + " cases");
+        }
+        
+        System.out.println("\nPress Enter to continue...");
+        scanner.nextLine();
+    }
+    
+    public void displayAvailableMedicines() {
+        System.out.println(repeatString("-", 80));
+        System.out.printf("%-12s %-20s %-15s %-10s %-8s %-10s\n", "ID", "Name", "Brand", "Stock", "Price", "Purpose");
+        System.out.println(repeatString("-", 80));
+        
+        Object[] medicinesArray = medicineList.toArray();
+        for (Object obj : medicinesArray) {
+            Medicine medicine = (Medicine) obj;
+            System.out.printf("%-12s %-20s %-15s %-10s %-8s %-10s\n", 
+                medicine.getMedicineId(), medicine.getName(), medicine.getBrand(),
+                medicine.getStockQuantity(), "RM " + medicine.getPrice(), medicine.getPurpose());
+        }
+        System.out.println(repeatString("-", 80));
+    }
+    
+    public Prescription findPrescriptionById(String prescriptionId) {
+        Object[] prescriptionsArray = prescriptionList.toArray();
+        for (Object obj : prescriptionsArray) {
+            Prescription prescription = (Prescription) obj;
+            if (prescription.getPrescriptionId().equals(prescriptionId)) {
+                return prescription;
             }
         }
         return null;
     }
     
-    //check if patient exists
-    public boolean patientExists(String patientId) {
-        Object[] patientArray = patients.toArray();
+    public Medicine findMedicineById(String medicineId) {
+        Object[] medicinesArray = medicineList.toArray();
+        for (Object obj : medicinesArray) {
+            Medicine medicine = (Medicine) obj;
+            if (medicine.getMedicineId().equals(medicineId)) {
+                return medicine;
+            }
+        }
+        return null;
+    }
+    
+    private int getUserInputInt(int min, int max) {
+        int input;
+        do {
+            while (!scanner.hasNextInt()) {
+                System.out.print("Invalid input! Please enter a number between " + min + " and " + max + ": ");
+                scanner.next();
+            }
+            input = scanner.nextInt();
+            scanner.nextLine();
+            
+            if (input < min || input > max) {
+                System.out.print("Please enter a number between " + min + " and " + max + ": ");
+            }
+        } while (input < min || input > max);
         
-        for (Object obj : patientArray) {
-            if (obj instanceof Patient) {
-                Patient patient = (Patient) obj;
-                if (patient.getId() == Integer.parseInt(patientId)) {
-                    return true;
+        return input;
+    }
+
+    public int getTotalPrescriptionCount() {
+        return prescriptionList.size();
+    }
+    
+    public double getTotalRevenue() {
+        double totalRevenue = 0.0;
+        Object[] prescriptionsArray = prescriptionList.toArray();
+        for (Object obj : prescriptionsArray) {
+            Prescription prescription = (Prescription) obj;
+            if (prescription.isPaid()) {
+                totalRevenue += prescription.getTotalCost();
+            }
+        }
+        return totalRevenue;
+    }
+    
+    public int getPaidPrescriptionCount() {
+        int paidCount = 0;
+        Object[] prescriptionsArray = prescriptionList.toArray();
+        for (Object obj : prescriptionsArray) {
+            Prescription prescription = (Prescription) obj;
+            if (prescription.isPaid()) {
+                paidCount++;
+            }
+        }
+        return paidCount;
+    }
+
+    public void processPayment() {
+        System.out.println("\n" + repeatString("=", 60));
+        System.out.println("        PAYMENT PROCESSING");
+        System.out.println(repeatString("=", 60));
+
+        System.out.println("Unpaid Prescriptions:");
+        System.out.println(repeatString("-", 80));
+        System.out.printf("%-15s %-10s %-20s %-15s %-10s\n", "Prescription ID", "Patient ID", "Diagnosis", "Total Cost", "Status");
+        System.out.println(repeatString("-", 80));
+        
+        Object[] prescriptionsArray = prescriptionList.toArray();
+        boolean hasUnpaid = false;
+        
+        for (Object obj : prescriptionsArray) {
+            Prescription prescription = (Prescription) obj;
+            if (!prescription.isPaid() && prescription.getStatus().equals("active")) {
+                System.out.printf("%-15s %-10s %-20s %-15s %-10s\n", 
+                    prescription.getPrescriptionId(), prescription.getPatientId(),
+                    prescription.getDiagnosis(), "RM " + String.format("%.2f", prescription.getTotalCost()),
+                    prescription.getStatus());
+                hasUnpaid = true;
+            }
+        }
+        
+        if (!hasUnpaid) {
+            System.out.println("No unpaid prescriptions found.");
+            System.out.println(repeatString("-", 80));
+            System.out.println("Press Enter to continue...");
+            scanner.nextLine();
+            return;
+        }
+        
+        System.out.println(repeatString("-", 80));
+
+        System.out.print("Enter prescription ID to process payment: ");
+        String prescriptionId = scanner.nextLine();
+        
+        Prescription prescription = findPrescriptionById(prescriptionId);
+        if (prescription == null) {
+            System.out.println("Prescription not found!");
+            System.out.println("Press Enter to continue...");
+            scanner.nextLine();
+            return;
+        }
+        
+        if (prescription.isPaid()) {
+            System.out.println("This prescription has already been paid!");
+            System.out.println("Press Enter to continue...");
+            scanner.nextLine();
+            return;
+        }
+        
+        if (!prescription.getStatus().equals("active")) {
+            System.out.println("Cannot process payment for non-active prescription!");
+            System.out.println("Press Enter to continue...");
+            scanner.nextLine();
+            return;
+        }
+
+        System.out.println("\nPrescription Details:");
+        System.out.println("Prescription ID: " + prescription.getPrescriptionId());
+        System.out.println("Patient ID: " + prescription.getPatientId());
+        System.out.println("Diagnosis: " + prescription.getDiagnosis());
+        System.out.println("Total Cost: RM " + String.format("%.2f", prescription.getTotalCost()));
+
+        System.out.println("\nPayment Methods:");
+        System.out.println("1. Cash");
+        System.out.println("2. Credit Card");
+        System.out.println("3. Debit Card");
+        System.out.println("4. Online Banking");
+        System.out.print("Select payment method (1-4): ");
+        
+        int paymentMethod = getUserInputInt(1, 4);
+        String paymentMethodStr = "";
+        switch (paymentMethod) {
+            case 1: paymentMethodStr = "Cash"; break;
+            case 2: paymentMethodStr = "Credit Card"; break;
+            case 3: paymentMethodStr = "Debit Card"; break;
+            case 4: paymentMethodStr = "Online Banking"; break;
+        }
+
+        System.out.print("Enter amount received: RM ");
+        double amountReceived = getUserInputDouble(prescription.getTotalCost(), prescription.getTotalCost() * 2);
+
+        double change = amountReceived - prescription.getTotalCost();
+
+        prescription.setPaid(true);
+
+        System.out.println("\n" + repeatString("=", 50));
+        System.out.println("        PAYMENT RECEIPT");
+        System.out.println(repeatString("=", 50));
+        System.out.println("Prescription ID: " + prescription.getPrescriptionId());
+        System.out.println("Patient ID: " + prescription.getPatientId());
+        System.out.println("Diagnosis: " + prescription.getDiagnosis());
+        System.out.println("Total Cost: RM " + String.format("%.2f", prescription.getTotalCost()));
+        System.out.println("Amount Received: RM " + String.format("%.2f", amountReceived));
+        System.out.println("Change: RM " + String.format("%.2f", change));
+        System.out.println("Payment Method: " + paymentMethodStr);
+        System.out.println("Payment Status: PAID");
+        System.out.println("Date: " + java.time.LocalDate.now());
+        System.out.println("Time: " + java.time.LocalTime.now().toString().substring(0, 8));
+        System.out.println(repeatString("=", 50));
+        System.out.println("Thank you for your payment!");
+        
+        System.out.println("\nPress Enter to continue...");
+        scanner.nextLine();
+    }
+    
+    private double getUserInputDouble(double min, double max) {
+        double input;
+        do {
+            while (!scanner.hasNextDouble()) {
+                System.out.print("Invalid input! Please enter a number between " + String.format("%.2f", min) + " and " + String.format("%.2f", max) + ": ");
+                scanner.next();
+            }
+            input = scanner.nextDouble();
+            scanner.nextLine();
+            
+            if (input < min || input > max) {
+                System.out.print("Please enter a number between " + String.format("%.2f", min) + " and " + String.format("%.2f", max) + ": ");
+            }
+        } while (input < min || input > max);
+        
+        return input;
+    }
+
+    public void dispenseMedicines() {
+        System.out.println("\n" + repeatString("=", 60));
+        System.out.println("        MEDICINE DISPENSING");
+        System.out.println(repeatString("=", 60));
+        
+        // Display prescriptions with undispensed medicines
+        System.out.println("Prescriptions with Undispensed Medicines:");
+        System.out.println(repeatString("-", 80));
+        System.out.printf("%-15s %-10s %-20s %-15s %-10s\n", "Prescription ID", "Patient ID", "Diagnosis", "Total Cost", "Status");
+        System.out.println(repeatString("-", 80));
+        
+        Object[] prescriptionsArray = prescriptionList.toArray();
+        boolean hasUndispensed = false;
+        
+        for (Object obj : prescriptionsArray) {
+            Prescription prescription = (Prescription) obj;
+            if (prescription.getStatus().equals("active") && hasUndispensedMedicines(prescription)) {
+                System.out.printf("%-15s %-10s %-20s %-15s %-10s\n", 
+                    prescription.getPrescriptionId(), prescription.getPatientId(),
+                    prescription.getDiagnosis(), "RM " + String.format("%.2f", prescription.getTotalCost()),
+                    prescription.getStatus());
+                hasUndispensed = true;
+            }
+        }
+        
+        if (!hasUndispensed) {
+            System.out.println("No prescriptions with undispensed medicines found.");
+            System.out.println(repeatString("-", 80));
+            System.out.println("Press Enter to continue...");
+            scanner.nextLine();
+            return;
+        }
+        
+        System.out.println(repeatString("-", 80));
+        
+        // Get prescription ID for dispensing
+        System.out.print("Enter prescription ID to dispense medicines: ");
+        String prescriptionId = scanner.nextLine();
+        
+        Prescription prescription = findPrescriptionById(prescriptionId);
+        if (prescription == null) {
+            System.out.println("Prescription not found!");
+            System.out.println("Press Enter to continue...");
+            scanner.nextLine();
+            return;
+        }
+        
+        if (!prescription.getStatus().equals("active")) {
+            System.out.println("Cannot dispense medicines for non-active prescription!");
+            System.out.println("Press Enter to continue...");
+            scanner.nextLine();
+            return;
+        }
+        
+        // Display prescription details and medicines
+        System.out.println("\nPrescription Details:");
+        System.out.println("Prescription ID: " + prescription.getPrescriptionId());
+        System.out.println("Patient ID: " + prescription.getPatientId());
+        System.out.println("Diagnosis: " + prescription.getDiagnosis());
+        System.out.println("Date: " + prescription.getPrescriptionDate());
+        
+        System.out.println("\nPrescribed Medicines:");
+        System.out.println(repeatString("-", 100));
+        System.out.printf("%-20s %-10s %-20s %-10s %-10s %-10s\n", "Medicine", "Quantity", "Dosage", "Instructions", "Price", "Dispensed");
+        System.out.println(repeatString("-", 100));
+        
+        Object[] prescribedMedicinesArray = prescription.getPrescribedMedicines().toArray();
+        boolean allDispensed = true;
+        
+        for (Object obj : prescribedMedicinesArray) {
+            PrescribedMedicine pm = (PrescribedMedicine) obj;
+            System.out.printf("%-20s %-10s %-20s %-10s %-10s %-10s\n", 
+                pm.getMedicineName(), pm.getQuantity(), pm.getDosage(),
+                pm.getInstructions(), "RM " + String.format("%.2f", pm.getUnitPrice()),
+                pm.isDispensed() ? "Yes" : "No");
+            
+            if (!pm.isDispensed()) {
+                allDispensed = false;
+            }
+        }
+        
+        if (allDispensed) {
+            System.out.println("\nAll medicines in this prescription have been dispensed!");
+            System.out.println("Press Enter to continue...");
+            scanner.nextLine();
+            return;
+        }
+        
+        System.out.println(repeatString("-", 100));
+        
+        // Dispense medicines
+        System.out.println("\nDispensing Options:");
+        System.out.println("1. Dispense all undispensed medicines");
+        System.out.println("2. Dispense specific medicine");
+        System.out.print("Select option (1-2): ");
+        
+        int option = getUserInputInt(1, 2);
+        
+        if (option == 1) {
+            // Dispense all undispensed medicines
+            boolean success = true;
+            for (Object obj : prescribedMedicinesArray) {
+                PrescribedMedicine pm = (PrescribedMedicine) obj;
+                if (!pm.isDispensed()) {
+                    Medicine medicine = findMedicineById(pm.getMedicineId());
+                    if (medicine != null) {
+                        if (medicine.getStockQuantity() >= pm.getQuantity()) {
+                            // Update stock in TreatmentManagement
+                            medicine.setStockQuantity(medicine.getStockQuantity() - pm.getQuantity());
+                            
+                            // Also update stock in PharmacyManagement if available
+                            if (pharmacyManagement != null) {
+                                Medicine pharmacyMedicine = pharmacyManagement.findMedicineById(pm.getMedicineId());
+                                if (pharmacyMedicine != null) {
+                                    pharmacyMedicine.setStockQuantity(pharmacyMedicine.getStockQuantity() - pm.getQuantity());
+                                }
+                            }
+                            
+                            // Mark as dispensed
+                            pm.setDispensed(true);
+                        } else {
+                            System.out.println("Insufficient stock for " + pm.getMedicineName() + 
+                                             " (Required: " + pm.getQuantity() + ", Available: " + medicine.getStockQuantity() + ")");
+                            success = false;
+                        }
+                    } else {
+                        System.out.println("Medicine " + pm.getMedicineName() + " not found in inventory!");
+                        success = false;
+                    }
                 }
+            }
+            
+            if (success) {
+                System.out.println("\n✅ All medicines dispensed successfully!");
+                System.out.println("Stock levels have been updated.");
+            } else {
+                System.out.println("\n❌ Some medicines could not be dispensed due to insufficient stock.");
+            }
+        } else {
+            // Dispense specific medicine
+            System.out.print("Enter medicine name to dispense: ");
+            String medicineName = scanner.nextLine();
+            
+            boolean found = false;
+            for (Object obj : prescribedMedicinesArray) {
+                PrescribedMedicine pm = (PrescribedMedicine) obj;
+                if (pm.getMedicineName().equalsIgnoreCase(medicineName) && !pm.isDispensed()) {
+                    found = true;
+                    Medicine medicine = findMedicineById(pm.getMedicineId());
+                    if (medicine != null) {
+                        if (medicine.getStockQuantity() >= pm.getQuantity()) {
+                            // Update stock in TreatmentManagement
+                            medicine.setStockQuantity(medicine.getStockQuantity() - pm.getQuantity());
+                            
+                            // Also update stock in PharmacyManagement if available
+                            if (pharmacyManagement != null) {
+                                Medicine pharmacyMedicine = pharmacyManagement.findMedicineById(pm.getMedicineId());
+                                if (pharmacyMedicine != null) {
+                                    pharmacyMedicine.setStockQuantity(pharmacyMedicine.getStockQuantity() - pm.getQuantity());
+                                }
+                            }
+                            
+                            // Mark as dispensed
+                            pm.setDispensed(true);
+                            System.out.println("\n✅ " + pm.getMedicineName() + " dispensed successfully!");
+                            System.out.println("Quantity dispensed: " + pm.getQuantity());
+                            System.out.println("Remaining stock: " + medicine.getStockQuantity());
+                        } else {
+                            System.out.println("❌ Insufficient stock for " + pm.getMedicineName() + 
+                                             " (Required: " + pm.getQuantity() + ", Available: " + medicine.getStockQuantity() + ")");
+                        }
+                    } else {
+                        System.out.println("❌ Medicine " + pm.getMedicineName() + " not found in inventory!");
+                    }
+                    break;
+                }
+            }
+            
+            if (!found) {
+                System.out.println("❌ Medicine not found or already dispensed!");
+            }
+        }
+        
+        System.out.println("\nPress Enter to continue...");
+        scanner.nextLine();
+    }
+    
+    private boolean hasUndispensedMedicines(Prescription prescription) {
+        Object[] prescribedMedicinesArray = prescription.getPrescribedMedicines().toArray();
+        for (Object obj : prescribedMedicinesArray) {
+            PrescribedMedicine pm = (PrescribedMedicine) obj;
+            if (!pm.isDispensed()) {
+                return true;
             }
         }
         return false;
     }
     
-    //check if doctor exists
-    public boolean doctorExists(String doctorId) {
-        Object[] doctorArray = doctors.toArray();
-        
-        for (Object obj : doctorArray) {
-            if (obj instanceof Doctor) {
-                Doctor doctor = (Doctor) obj;
-                if (doctor.getDoctorId().equals(doctorId)) {
-                    return true;
-                }
-            }
+    public Object[] getAllPrescriptions() {
+        return prescriptionList.toArray();
+    }
+
+    private String repeatString(String str, int count) {
+        StringBuilder sb = new StringBuilder();
+        for (int i = 0; i < count; i++) {
+            sb.append(str);
         }
-        return false;
-    }
-    
-    //check if treatments set is empty
-    public boolean isTreatmentDatabaseEmpty() {
-        return treatments.isEmpty();
-    }
-    
-    //clear all treatments
-    public void clearAllTreatments() {
-        treatments.clearSet();
-    }
-    
-    //get total number of treatments
-    public int getTotalTreatmentCount() {
-        return treatments.size();
-    }
-    
-    //check if all treatments contain specific diagnosis
-    public boolean containsAllTreatmentsWithDiagnosis(String diagnosis) {
-        SetAndQueueInterface<Treatment> allTreatments = new SetAndQueue<>();
-        Object[] treatmentArray = treatments.toArray();
-        for (Object obj : treatmentArray) {
-            if (obj instanceof Treatment) {
-                allTreatments.add((Treatment) obj);
-            }
-        }
-        
-        SetAndQueueInterface<Treatment> diagnosisTreatments = getTreatmentsByDiagnosisSet(diagnosis);
-        return allTreatments.containsAll(diagnosisTreatments);
+        return sb.toString();
     }
 } 

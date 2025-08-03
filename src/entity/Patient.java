@@ -1,6 +1,6 @@
 package entity;
 
-public class Patient {
+public class Patient implements Comparable<Patient> {
     private int id;
     private String name;
     private int age;
@@ -152,5 +152,10 @@ public class Patient {
                 java.util.Objects.equals(registrationDate, patient.registrationDate) &&
                 java.util.Objects.equals(medicalHistory, patient.medicalHistory) &&
                 java.util.Objects.equals(currentStatus, patient.currentStatus);
+    }
+    
+    @Override
+    public int compareTo(Patient other) {
+        return Integer.compare(this.id, other.id);
     }
 }

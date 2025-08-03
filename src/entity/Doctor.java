@@ -1,6 +1,6 @@
 package entity;
 
-public class Doctor {
+public class Doctor implements Comparable<Doctor> {
     private String doctorId;
     private String name;
     private String specialization; //faculty such as cardiology, pediatrics
@@ -140,6 +140,11 @@ public class Doctor {
                 java.util.Objects.equals(dutySchedule, doctor.dutySchedule) &&
                 java.util.Objects.equals(leaveDateStart, doctor.leaveDateStart) &&
                 java.util.Objects.equals(leaveDateEnd, doctor.leaveDateEnd);
+    }
+    
+    @Override
+    public int compareTo(Doctor other) {
+        return this.doctorId.compareTo(other.doctorId);
     }
 }
 
