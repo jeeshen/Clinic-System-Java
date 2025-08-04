@@ -58,13 +58,11 @@ public class PatientManagementUI {
             System.out.println("2 . Search Patient by ID");
             System.out.println("3 . Search Patient by Name");
             System.out.println("4 . Update Patient Information");
-            System.out.println("5 . Patient Statistics Report");
-            System.out.println("6 . Patient Age Distribution Report");
             System.out.println("0 . Back to Main Menu");
             System.out.println(repeatString("-", 50));
             System.out.print("Enter your choice: ");
             
-            int choice = getUserInputInt(0, 6);
+            int choice = getUserInputInt(0, 4);
             
             switch (choice) {
                 case 1:
@@ -78,12 +76,6 @@ public class PatientManagementUI {
                     break;
                 case 4:
                     patientManagement.updatePatientInformation();
-                    break;
-                case 5:
-                    patientManagement.generatePatientStatisticsReport();
-                    break;
-                case 6:
-                    patientManagement.generatePatientAgeDistributionReport();
                     break;
                 case 0:
                     back = true;

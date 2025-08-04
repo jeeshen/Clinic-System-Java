@@ -2,6 +2,8 @@ package utility;
 
 import java.util.Scanner;
 import java.util.regex.Pattern;
+import java.util.Date;
+import java.util.Calendar;
 
 public class InputValidator {
     
@@ -124,22 +126,22 @@ public class InputValidator {
         try {
             java.text.SimpleDateFormat sdf = new java.text.SimpleDateFormat("dd-MM-yyyy");
             sdf.setLenient(false);
-            java.util.Date inputDate = sdf.parse(dateStr);
-            java.util.Date currentDate = new java.util.Date();
+            Date inputDate = sdf.parse(dateStr);
+            Date currentDate = new Date();
             
-            java.util.Calendar inputCal = java.util.Calendar.getInstance();
+            Calendar inputCal = Calendar.getInstance();
             inputCal.setTime(inputDate);
-            inputCal.set(java.util.Calendar.HOUR_OF_DAY, 0);
-            inputCal.set(java.util.Calendar.MINUTE, 0);
-            inputCal.set(java.util.Calendar.SECOND, 0);
-            inputCal.set(java.util.Calendar.MILLISECOND, 0);
+            inputCal.set(Calendar.HOUR_OF_DAY, 0);
+            inputCal.set(Calendar.MINUTE, 0);
+            inputCal.set(Calendar.SECOND, 0);
+            inputCal.set(Calendar.MILLISECOND, 0);
             
-            java.util.Calendar currentCal = java.util.Calendar.getInstance();
+            Calendar currentCal = Calendar.getInstance();
             currentCal.setTime(currentDate);
-            currentCal.set(java.util.Calendar.HOUR_OF_DAY, 0);
-            currentCal.set(java.util.Calendar.MINUTE, 0);
-            currentCal.set(java.util.Calendar.SECOND, 0);
-            currentCal.set(java.util.Calendar.MILLISECOND, 0);
+            currentCal.set(Calendar.HOUR_OF_DAY, 0);
+            currentCal.set(Calendar.MINUTE, 0);
+            currentCal.set(Calendar.SECOND, 0);
+            currentCal.set(Calendar.MILLISECOND, 0);
             
             return !inputCal.getTime().before(currentCal.getTime());
         } catch (Exception e) {
@@ -154,14 +156,18 @@ public class InputValidator {
     public static String getValidGender(Scanner scanner, String prompt) {
         String gender;
         do {
-            System.out.print(prompt + " (Male/Female): ");
-            gender = scanner.nextLine().trim();
-            if (!gender.equalsIgnoreCase("Male") && !gender.equalsIgnoreCase("Female")) {
-                System.out.println("Invalid gender. Please enter 'Male' or 'Female'.");
+            System.out.print(prompt + " (M/F): ");
+            gender = scanner.nextLine().trim().toUpperCase();
+            if (!gender.equals("M") && !gender.equals("F")) {
+                System.out.println("Invalid gender. Please enter 'M' or 'F'.");
             }
-        } while (!gender.equalsIgnoreCase("Male") && !gender.equalsIgnoreCase("Female"));
+        } while (!gender.equals("M") && !gender.equals("F"));
         
-        return gender;
+        if (gender.equals("M")) {
+            return "Male";
+        } else {
+            return "Female";
+        }
     }
     
     public static int getValidId(Scanner scanner, String prompt) {

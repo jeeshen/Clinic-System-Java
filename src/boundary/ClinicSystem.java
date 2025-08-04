@@ -13,8 +13,8 @@ public class ClinicSystem {
     private DoctorManagementUI doctorUI;
     private ConsultationManagementUI consultationUI;
     private TreatmentManagementUI treatmentUI;
-    private ReportUI reportUI;
-    private PharmacyUI pharmacyUI;
+    private ReportManagementUI reportUI;
+    private PharmacyManagementUI pharmacyUI;
     private Scanner scanner;
     
     public ClinicSystem() {
@@ -34,11 +34,13 @@ public class ClinicSystem {
         doctorUI = new DoctorManagementUI(doctorManagement);
         consultationUI = new ConsultationManagementUI(consultationManagement);
         treatmentUI = new TreatmentManagementUI(treatmentManagement);
-        reportUI = new ReportUI(reportManagement);
-        pharmacyUI = new PharmacyUI(pharmacyManagement);
+        reportUI = new ReportManagementUI(reportManagement);
+        pharmacyUI = new PharmacyManagementUI(pharmacyManagement);
 
         //connect to other controllers
         consultationUI.setDependencies(patientManagement, doctorManagement, treatmentManagement);
+        consultationManagement.setDoctorManagement(doctorManagement);
+        patientManagement.setConsultationManagement(consultationManagement);
         reportUI.setDependencies(patientManagement, doctorManagement, consultationManagement, treatmentManagement);
         pharmacyUI.setDependencies(treatmentManagement);
         treatmentManagement.setPharmacyManagement(pharmacyManagement);
@@ -49,7 +51,7 @@ public class ClinicSystem {
         
         while (running) {
             displayMainMenu();
-            int choice = getUserInputInt(0, 12);
+            int choice = getUserInputInt(0, 11);
             
             switch (choice) {
                 case 1:
@@ -85,9 +87,6 @@ public class ClinicSystem {
                 case 11:
                     pharmacyUI.processPayment();
                     break;
-                case 12:
-                    reportUI.viewSystemStatus();
-                    break;
                 case 0:
                     System.out.println("Thank you for using Integrated Clinic Management System!");
                     running = false;
@@ -114,7 +113,6 @@ public class ClinicSystem {
         System.out.println("9 . Medicine Dispensing & Stock Control");
         System.out.println("10. Pharmacy Reports & Inventory");
         System.out.println("11. Process Payment");
-        System.out.println("12. View System Status & Reports");
         System.out.println("0 . Exit System");
         System.out.println(repeatString("-", 60));
         System.out.print("Enter your choice: ");

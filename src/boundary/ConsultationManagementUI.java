@@ -42,13 +42,11 @@ public class ConsultationManagementUI {
             System.out.println("2 . Search Consultation by ID");
             System.out.println("3 . Search Consultations by Doctor");
             System.out.println("4 . Search Consultations by Patient");
-            System.out.println("5 . Consultation Statistics Report");
-            System.out.println("6 . Doctor Performance Report");
             System.out.println("0 . Back to Main Menu");
             System.out.println(repeatString("-", 50));
             System.out.print("Enter your choice: ");
             
-            int choice = getUserInputInt(0, 6);
+            int choice = getUserInputInt(0, 4);
             
             switch (choice) {
                 case 1:
@@ -62,12 +60,6 @@ public class ConsultationManagementUI {
                     break;
                 case 4:
                     consultationManagement.searchConsultationsByPatient();
-                    break;
-                case 5:
-                    consultationManagement.generateConsultationStatisticsReport();
-                    break;
-                case 6:
-                    consultationManagement.generateDoctorPerformanceReport();
                     break;
                 case 0:
                     back = true;

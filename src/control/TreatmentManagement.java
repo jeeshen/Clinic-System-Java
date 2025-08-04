@@ -32,13 +32,18 @@ public class TreatmentManagement {
         for (Medicine medicine : sampleMedicines) {
             medicineList.add(medicine);
         }
+
+        Prescription[] samplePrescriptions = DataInitializer.initializeSamplePrescriptions();
+        for (Prescription prescription : samplePrescriptions) {
+            prescriptionList.add(prescription);
+        }
     }
     
     public void createPrescription(String consultationId, Patient currentPatient, Doctor selectedDoctor, String diagnosis, String consultationDate) {
-        String prescriptionId = "PRESC" + prescriptionIdCounter++;
+        String prescriptionId = "PRE" + String.format("%03d", prescriptionIdCounter++);
         Prescription prescription = new Prescription(prescriptionId, consultationId, String.valueOf(currentPatient.getId()), selectedDoctor.getDoctorId(), diagnosis, new SetAndQueue<>(), consultationDate, "active", 0.0, false);
         
-        // Prescribe medicines
+        //prescribe medicine
         System.out.println("\n=== PRESCRIBE MEDICINES ===");
         System.out.println("Available medicines:");
         displayAvailableMedicines();
@@ -55,7 +60,7 @@ public class TreatmentManagement {
             
             Medicine medicine = findMedicineById(medicineId);
             if (medicine != null) {
-                // Check for allergies
+                //check for allergies
                 if (currentPatient.getAllegy() != null && !currentPatient.getAllegy().isEmpty()) {
                     if (medicine.getActiveIngredient().toLowerCase().contains(currentPatient.getAllegy().toLowerCase()) ||
                         medicine.getName().toLowerCase().contains(currentPatient.getAllegy().toLowerCase())) {
@@ -77,8 +82,7 @@ public class TreatmentManagement {
                 
                 System.out.print("Enter instructions (e.g., 'Take with food'): ");
                 String instructions = scanner.nextLine();
-                
-                // Create prescribed medicine
+
                 String prescribedMedicineId = "PM" + prescribedMedicineIdCounter++;
                 double totalPrice = medicine.getPrice() * quantity;
                 
@@ -235,35 +239,128 @@ public class TreatmentManagement {
     }
     
     public void generateTreatmentStatisticsReport() {
-        System.out.println("\n" + repeatString("=", 60));
+        System.out.println("\n" + repeatString("=", 80));
         System.out.println("        TREATMENT STATISTICS REPORT");
-        System.out.println(repeatString("=", 60));
+        System.out.println(repeatString("=", 80));
         
         Object[] prescriptionsArray = prescriptionList.toArray();
         int totalPrescriptions = prescriptionsArray.length;
-        int activeCount = 0, completedCount = 0, paidCount = 0;
-        double totalRevenue = 0.0;
+        
+        int paidCount = 0;
+
+        SetAndQueueInterface<String> diagnosisSet = new SetAndQueue<>();
+        SetAndQueueInterface<String> dates = new SetAndQueue<>();  
+
+        int[] diagnosisCounts = new int[100];
+        String[] diagnosisArray = new String[100];
+        int diagnosisIndex = 0;
         
         for (Object obj : prescriptionsArray) {
             Prescription prescription = (Prescription) obj;
-            if (prescription.getStatus().equals("active")) activeCount++;
-            else if (prescription.getStatus().equals("completed")) completedCount++;
+
             if (prescription.isPaid()) {
                 paidCount++;
-                totalRevenue += prescription.getTotalCost();
             }
+            
+            //diagnosis analysis
+            String diagnosis = prescription.getDiagnosis();
+            diagnosisSet.add(diagnosis);
+            
+            //count diagnoses
+            boolean found = false;
+            for (int i = 0; i < diagnosisIndex; i++) {
+                if (diagnosisArray[i].equals(diagnosis)) {
+                    diagnosisCounts[i]++;
+                    found = true;
+                    break;
+                }
+            }
+            if (!found) {
+                diagnosisArray[diagnosisIndex] = diagnosis;
+                diagnosisCounts[diagnosisIndex] = 1;
+                diagnosisIndex++;
+            }
+            
+            //date analysis
+            String date = prescription.getPrescriptionDate();
+            dates.add(date);
+        }
+
+        System.out.println("📊 PRESCRIPTION OVERVIEW:");
+        System.out.println("• Total Prescriptions: " + totalPrescriptions);
+        System.out.println("• Paid Prescriptions: " + paidCount);
+
+        System.out.println("\n🏥 DIAGNOSIS ANALYSIS:");
+        System.out.println("• Total Unique Diagnoses: " + diagnosisSet.size());
+
+        System.out.println("• Top 5 Diagnoses:");
+        for (int i = 0; i < Math.min(5, diagnosisIndex); i++) {
+            //find the diagnosis with highest count
+            int maxIndex = 0;
+            for (int j = 1; j < diagnosisIndex; j++) {
+                if (diagnosisCounts[j] > diagnosisCounts[maxIndex]) {
+                    maxIndex = j;
+                }
+            }
+            int bars = (int) Math.round((double) diagnosisCounts[maxIndex] / totalPrescriptions * 20);
+            System.out.printf("  %d. %-20s: [%s] %d cases (%.1f%%)\n", 
+                i+1, diagnosisArray[maxIndex], 
+                createColoredBar(BLUE_BG, bars, 20),
+                diagnosisCounts[maxIndex], 
+                (double)diagnosisCounts[maxIndex]/totalPrescriptions*100);
+            //mark as used by setting to -1
+            diagnosisCounts[maxIndex] = -1;
+        }
+
+        System.out.println("\n📅 PRESCRIPTION TRENDS:");
+        System.out.println("• Total Active Days: " + dates.size());
+        System.out.println("• Average Prescriptions per Day: " + String.format("%.1f", (double)totalPrescriptions/dates.size()));
+
+        System.out.println("• Daily Prescription Distribution:");
+        Object[] datesArray = dates.toArray();
+        for (Object dateObj : datesArray) {
+            String date = (String) dateObj;
+            int count = 0;
+            for (Object obj : prescriptionsArray) {
+                Prescription prescription = (Prescription) obj;
+                if (prescription.getPrescriptionDate().equals(date)) {
+                    count++;
+                }
+            }
+            int bars = (int) Math.round((double) count / getMaxPrescriptions(prescriptionsArray) * 15);
+            System.out.printf("  %s: [%s] %d prescriptions\n", 
+                date, 
+                createColoredBar(BLUE_BG, bars, 15),
+                count);
+        }
+
+        System.out.println("");
+        System.out.println("Press Enter to continue...");
+        scanner.nextLine();
+    }
+    
+    private int getMaxPrescriptions(Object[] prescriptionsArray) {
+        //count prescriptions per date
+        SetAndQueueInterface<String> dates = new SetAndQueue<>();
+        for (Object obj : prescriptionsArray) {
+            Prescription prescription = (Prescription) obj;
+            dates.add(prescription.getPrescriptionDate());
         }
         
-        System.out.println("📊 Treatment Statistics:");
-        System.out.println("• Total Prescriptions: " + totalPrescriptions);
-        System.out.println("• Active Prescriptions: " + activeCount);
-        System.out.println("• Completed Prescriptions: " + completedCount);
-        System.out.println("• Paid Prescriptions: " + paidCount);
-        System.out.println("• Total Revenue: RM " + String.format("%.2f", totalRevenue));
-        System.out.println("• Average Prescription Cost: RM " + String.format("%.2f", totalRevenue/totalPrescriptions));
-        
-        System.out.println("\nPress Enter to continue...");
-        scanner.nextLine();
+        int maxCount = 0;
+        Object[] datesArray = dates.toArray();
+        for (Object dateObj : datesArray) {
+            String date = (String) dateObj;
+            int count = 0;
+            for (Object obj : prescriptionsArray) {
+                Prescription prescription = (Prescription) obj;
+                if (prescription.getPrescriptionDate().equals(date)) {
+                    count++;
+                }
+            }
+            if (count > maxCount) maxCount = count;
+        }
+        return maxCount;
     }
     
     public void generateDiagnosisAnalysisReport() {
@@ -272,17 +369,55 @@ public class TreatmentManagement {
         System.out.println(repeatString("=", 60));
         
         Object[] prescriptionsArray = prescriptionList.toArray();
-        java.util.Map<String, Integer> diagnosisCount = new java.util.HashMap<>();
+        SetAndQueueInterface<String> diagnosisSet = new SetAndQueue<>();
+        
+        //count diagnoses manually
+        int[] diagnosisCounts = new int[100];
+        String[] diagnosisArray = new String[100];
+        int diagnosisIndex = 0;
         
         for (Object obj : prescriptionsArray) {
             Prescription prescription = (Prescription) obj;
             String diagnosis = prescription.getDiagnosis();
-            diagnosisCount.put(diagnosis, diagnosisCount.getOrDefault(diagnosis, 0) + 1);
+            diagnosisSet.add(diagnosis);
+            
+            //count diagnoses
+            boolean found = false;
+            for (int i = 0; i < diagnosisIndex; i++) {
+                if (diagnosisArray[i].equals(diagnosis)) {
+                    diagnosisCounts[i]++;
+                    found = true;
+                    break;
+                }
+            }
+            if (!found) {
+                diagnosisArray[diagnosisIndex] = diagnosis;
+                diagnosisCounts[diagnosisIndex] = 1;
+                diagnosisIndex++;
+            }
         }
         
         System.out.println("📊 Diagnosis Distribution:");
-        for (java.util.Map.Entry<String, Integer> entry : diagnosisCount.entrySet()) {
-            System.out.println("• " + entry.getKey() + ": " + entry.getValue() + " cases");
+        for (int i = 0; i < diagnosisIndex; i++) {
+            System.out.println("• " + diagnosisArray[i] + ": " + diagnosisCounts[i] + " cases");
+        }
+        
+        System.out.println("\n📈 Diagnosis Chart:");
+        if (diagnosisIndex > 0) {
+            int totalCases = 0;
+            for (int i = 0; i < diagnosisIndex; i++) {
+                totalCases += diagnosisCounts[i];
+            }
+            
+            for (int i = 0; i < diagnosisIndex; i++) {
+                int bars = totalCases > 0 ? (int) Math.round((double) diagnosisCounts[i] / totalCases * 25) : 0;
+                System.out.printf("%-30s [%s] %d cases (%.1f%%)\n", 
+                    diagnosisArray[i] + ":", 
+                    createColoredBar(BLUE_BG, bars, 25),
+                    diagnosisCounts[i], 
+                    (double)diagnosisCounts[i]/totalCases*100);
+                System.out.println("");
+            }
         }
         
         System.out.println("\nPress Enter to continue...");
@@ -503,7 +638,7 @@ public class TreatmentManagement {
         System.out.println("        MEDICINE DISPENSING");
         System.out.println(repeatString("=", 60));
         
-        // Display prescriptions with undispensed medicines
+        //display prescriptions with undispensed medicines
         System.out.println("Prescriptions with Undispensed Medicines:");
         System.out.println(repeatString("-", 80));
         System.out.printf("%-15s %-10s %-20s %-15s %-10s\n", "Prescription ID", "Patient ID", "Diagnosis", "Total Cost", "Status");
@@ -533,7 +668,7 @@ public class TreatmentManagement {
         
         System.out.println(repeatString("-", 80));
         
-        // Get prescription ID for dispensing
+        //get prescription ID for dispensing
         System.out.print("Enter prescription ID to dispense medicines: ");
         String prescriptionId = scanner.nextLine();
         
@@ -547,6 +682,14 @@ public class TreatmentManagement {
         
         if (!prescription.getStatus().equals("active")) {
             System.out.println("Cannot dispense medicines for non-active prescription!");
+            System.out.println("Press Enter to continue...");
+            scanner.nextLine();
+            return;
+        }
+        
+        if (!prescription.isPaid()) {
+            System.out.println("Cannot dispense medicines for unpaid prescription!");
+            System.out.println("Please process payment first.");
             System.out.println("Press Enter to continue...");
             scanner.nextLine();
             return;
@@ -588,7 +731,7 @@ public class TreatmentManagement {
         
         System.out.println(repeatString("-", 100));
         
-        // Dispense medicines
+        //dispense medicines
         System.out.println("\nDispensing Options:");
         System.out.println("1. Dispense all undispensed medicines");
         System.out.println("2. Dispense specific medicine");
@@ -597,7 +740,7 @@ public class TreatmentManagement {
         int option = getUserInputInt(1, 2);
         
         if (option == 1) {
-            // Dispense all undispensed medicines
+            //dispense all undispensed medicines
             boolean success = true;
             for (Object obj : prescribedMedicinesArray) {
                 PrescribedMedicine pm = (PrescribedMedicine) obj;
@@ -608,7 +751,7 @@ public class TreatmentManagement {
                             // Update stock in TreatmentManagement
                             medicine.setStockQuantity(medicine.getStockQuantity() - pm.getQuantity());
                             
-                            // Also update stock in PharmacyManagement if available
+                            //also update stock in PharmacyManagement if available
                             if (pharmacyManagement != null) {
                                 Medicine pharmacyMedicine = pharmacyManagement.findMedicineById(pm.getMedicineId());
                                 if (pharmacyMedicine != null) {
@@ -616,7 +759,7 @@ public class TreatmentManagement {
                                 }
                             }
                             
-                            // Mark as dispensed
+                            //mark as dispensed
                             pm.setDispensed(true);
                         } else {
                             System.out.println("Insufficient stock for " + pm.getMedicineName() + 
@@ -637,7 +780,7 @@ public class TreatmentManagement {
                 System.out.println("\n❌ Some medicines could not be dispensed due to insufficient stock.");
             }
         } else {
-            // Dispense specific medicine
+            //dispense specific medicine
             System.out.print("Enter medicine name to dispense: ");
             String medicineName = scanner.nextLine();
             
@@ -649,10 +792,10 @@ public class TreatmentManagement {
                     Medicine medicine = findMedicineById(pm.getMedicineId());
                     if (medicine != null) {
                         if (medicine.getStockQuantity() >= pm.getQuantity()) {
-                            // Update stock in TreatmentManagement
+                            //update stock in TreatmentManagement
                             medicine.setStockQuantity(medicine.getStockQuantity() - pm.getQuantity());
                             
-                            // Also update stock in PharmacyManagement if available
+                            //also update stock in PharmacyManagement if available
                             if (pharmacyManagement != null) {
                                 Medicine pharmacyMedicine = pharmacyManagement.findMedicineById(pm.getMedicineId());
                                 if (pharmacyMedicine != null) {
@@ -660,7 +803,7 @@ public class TreatmentManagement {
                                 }
                             }
                             
-                            // Mark as dispensed
+                            //mark as dispensed
                             pm.setDispensed(true);
                             System.out.println("\n✅ " + pm.getMedicineName() + " dispensed successfully!");
                             System.out.println("Quantity dispensed: " + pm.getQuantity());
@@ -699,12 +842,61 @@ public class TreatmentManagement {
     public Object[] getAllPrescriptions() {
         return prescriptionList.toArray();
     }
+    
+    public void generateDispensingStatisticsReport() {
+        System.out.println("\n" + repeatString("=", 60));
+        System.out.println("        DISPENSING STATISTICS REPORT");
+        System.out.println(repeatString("=", 60));
+        
+        Object[] prescriptionsArray = prescriptionList.toArray();
+        int totalPrescriptions = prescriptionsArray.length;
+        int totalMedicines = 0;
+        int dispensedMedicines = 0;
+        double totalRevenue = 0.0;
+        
+        for (Object obj : prescriptionsArray) {
+            Prescription prescription = (Prescription) obj;
+            Object[] prescribedMedicinesArray = prescription.getPrescribedMedicines().toArray();
+            
+            for (Object pmObj : prescribedMedicinesArray) {
+                PrescribedMedicine pm = (PrescribedMedicine) pmObj;
+                totalMedicines++;
+                if (pm.isDispensed()) {
+                    dispensedMedicines++;
+                    if (prescription.isPaid()) {
+                        totalRevenue += pm.getTotalPrice();
+                    }
+                }
+            }
+        }
+        
+        System.out.println("📊 Dispensing Statistics:");
+        System.out.println("• Total Prescriptions: " + totalPrescriptions);
+        System.out.println("• Total Medicines Prescribed: " + totalMedicines);
+        System.out.println("• Prescriptions Dispensed: " + dispensedMedicines);
+        System.out.println("• Dispensing Rate: " + String.format("%.1f", (double)dispensedMedicines/totalMedicines*100) + "%");
+        System.out.println("• Total Revenue from Dispensed Medicines: RM " + String.format("%.2f", totalRevenue));
+        
+        if (totalMedicines > 0) {
+            System.out.println("• Average Medicines per Prescription: " + String.format("%.1f", (double)totalMedicines/totalPrescriptions));
+        }
+        
+        System.out.println("\nPress Enter to continue...");
+        scanner.nextLine();
+    }
 
+    private static final String RESET = "\u001B[0m";
+    private static final String BLUE_BG = "\u001B[44m";
+    
     private String repeatString(String str, int count) {
         StringBuilder sb = new StringBuilder();
         for (int i = 0; i < count; i++) {
             sb.append(str);
         }
         return sb.toString();
+    }
+    
+    private String createColoredBar(String color, int barCount, int totalWidth) {
+        return color + repeatString(" ", barCount) + RESET + repeatString(" ", totalWidth - barCount);
     }
 } 

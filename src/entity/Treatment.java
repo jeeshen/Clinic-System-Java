@@ -7,20 +7,18 @@ public class Treatment {
     private String diagnosis;
     private String prescribedMedications; //can make to list
     private String treatmentDate;
-    private String followUpDate;
 
     public Treatment() {    
-        this("", "", "", "", "", "", "");
+        this("", "", "", "", "", "");
     }
 
-    public Treatment(String treatmentId, String patientId, String doctorId, String diagnosis, String prescribedMedications, String treatmentDate, String followUpDate) {
+    public Treatment(String treatmentId, String patientId, String doctorId, String diagnosis, String prescribedMedications, String treatmentDate) {
         this.treatmentId = treatmentId;
         this.patientId = patientId;
         this.doctorId = doctorId;
         this.diagnosis = diagnosis;
         this.prescribedMedications = prescribedMedications;
         this.treatmentDate = treatmentDate;
-        this.followUpDate = followUpDate;
     }
 
     public String getTreatmentId() {
@@ -71,13 +69,7 @@ public class Treatment {
         this.treatmentDate = treatmentDate;
     }
 
-    public String getFollowUpDate() {
-        return followUpDate;
-    }
 
-    public void setFollowUpDate(String followUpDate) {
-        this.followUpDate = followUpDate;
-    }
 
     @Override
     public String toString() {
@@ -88,7 +80,6 @@ public class Treatment {
                 ", diagnosis='" + diagnosis + '\'' +
                 ", prescribedMedications='" + prescribedMedications + '\'' +
                 ", treatmentDate='" + treatmentDate + '\'' +
-                ", followUpDate='" + followUpDate + '\'' +
                 '}';
     }
 
@@ -102,7 +93,6 @@ public class Treatment {
                 java.util.Objects.equals(doctorId, treatment.doctorId) &&
                 java.util.Objects.equals(diagnosis, treatment.diagnosis) &&
                 java.util.Objects.equals(prescribedMedications, treatment.prescribedMedications) &&
-                java.util.Objects.equals(treatmentDate, treatment.treatmentDate) &&
-                java.util.Objects.equals(followUpDate, treatment.followUpDate);
+                java.util.Objects.equals(treatmentDate, treatment.treatmentDate);
     }
 }

@@ -5,22 +5,20 @@ public class Consultation implements Comparable<Consultation> {
     private String patientId;
     private String doctorId;
     private String consultationDate;
-    private String status; //scheduled or completed
+    private String status; //completed
     private String notes;
-    private String nextAppointmentDate;
 
     public Consultation() {
-        this("", "", "", "", "", "", "");
+        this("", "", "", "", "", "");
     }
 
-    public Consultation(String consultationId, String patientId, String doctorId, String consultationDate, String status, String notes, String nextAppointmentDate) {
+    public Consultation(String consultationId, String patientId, String doctorId, String consultationDate, String status, String notes) {
         this.consultationId = consultationId;
         this.patientId = patientId;
         this.doctorId = doctorId;
         this.consultationDate = consultationDate;
         this.status = status;
         this.notes = notes;
-        this.nextAppointmentDate = nextAppointmentDate;
     }
 
     public String getConsultationId() {
@@ -47,10 +45,6 @@ public class Consultation implements Comparable<Consultation> {
         return notes;
     }
 
-    public String getNextAppointmentDate() {
-        return nextAppointmentDate;
-    }
-
     public void setConsultationId(String consultationId) {
         this.consultationId = consultationId;
     }
@@ -75,10 +69,6 @@ public class Consultation implements Comparable<Consultation> {
         this.notes = notes;
     }
 
-    public void setNextAppointmentDate(String nextAppointmentDate) {
-        this.nextAppointmentDate = nextAppointmentDate;
-    }
-
     @Override
     public String toString() {
         return "Consultation{" +
@@ -88,7 +78,6 @@ public class Consultation implements Comparable<Consultation> {
                 ", consultationDate='" + consultationDate + '\'' +
                 ", status='" + status + '\'' +
                 ", notes='" + notes + '\'' +
-                ", nextAppointmentDate='" + nextAppointmentDate + '\'' +
                 '}';
     }
 
@@ -102,8 +91,7 @@ public class Consultation implements Comparable<Consultation> {
                 java.util.Objects.equals(doctorId, that.doctorId) &&
                 java.util.Objects.equals(consultationDate, that.consultationDate) &&
                 java.util.Objects.equals(status, that.status) &&
-                java.util.Objects.equals(notes, that.notes) &&
-                java.util.Objects.equals(nextAppointmentDate, that.nextAppointmentDate);
+                java.util.Objects.equals(notes, that.notes);
     }
     
     @Override

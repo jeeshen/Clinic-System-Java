@@ -6,8 +6,8 @@ public class PrescribedMedicine implements Comparable<PrescribedMedicine> {
     private String medicineId;
     private String medicineName;
     private int quantity;
-    private String dosage; // e.g., "1 tablet twice daily"
-    private String instructions; // e.g., "Take with food"
+    private String dosage; //e.g., "1 tablet twice daily"
+    private String instructions; //e.g., "Take with food"
     private double unitPrice;
     private double totalPrice;
     private boolean isDispensed;

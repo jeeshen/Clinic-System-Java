@@ -7,7 +7,7 @@ import control.ConsultationManagement;
 import control.TreatmentManagement;
 import java.util.Scanner;
 
-public class ReportUI {
+public class ReportManagementUI {
     private ReportManagement reportManagement;
     private PatientManagement patientManagement;
     private DoctorManagement doctorManagement;
@@ -15,7 +15,7 @@ public class ReportUI {
     private TreatmentManagement treatmentManagement;
     private Scanner scanner;
     
-    public ReportUI(ReportManagement reportManagement) {
+    public ReportManagementUI(ReportManagement reportManagement) {
         this.reportManagement = reportManagement;
         this.scanner = new Scanner(System.in);
     }
@@ -38,12 +38,14 @@ public class ReportUI {
             System.out.println("3 . Consultation Statistics Report");
             System.out.println("4 . Treatment Statistics Report");
             System.out.println("5 . Diagnosis Analysis Report");
-            System.out.println("6 . Comprehensive Medical Report");
+            System.out.println("6 . Age vs Disease Analysis Report");
+            System.out.println("7 . Doctor vs Workload Analysis Report");
+            System.out.println("8 . Comprehensive Medical Report");
             System.out.println("0 . Back to Main Menu");
             System.out.println(repeatString("-", 50));
             System.out.print("Enter your choice: ");
             
-            int choice = getUserInputInt(0, 6);
+            int choice = getUserInputInt(0, 8);
             
             switch (choice) {
                 case 1:
@@ -82,6 +84,20 @@ public class ReportUI {
                     }
                     break;
                 case 6:
+                    if (patientManagement != null && treatmentManagement != null) {
+                        reportManagement.generateAgeVsDiseaseAnalysisReport(patientManagement, treatmentManagement);
+                    } else {
+                        System.out.println("Patient and Treatment management not available!");
+                    }
+                    break;
+                case 7:
+                    if (doctorManagement != null && consultationManagement != null) {
+                        reportManagement.generateDoctorVsWorkloadAnalysisReport(doctorManagement, consultationManagement);
+                    } else {
+                        System.out.println("Doctor and Consultation management not available!");
+                    }
+                    break;
+                case 8:
                     if (patientManagement != null && doctorManagement != null && 
                         consultationManagement != null && treatmentManagement != null) {
                         reportManagement.generateComprehensiveMedicalReport(
@@ -94,16 +110,6 @@ public class ReportUI {
                     back = true;
                     break;
             }
-        }
-    }
-    
-    public void viewSystemStatus() {
-        if (patientManagement != null && doctorManagement != null && 
-            consultationManagement != null && treatmentManagement != null) {
-            reportManagement.viewSystemStatus(
-                patientManagement, doctorManagement, consultationManagement, treatmentManagement);
-        } else {
-            System.out.println("All management systems not available!");
         }
     }
     
