@@ -131,7 +131,7 @@ public class DoctorManagement {
         System.out.println("\n" + repeatString("-", 95));
         System.out.println("ALL DOCTORS (SORTED BY ID)");
         System.out.println(repeatString("-", 95));
-        System.out.printf("%-10s %-35s %-20s %-15s %-10s\n", "ID", "Name", "Specialization", "Contact", "Available");
+        System.out.printf("%-10s %-35s %-30s %-15s %-10s\n", "ID", "Name", "Specialization", "Contact", "Available");
         System.out.println(repeatString("-", 95));
         
         Object[] doctorsArray = doctorList.toArray();
@@ -143,7 +143,7 @@ public class DoctorManagement {
         utility.BubbleSort.sort(doctorArray);
         
         for (Doctor doctor : doctorArray) {
-            System.out.printf("%-10s %-35s %-20s %-15s %-10s\n", 
+            System.out.printf("%-10s %-35s %-30s %-15s %-10s\n", 
                 doctor.getDoctorId(), doctor.getName(), doctor.getSpecialization(), 
                 doctor.getContactNumber(), doctor.isIsAvailable() ? "Yes" : "No");
         }
@@ -213,25 +213,119 @@ public class DoctorManagement {
         scanner.nextLine();
     }
     
+    public void updateDoctorDetails() {
+        System.out.println("\n" + repeatString("=", 60));
+        System.out.println("        UPDATE DOCTOR DETAILS");
+        System.out.println(repeatString("=", 60));
+
+        System.out.println("📋 AVAILABLE DOCTORS:");
+        System.out.println(repeatString("-", 95));
+        System.out.printf("%-10s %-35s %-30s %-15s %-10s\n", "ID", "Name", "Specialization", "Contact", "Available");
+        System.out.println(repeatString("-", 95));
+        
+        Object[] doctorsArray = doctorList.toArray();
+        Doctor[] doctorArray = new Doctor[doctorsArray.length];
+        for (int i = 0; i < doctorsArray.length; i++) {
+            doctorArray[i] = (Doctor) doctorsArray[i];
+        }
+        
+        utility.BubbleSort.sort(doctorArray);
+        
+        for (Doctor doctor : doctorArray) {
+            System.out.printf("%-10s %-35s %-30s %-15s %-10s\n", 
+                doctor.getDoctorId(), doctor.getName(), doctor.getSpecialization(), 
+                doctor.getContactNumber(), doctor.isIsAvailable() ? "Yes" : "No");
+        }
+        System.out.println(repeatString("-", 95));
+        System.out.println("Total Doctors: " + doctorArray.length);
+        System.out.println(repeatString("=", 60));
+        
+        System.out.print("Enter doctor ID to update: ");
+        String doctorId = scanner.nextLine();
+        
+        Doctor doctor = findDoctorById(doctorId);
+        if (doctor != null) {
+            System.out.println("\nCurrent doctor information:");
+            displayDoctorDetails(doctor);
+            
+            System.out.println("\n" + repeatString("-", 60));
+            System.out.println("Enter new information (press Enter to keep current value):");
+            System.out.println(repeatString("-", 60));
+            
+            //update name
+            System.out.print("Name [" + doctor.getName() + "]: ");
+            String name = scanner.nextLine();
+            if (!name.isEmpty()) doctor.setName(name);
+            
+            //update specialization
+            System.out.print("Specialization [" + doctor.getSpecialization() + "]: ");
+            String specialization = scanner.nextLine();
+            if (!specialization.isEmpty()) doctor.setSpecialization(specialization);
+            
+            //update contact number
+            System.out.print("Contact Number [" + doctor.getContactNumber() + "]: ");
+            String contact = scanner.nextLine();
+            if (!contact.isEmpty()) doctor.setContactNumber(contact);
+            
+            System.out.println("\n✅ Doctor details updated successfully!");
+            System.out.println("\nUpdated doctor information:");
+            displayDoctorDetails(doctor);
+        } else {
+            System.out.println("❌ Doctor not found!");
+        }
+    }
+    
     public void updateDoctorSchedule() {
+        System.out.println("\n" + repeatString("=", 60));
+        System.out.println("        UPDATE DOCTOR SCHEDULE");
+        System.out.println(repeatString("=", 60));
+
+        System.out.println("📋 AVAILABLE DOCTORS:");
+        System.out.println(repeatString("-", 95));
+        System.out.printf("%-10s %-35s %-30s %-15s %-10s\n", "ID", "Name", "Specialization", "Contact", "Available");
+        System.out.println(repeatString("-", 95));
+        
+        Object[] doctorsArray = doctorList.toArray();
+        Doctor[] doctorArray = new Doctor[doctorsArray.length];
+        for (int i = 0; i < doctorsArray.length; i++) {
+            doctorArray[i] = (Doctor) doctorsArray[i];
+        }
+        
+        utility.BubbleSort.sort(doctorArray);
+        
+        for (Doctor doctor : doctorArray) {
+            System.out.printf("%-10s %-35s %-30s %-15s %-10s\n", 
+                doctor.getDoctorId(), doctor.getName(), doctor.getSpecialization(), 
+                doctor.getContactNumber(), doctor.isIsAvailable() ? "Yes" : "No");
+        }
+        System.out.println(repeatString("-", 95));
+        System.out.println("Total Doctors: " + doctorArray.length);
+        System.out.println(repeatString("=", 60));
+        
         System.out.print("Enter doctor ID to update schedule: ");
         String doctorId = scanner.nextLine();
         
         Doctor doctor = findDoctorById(doctorId);
         if (doctor != null) {
-            System.out.println("Current doctor information:");
+            System.out.println("\nCurrent doctor information:");
             displayDoctorDetails(doctor);
             
-            System.out.println("\nEnter new information (press Enter to keep current value):");
+            System.out.println("\n" + repeatString("-", 60));
+            System.out.println("Enter new schedule information (press Enter to keep current value):");
+            System.out.println(repeatString("-", 60));
+            
+            //update duty schedule
             System.out.print("Duty Schedule [" + doctor.getDutySchedule() + "]: ");
             String schedule = scanner.nextLine();
             if (!schedule.isEmpty()) doctor.setDutySchedule(schedule);
             
+            //update availability
             System.out.print("Available (y/n) [" + (doctor.isIsAvailable() ? "y" : "n") + "]: ");
             String available = scanner.nextLine();
             boolean wasAvailable = doctor.isIsAvailable();
             if (!available.isEmpty()) doctor.setIsAvailable(available.equalsIgnoreCase("y"));
             
+            //update leave status
             System.out.print("On Leave (y/n) [" + (doctor.isOnLeave() ? "y" : "n") + "]: ");
             String onLeave = scanner.nextLine();
             boolean wasOnLeave = doctor.isOnLeave();
@@ -249,6 +343,7 @@ public class DoctorManagement {
                 }
             }
             
+            //handle duty list updates
             boolean shouldRemoveFromDuty = false;
             String removalReason = "";
             
@@ -267,9 +362,11 @@ public class DoctorManagement {
                 }
             }
             
-            System.out.println("Doctor schedule updated successfully!");
+            System.out.println("\n✅ Doctor schedule updated successfully!");
+            System.out.println("\nUpdated doctor information:");
+            displayDoctorDetails(doctor);
         } else {
-            System.out.println("Doctor not found!");
+            System.out.println("❌ Doctor not found!");
         }
     }
     

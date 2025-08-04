@@ -107,6 +107,113 @@ public class PharmacyManagement {
         scanner.nextLine();
     }
     
+    public void updateMedicineInfo() {
+        System.out.println("\n" + StringUtility.repeatString("=", 80));
+        System.out.println("                    UPDATE MEDICINE INFORMATION");
+        System.out.println(StringUtility.repeatString("=", 80));
+
+        System.out.println("📋 CURRENT MEDICINE LIST:");
+        System.out.println(StringUtility.repeatString("-", 80));
+        System.out.printf("%-12s %-25s %-15s %-10s %-10s %-10s\n", "ID", "Name", "Brand", "Stock", "Price", "Status");
+        System.out.println(StringUtility.repeatString("-", 80));
+        
+        Object[] medicinesArray = medicineList.toArray();
+        for (Object obj : medicinesArray) {
+            Medicine medicine = (Medicine) obj;
+            String status;
+            if (medicine.getStockQuantity() == 0) {
+                status = "OUT OF STOCK";
+            } else if (medicine.getStockQuantity() <= 5) {
+                status = "CRITICAL";
+            } else if (medicine.getStockQuantity() <= 10) {
+                status = "LOW";
+            } else {
+                status = "OK";
+            }
+            
+            System.out.printf("%-12s %-25s %-15s %-10s %-10s %-10s\n", 
+                medicine.getMedicineId(), 
+                medicine.getName(), 
+                medicine.getBrand(),
+                medicine.getStockQuantity(),
+                "RM " + String.format("%.2f", medicine.getPrice()),
+                status);
+        }
+        
+        System.out.println(StringUtility.repeatString("-", 80));
+        System.out.println("Total Medicines: " + medicinesArray.length);
+        System.out.println(StringUtility.repeatString("=", 80));
+        
+        System.out.print("\nEnter medicine ID to update: ");
+        String medicineId = scanner.nextLine();
+        
+        Medicine medicine = findMedicineById(medicineId);
+        if (medicine != null) {
+            System.out.println("\n" + StringUtility.repeatString("-", 60));
+            System.out.println("Current medicine information:");
+            displayMedicineDetails(medicine);
+            System.out.println(StringUtility.repeatString("-", 60));
+            
+            System.out.println("\n" + StringUtility.repeatString("-", 60));
+            System.out.println("Enter new information (press Enter to keep current value):");
+            System.out.println(StringUtility.repeatString("-", 60));
+            
+            // Update name
+            System.out.print("Name [" + medicine.getName() + "]: ");
+            String name = scanner.nextLine();
+            if (!name.isEmpty()) medicine.setName(name);
+            
+            // Update brand
+            System.out.print("Brand [" + medicine.getBrand() + "]: ");
+            String brand = scanner.nextLine();
+            if (!brand.isEmpty()) medicine.setBrand(brand);
+            
+            // Update purpose
+            System.out.print("Purpose [" + medicine.getPurpose() + "]: ");
+            String purpose = scanner.nextLine();
+            if (!purpose.isEmpty()) medicine.setPurpose(purpose);
+            
+            // Update active ingredient
+            System.out.print("Active Ingredient [" + medicine.getActiveIngredient() + "]: ");
+            String activeIngredient = scanner.nextLine();
+            if (!activeIngredient.isEmpty()) medicine.setActiveIngredient(activeIngredient);
+            
+            // Update category
+            System.out.print("Category [" + medicine.getCategory() + "]: ");
+            String category = scanner.nextLine();
+            if (!category.isEmpty()) medicine.setCategory(category);
+            
+            // Update expiry date
+            System.out.print("Expiry Date [" + medicine.getExpiryDate() + "] (YYYY-MM-DD): ");
+            String expiryDate = scanner.nextLine();
+            if (!expiryDate.isEmpty()) medicine.setExpiryDate(expiryDate);
+            
+            // Update price
+            System.out.print("Price [" + String.format("%.2f", medicine.getPrice()) + "] (Enter new price or press Enter): ");
+            String priceInput = scanner.nextLine();
+            if (!priceInput.isEmpty()) {
+                try {
+                    double newPrice = Double.parseDouble(priceInput);
+                    if (newPrice >= 0) {
+                        medicine.setPrice(newPrice);
+                    } else {
+                        System.out.println("Invalid price. Price not updated.");
+                    }
+                } catch (NumberFormatException e) {
+                    System.out.println("Invalid price format. Price not updated.");
+                }
+            }
+            
+            System.out.println("\n✅ Medicine information updated successfully!");
+            System.out.println("Updated " + medicine.getName() + " information.");
+            
+            System.out.println("\nUpdated medicine information:");
+            displayMedicineDetails(medicine);
+        } else {
+            System.out.println("❌ Medicine not found!");
+        }
+    }
+    
     public void updateMedicineStock() {
         System.out.println("\n" + StringUtility.repeatString("=", 80));
         System.out.println("                    UPDATE MEDICINE STOCK");
@@ -154,12 +261,42 @@ public class PharmacyManagement {
             displayMedicineDetails(medicine);
             System.out.println(StringUtility.repeatString("-", 60));
             
-            System.out.print("Enter new stock quantity: ");
-            int newStock = getUserInputInt(0, 10000);
-            medicine.setStockQuantity(newStock);
+            System.out.println("\n" + StringUtility.repeatString("-", 60));
+            System.out.println("Enter new stock information:");
+            System.out.println(StringUtility.repeatString("-", 60));
             
-            System.out.println("\n✅ Medicine stock updated successfully!");
-            System.out.println("Updated " + medicine.getName() + " stock to: " + newStock + " units");
+            //update stock quantity
+            System.out.print("Stock Quantity [" + medicine.getStockQuantity() + "] (Enter new quantity or press Enter): ");
+            String stockInput = scanner.nextLine();
+            if (!stockInput.isEmpty()) {
+                try {
+                    int newStock = Integer.parseInt(stockInput);
+                    if (newStock >= 0) {
+                        medicine.setStockQuantity(newStock);
+                        System.out.println("\n✅ Medicine stock updated successfully!");
+                        System.out.println("Updated " + medicine.getName() + " stock to: " + newStock + " units");
+                        
+                        //show updated status
+                        String status;
+                        if (newStock == 0) {
+                            status = "OUT OF STOCK";
+                        } else if (newStock <= 5) {
+                            status = "CRITICAL";
+                        } else if (newStock <= 10) {
+                            status = "LOW";
+                        } else {
+                            status = "OK";
+                        }
+                        System.out.println("Stock Status: " + status);
+                    } else {
+                        System.out.println("Invalid stock quantity. Stock not updated.");
+                    }
+                } catch (NumberFormatException e) {
+                    System.out.println("Invalid stock format. Stock not updated.");
+                }
+            } else {
+                System.out.println("No changes made to stock quantity.");
+            }
         } else {
             System.out.println("❌ Medicine not found!");
         }
