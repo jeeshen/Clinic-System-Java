@@ -22,11 +22,13 @@ public class PatientManagementUI {
             System.out.println("2 . Select Existing Patient");
             System.out.println("3 . View Waiting Queue");
             System.out.println("4 . Remove Patient from Queue");
+            System.out.println("5 . View Next Patient in Queue");
+            System.out.println("6 . Clear Patient Queue");
             System.out.println("0 . Back to Main Menu");
             System.out.println(repeatString("-", 50));
             System.out.print("Enter your choice: ");
             
-            int choice = getUserInputInt(0, 4);
+            int choice = getUserInputInt(0, 6);
             
             switch (choice) {
                 case 1:
@@ -40,6 +42,12 @@ public class PatientManagementUI {
                     break;
                 case 4:
                     patientManagement.removePatientFromQueue();
+                    break;
+                case 5:
+                    patientManagement.viewNextPatientInQueue();
+                    break;
+                case 6:
+                    patientManagement.clearPatientQueue();
                     break;
                 case 0:
                     back = true;
@@ -58,11 +66,12 @@ public class PatientManagementUI {
             System.out.println("2 . Search Patient by ID");
             System.out.println("3 . Search Patient by Name");
             System.out.println("4 . Update Patient Information");
+            System.out.println("5 . Clear All Patient Records");
             System.out.println("0 . Back to Main Menu");
             System.out.println(repeatString("-", 50));
             System.out.print("Enter your choice: ");
             
-            int choice = getUserInputInt(0, 4);
+            int choice = getUserInputInt(0, 5);
             
             switch (choice) {
                 case 1:
@@ -76,6 +85,9 @@ public class PatientManagementUI {
                     break;
                 case 4:
                     patientManagement.updatePatientInformation();
+                    break;
+                case 5:
+                    patientManagement.clearSet();
                     break;
                 case 0:
                     back = true;

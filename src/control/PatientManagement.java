@@ -195,6 +195,51 @@ public class PatientManagement {
         }
     }
     
+    public void clearPatientQueue() {
+        if (waitingPatientList.isQueueEmpty()) {
+            System.out.println("No patients in waiting queue to clear.");
+            return;
+        }
+        
+        int queueSize = waitingPatientList.toQueueArray().length;
+        waitingPatientList.clearQueue();
+        
+        //update patient status for all patients in the queue
+        Object[] allPatients = patientList.toArray();
+        for (Object obj : allPatients) {
+            Patient patient = (Patient) obj;
+            if (patient.isIsInWaiting()) {
+                patient.setIsInWaiting(false);
+                patient.setCurrentStatus("Cleared from queue");
+            }
+        }
+        
+        System.out.println("✅ Patient queue cleared successfully! " + queueSize + " patients removed from queue.");
+    }
+    
+    public void viewNextPatientInQueue() {
+        if (waitingPatientList.isQueueEmpty()) {
+            System.out.println("No patients in waiting queue.");
+            return;
+        }
+        
+        Patient nextPatient = waitingPatientList.getFront();
+        if (nextPatient != null) {
+            System.out.println("\n" + repeatString("-", 60));
+            System.out.println("NEXT PATIENT IN QUEUE");
+            System.out.println(repeatString("-", 60));
+            System.out.println("ID: " + nextPatient.getId());
+            System.out.println("Name: " + nextPatient.getName());
+            System.out.println("Age: " + nextPatient.getAge());
+            System.out.println("Gender: " + nextPatient.getGender());
+            System.out.println("Contact: " + nextPatient.getContactNumber());
+            System.out.println("Status: " + nextPatient.getCurrentStatus());
+            System.out.println(repeatString("-", 60));
+        } else {
+            System.out.println("Error retrieving next patient from queue.");
+        }
+    }
+    
     public void displayAllPatientsSorted() {
         System.out.println("\n" + repeatString("-", 90));
         System.out.println("ALL PATIENTS (SORTED BY ID)");
@@ -458,6 +503,11 @@ public class PatientManagement {
     
     public Patient getNextPatientFromQueue() {
         return waitingPatientList.dequeue();
+    }
+    
+    public void clearSet() {
+        patientList.clearSet();
+        System.out.println("✅ All patient records cleared successfully!");
     }
     
     public int getTotalPatientCount() {
