@@ -358,19 +358,48 @@ public class PatientManagement {
         int totalPatients = patientsArray.length;
         int maleCount = 0, femaleCount = 0;
 
-        SetAndQueueInterface<String> patientsWithConsultations = new SetAndQueue<>();
+        //create sets for set operations analysis
+        SetAndQueueInterface<Patient> malePatients = new SetAndQueue<>();
+        SetAndQueueInterface<Patient> femalePatients = new SetAndQueue<>();
+        SetAndQueueInterface<Patient> patientsWithConsultations = new SetAndQueue<>();
+        SetAndQueueInterface<Patient> patientsInQueue = new SetAndQueue<>();
 
+        //categorize patients and count gender
+        for (Object obj : patientsArray) {
+            Patient patient = (Patient) obj;
+            if (patient.getGender().equalsIgnoreCase("Male")) {
+                maleCount++;
+                malePatients.add(patient);
+            } else {
+                femalePatients.add(patient);
+            }
+        }
+        femaleCount = totalPatients - maleCount;
+
+        // Get patients with consultations
         if (consultationManagement != null) {
             Object[] consultationsArray = consultationManagement.getAllConsultations();
             for (Object obj : consultationsArray) {
                 Consultation consultation = (Consultation) obj;
-                patientsWithConsultations.add(consultation.getPatientId());
-            }
-        } else {
-            for (int i = 1; i <= 20; i++) {
-                patientsWithConsultations.add(String.valueOf(i));
+                Patient patient = findPatientById(Integer.parseInt(consultation.getPatientId()));
+                if (patient != null) {
+                    patientsWithConsultations.add(patient);
+                }
             }
         }
+
+        //get patients in queue
+        Object[] queueArray = waitingPatientList.toQueueArray();
+        for (Object obj : queueArray) {
+            Patient patient = (Patient) obj;
+            patientsInQueue.add(patient);
+        }
+
+        //perform set operations
+        SetAndQueueInterface<Patient> patientsWithConsultationsOnly = patientsWithConsultations.difference(patientsInQueue);
+        SetAndQueueInterface<Patient> patientsInQueueOnly = patientsInQueue.difference(patientsWithConsultations);
+        SetAndQueueInterface<Patient> patientsWithBoth = patientsWithConsultations.intersection(patientsInQueue);
+        SetAndQueueInterface<Patient> allActivePatients = patientsWithConsultations.union(patientsInQueue);
         
         System.out.println("📊 Patient Statistics:");
         System.out.println("• Total Patients: " + totalPatients);
@@ -386,6 +415,13 @@ public class PatientManagement {
             System.out.println("");
             System.out.printf("%-10s [%s] %2d (%.1f%%)\n", "Female:", createColoredBar(BLUE_BG, femaleBars, 20), femaleCount, (double)femaleCount/totalPatients*100);
         }
+        
+        System.out.println("\n📊 Patient Activity Analysis:");
+        System.out.println("• Patients with Consultations Only: " + patientsWithConsultationsOnly.size());
+        System.out.println("• Patients in Queue Only: " + patientsInQueueOnly.size());
+        System.out.println("• Patients with Both (Consultations & Queue): " + patientsWithBoth.size());
+        System.out.println("• Total Active Patients: " + allActivePatients.size());
+        System.out.println("• Inactive Patients: " + (totalPatients - allActivePatients.size()));
         
         System.out.println("\n📈 Age Range Distribution:");
         if (totalPatients > 0) {

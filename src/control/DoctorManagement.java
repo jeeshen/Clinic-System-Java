@@ -379,13 +379,32 @@ public class DoctorManagement {
         int totalDoctors = doctorsArray.length;
         int availableCount = 0, onLeaveCount = 0, onDutyCount = 0;
         
+        //create sets for set operations analysis
+        SetAndQueueInterface<Doctor> availableDoctors = new SetAndQueue<>();
+        SetAndQueueInterface<Doctor> onLeaveDoctors = new SetAndQueue<>();
+        SetAndQueueInterface<Doctor> unavailableDoctors = new SetAndQueue<>();
+        
         for (Object obj : doctorsArray) {
             Doctor doctor = (Doctor) obj;
-            if (doctor.isIsAvailable()) availableCount++;
-            if (doctor.isOnLeave()) onLeaveCount++;
+            if (doctor.isIsAvailable()) {
+                availableCount++;
+                availableDoctors.add(doctor);
+            } else {
+                unavailableDoctors.add(doctor);
+            }
+            if (doctor.isOnLeave()) {
+                onLeaveCount++;
+                onLeaveDoctors.add(doctor);
+            }
         }
         
         onDutyCount = onDutyDoctorList.size();
+        
+        //perform set operations
+        SetAndQueueInterface<Doctor> availableNotOnDuty = availableDoctors.difference(onDutyDoctorList);
+        SetAndQueueInterface<Doctor> onLeaveNotOnDuty = onLeaveDoctors.difference(onDutyDoctorList);
+        SetAndQueueInterface<Doctor> availableAndOnDuty = availableDoctors.intersection(onDutyDoctorList);
+        SetAndQueueInterface<Doctor> allActiveDoctors = availableDoctors.union(onDutyDoctorList);
         
         System.out.println("📊 Doctor Availability:");
         System.out.println("• Total Doctors: " + totalDoctors);
@@ -393,6 +412,13 @@ public class DoctorManagement {
         System.out.println("• Doctors on Leave: " + onLeaveCount);
         System.out.println("• Doctors on Duty: " + onDutyCount);
         System.out.println("• Unavailable Doctors: " + (totalDoctors - availableCount));
+        
+        System.out.println("\n📊 Doctor Activity Analysis:");
+        System.out.println("• Available but Not on Duty: " + availableNotOnDuty.size());
+        System.out.println("• On Leave but Not on Duty: " + onLeaveNotOnDuty.size());
+        System.out.println("• Available and On Duty: " + availableAndOnDuty.size());
+        System.out.println("• Total Active Doctors: " + allActiveDoctors.size());
+        System.out.println("• Completely Inactive: " + (totalDoctors - allActiveDoctors.size()));
         
         System.out.println("\n📈 Availability Distribution:");
         if (totalDoctors > 0) {

@@ -35,7 +35,7 @@ public class ReportManagementUI {
             System.out.println(repeatString("=", 50));
             System.out.println("1 . Patient Statistics Report");
             System.out.println("2 . Doctor Performance Report");
-            System.out.println("3 . Consultation Statistics Report");
+            System.out.println("3 . Doctor Availability Report");
             System.out.println("4 . Treatment Statistics Report");
             System.out.println("5 . Diagnosis Analysis Report");
             System.out.println("6 . Age vs Disease Analysis Report");
@@ -63,10 +63,10 @@ public class ReportManagementUI {
                     }
                     break;
                 case 3:
-                    if (consultationManagement != null) {
-                        consultationManagement.generateConsultationStatisticsReport();
+                    if (doctorManagement != null) {
+                        doctorManagement.generateDoctorAvailabilityReport();
                     } else {
-                        System.out.println("Consultation management not available!");
+                        System.out.println("Doctor management not available!");
                     }
                     break;
                 case 4:

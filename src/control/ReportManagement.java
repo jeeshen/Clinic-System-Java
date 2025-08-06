@@ -20,6 +20,64 @@ public class ReportManagement {
         System.out.println("        COMPREHENSIVE MEDICAL REPORT");
         System.out.println(repeatString("=", 80));
         
+        //create sets for comprehensive analysis
+        SetAndQueueInterface<Patient> allPatients = new SetAndQueue<>();
+        SetAndQueueInterface<Doctor> allDoctors = new SetAndQueue<>();
+        SetAndQueueInterface<Patient> patientsWithConsultations = new SetAndQueue<>();
+        SetAndQueueInterface<Patient> patientsInQueue = new SetAndQueue<>();
+        SetAndQueueInterface<Doctor> doctorsOnDuty = new SetAndQueue<>();
+        SetAndQueueInterface<Doctor> availableDoctors = new SetAndQueue<>();
+        
+        //populate patient sets
+        Object[] patientsArray = patientManagement.getAllPatients();
+        for (Object obj : patientsArray) {
+            Patient patient = (Patient) obj;
+            allPatients.add(patient);
+        }
+        
+        //populate doctor sets
+        Object[] doctorsArray = doctorManagement.getAllDoctors();
+        for (Object obj : doctorsArray) {
+            Doctor doctor = (Doctor) obj;
+            allDoctors.add(doctor);
+            if (doctor.isIsAvailable()) {
+                availableDoctors.add(doctor);
+            }
+        }
+        
+        //get doctors on duty
+        Doctor[] onDutyDoctors = doctorManagement.getDoctorsOnDuty();
+        for (Doctor doctor : onDutyDoctors) {
+            doctorsOnDuty.add(doctor);
+        }
+        
+        //get patients with consultations
+        if (consultationManagement != null) {
+            Object[] consultationsArray = consultationManagement.getAllConsultations();
+            for (Object obj : consultationsArray) {
+                Consultation consultation = (Consultation) obj;
+                Patient patient = patientManagement.findPatientById(Integer.parseInt(consultation.getPatientId()));
+                if (patient != null) {
+                    patientsWithConsultations.add(patient);
+                }
+            }
+        }
+        
+        //get patients in queue
+        Object[] queueArray = patientManagement.getAllPatients();
+        for (Object obj : queueArray) {
+            Patient patient = (Patient) obj;
+            if (patient.isIsInWaiting()) {
+                patientsInQueue.add(patient);
+            }
+        }
+        
+        //perform set operations for comprehensive analysis
+        SetAndQueueInterface<Patient> activePatients = patientsWithConsultations.union(patientsInQueue);
+        SetAndQueueInterface<Patient> inactivePatients = allPatients.difference(activePatients);
+        SetAndQueueInterface<Doctor> availableNotOnDuty = availableDoctors.difference(doctorsOnDuty);
+        SetAndQueueInterface<Doctor> allActiveDoctors = availableDoctors.union(doctorsOnDuty);
+        
         System.out.println("📊 SYSTEM OVERVIEW:");
         System.out.println("• Total Patients: " + patientManagement.getTotalPatientCount());
         System.out.println("• Total Doctors: " + doctorManagement.getTotalDoctorCount());
@@ -27,6 +85,13 @@ public class ReportManagement {
         System.out.println("• Total Prescriptions: " + treatmentManagement.getTotalPrescriptionCount());
         System.out.println("• Total Revenue: RM " + String.format("%.2f", treatmentManagement.getTotalRevenue()));
         System.out.println("• Paid Prescriptions: " + treatmentManagement.getPaidPrescriptionCount());
+        
+        System.out.println("\n📊 SYSTEM EFFICIENCY ANALYSIS:");
+        System.out.println("• Active Patients: " + activePatients.size());
+        System.out.println("• Inactive Patients: " + inactivePatients.size());
+        System.out.println("• Available Doctors Not on Duty: " + availableNotOnDuty.size());
+        System.out.println("• All Active Doctors: " + allActiveDoctors.size());
+        System.out.println("• System Efficiency: " + String.format("%.1f", (double)activePatients.size()/patientManagement.getTotalPatientCount()*100) + "%");
         
         System.out.println("\n📈 PERFORMANCE METRICS:");
         double completionRate = (double) treatmentManagement.getPaidPrescriptionCount() / 
@@ -57,6 +122,8 @@ public class ReportManagement {
         
         //track diseases by age group
         SetAndQueueInterface<String> allDiseases = new SetAndQueue<>();
+        SetAndQueueInterface<Patient> patientsWithDiseases = new SetAndQueue<>();
+        SetAndQueueInterface<Patient> patientsWithoutDiseases = new SetAndQueue<>();
         int[][] diseaseByAgeGroup = new int[ageGroups.length - 1][100]; //assuming max 100 diseases
         String[] diseaseNames = new String[100];
         int diseaseIndex = 0;
@@ -69,12 +136,18 @@ public class ReportManagement {
             
             //find patient age
             int patientAge = 0;
+            Patient currentPatient = null;
             for (Object patientObj : patientsArray) {
                 Patient patient = (Patient) patientObj;
                 if (String.valueOf(patient.getId()).equals(patientId)) {
                     patientAge = patient.getAge();
+                    currentPatient = patient;
                     break;
                 }
+            }
+            
+            if (currentPatient != null) {
+                patientsWithDiseases.add(currentPatient);
             }
             
             //determine age group
@@ -105,6 +178,14 @@ public class ReportManagement {
             }
         }
         
+        //create sets for all patients and find patients without diseases
+        SetAndQueueInterface<Patient> allPatients = new SetAndQueue<>();
+        for (Object obj : patientsArray) {
+            Patient patient = (Patient) obj;
+            allPatients.add(patient);
+        }
+        patientsWithoutDiseases = allPatients.difference(patientsWithDiseases);
+        
         System.out.println("📊 AGE GROUP DISTRIBUTION:");
         for (int i = 0; i < ageGroupNames.length; i++) {
             int bars = (int) Math.round((double) ageGroupCounts[i] / getMaxValue(ageGroupCounts) * 25);
@@ -112,6 +193,12 @@ public class ReportManagement {
                 ageGroupNames[i], createColoredBar(BLUE_BG, bars, 25), ageGroupCounts[i], 
                 (double)ageGroupCounts[i]/getTotalPatients(patientsArray)*100);
         }
+        
+        System.out.println("\n📊 DISEASE PERCENTAGE ANALYSIS:");
+        System.out.println("• Patients with Diseases: " + patientsWithDiseases.size());
+        System.out.println("• Patients without Diseases: " + patientsWithoutDiseases.size());
+        System.out.println("• Total Patients Analyzed: " + allPatients.size());
+        System.out.println("• Disease Percentage: " + String.format("%.1f", (double)patientsWithDiseases.size()/allPatients.size()*100) + "%");
         
         System.out.println("\n🏥 DISEASE PATTERNS BY AGE GROUP:");
         for (int i = 0; i < ageGroupNames.length; i++) {
@@ -144,13 +231,28 @@ public class ReportManagement {
         int[] doctorWorkload = new int[doctorsArray.length];
         String[] doctorNames = new String[doctorsArray.length];
         
-        //initialize doctor names
+        //create sets for set operations analysis
+        SetAndQueueInterface<Doctor> allDoctors = new SetAndQueue<>();
+        SetAndQueueInterface<Doctor> doctorsWithConsultations = new SetAndQueue<>();
+        SetAndQueueInterface<Doctor> doctorsOnDuty = new SetAndQueue<>();
+        SetAndQueueInterface<Doctor> highWorkloadDoctors = new SetAndQueue<>();
+        SetAndQueueInterface<Doctor> mediumWorkloadDoctors = new SetAndQueue<>();
+        SetAndQueueInterface<Doctor> lowWorkloadDoctors = new SetAndQueue<>();
+        SetAndQueueInterface<Doctor> inactiveDoctors = new SetAndQueue<>();
+        
+        //initialize doctor names and populate sets
         for (int i = 0; i < doctorsArray.length; i++) {
             Doctor doctor = (Doctor) doctorsArray[i];
             doctorNames[i] = doctor.getName();
+            allDoctors.add(doctor);
+            
+            //add to on-duty set if available
+            if (doctor.isIsAvailable()) {
+                doctorsOnDuty.add(doctor);
+            }
         }
         
-        //count consultations per doctor
+        //count consultations per doctor and categorize
         for (Object consultationObj : consultationsArray) {
             Consultation consultation = (Consultation) consultationObj;
             String doctorId = consultation.getDoctorId();
@@ -159,10 +261,31 @@ public class ReportManagement {
                 Doctor doctor = (Doctor) doctorsArray[i];
                 if (doctor.getDoctorId().equals(doctorId)) {
                     doctorWorkload[i]++;
+                    doctorsWithConsultations.add(doctor);
                     break;
                 }
             }
         }
+        
+        //categorize doctors by workload
+        for (int i = 0; i < doctorsArray.length; i++) {
+            Doctor doctor = (Doctor) doctorsArray[i];
+            if (doctorWorkload[i] >= 5) {
+                highWorkloadDoctors.add(doctor);
+            } else if (doctorWorkload[i] >= 2) {
+                mediumWorkloadDoctors.add(doctor);
+            } else if (doctorWorkload[i] > 0) {
+                lowWorkloadDoctors.add(doctor);
+            } else {
+                inactiveDoctors.add(doctor);
+            }
+        }
+        
+        //perform set operations
+        SetAndQueueInterface<Doctor> activeDoctors = doctorsWithConsultations.union(doctorsOnDuty);
+        SetAndQueueInterface<Doctor> doctorsWithConsultationsOnly = doctorsWithConsultations.difference(doctorsOnDuty);
+        SetAndQueueInterface<Doctor> doctorsOnDutyOnly = doctorsOnDuty.difference(doctorsWithConsultations);
+        SetAndQueueInterface<Doctor> doctorsWithBoth = doctorsWithConsultations.intersection(doctorsOnDuty);
         
         System.out.println("👨‍⚕️ DOCTOR WORKLOAD ANALYSIS:");
         int maxWorkload = getMaxValue(doctorWorkload);
@@ -176,18 +299,19 @@ public class ReportManagement {
             }
         }
         
+        System.out.println("\n📊 DOCTOR ACTIVITY ANALYSIS:");
+        System.out.println("• Doctors with Consultations Only: " + doctorsWithConsultationsOnly.size());
+        System.out.println("• Doctors on Duty Only: " + doctorsOnDutyOnly.size());
+        System.out.println("• Doctors with Both (Consultations & Duty): " + doctorsWithBoth.size());
+        System.out.println("• Total Active Doctors: " + activeDoctors.size());
+        System.out.println("• Completely Inactive Doctors: " + inactiveDoctors.size());
+        
         //workload categories
         System.out.println("\n📈 WORKLOAD CATEGORIES:");
-        int highWorkload = 0, mediumWorkload = 0, lowWorkload = 0;
-        for (int workload : doctorWorkload) {
-            if (workload >= 5) highWorkload++;
-            else if (workload >= 2) mediumWorkload++;
-            else if (workload > 0) lowWorkload++;
-        }
-        
-        System.out.println("• High Workload (≥5 consultations): " + highWorkload + " doctors");
-        System.out.println("• Medium Workload (2-4 consultations): " + mediumWorkload + " doctors");
-        System.out.println("• Low Workload (1 consultation): " + lowWorkload + " doctors");
+        System.out.println("• High Workload (≥5 consultations): " + highWorkloadDoctors.size() + " doctors");
+        System.out.println("• Medium Workload (2-4 consultations): " + mediumWorkloadDoctors.size() + " doctors");
+        System.out.println("• Low Workload (1 consultation): " + lowWorkloadDoctors.size() + " doctors");
+        System.out.println("• Inactive Doctors: " + inactiveDoctors.size() + " doctors");
         
         System.out.println("");
         System.out.println("Press Enter to continue...");
