@@ -161,17 +161,6 @@ public class SetAndQueue<T> implements SetAndQueueInterface<T> {
         return result;
     }
     
-    @Override
-    public boolean isSubsetOf(SetAndQueueInterface<T> otherSet) {
-        T[] thisElements = this.toArray();
-        for (T entry : thisElements) {
-            if (!otherSet.contains(entry)) {
-                return false;
-            }
-        }
-        return true;
-    }
-    
     //queue functions
     @Override
     public void enqueue(T newEntry) {

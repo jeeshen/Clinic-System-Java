@@ -17,7 +17,6 @@ public interface SetAndQueueInterface<T> {
     public SetAndQueueInterface<T> union(SetAndQueueInterface<T> otherSet);
     public SetAndQueueInterface<T> intersection(SetAndQueueInterface<T> otherSet);
     public SetAndQueueInterface<T> difference(SetAndQueueInterface<T> otherSet);
-    public boolean isSubsetOf(SetAndQueueInterface<T> otherSet); //check if this set is a subset of another set
     
     //queue
     public void enqueue(T newEntry);
