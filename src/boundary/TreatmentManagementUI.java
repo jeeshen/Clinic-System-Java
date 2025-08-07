@@ -23,11 +23,12 @@ public class TreatmentManagementUI {
             System.out.println("2 . Search Prescription by ID");
             System.out.println("3 . Search Prescriptions by Patient");
             System.out.println("4 . Search Prescriptions by Doctor");
+            System.out.println("5 . Remove Prescription");
             System.out.println("0 . Back to Main Menu");
             System.out.println(StringUtility.repeatString("-", 50));
             System.out.print("Enter your choice: ");
             
-            int choice = getUserInputInt(0, 4);
+            int choice = getUserInputInt(0, 5);
             
             switch (choice) {
                 case 1:
@@ -41,6 +42,9 @@ public class TreatmentManagementUI {
                     break;
                 case 4:
                     treatmentManagement.searchPrescriptionsByDoctor();
+                    break;
+                case 5:
+                    treatmentManagement.removePrescription();
                     break;
                 case 0:
                     back = true;

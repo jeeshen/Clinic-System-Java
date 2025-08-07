@@ -7,6 +7,7 @@ import entity.Consultation;
 import dao.DataInitializer;
 import java.util.Scanner;
 import utility.StringUtility;
+import utility.InputValidator;
 
 public class DoctorManagement {
     private SetAndQueueInterface<Doctor> doctorList = new SetAndQueue<>();
@@ -313,7 +314,7 @@ public class DoctorManagement {
         System.out.println(StringUtility.repeatString("=", 60));
 
         Object[] doctorsArray = doctorList.toArray();
-
+        
         SetAndQueueInterface<Doctor> tempList = new SetAndQueue<>();
         for (Object obj : doctorsArray) {
             tempList.add((Doctor) obj);
@@ -358,55 +359,90 @@ public class DoctorManagement {
             
             //update duty schedule
             System.out.print("Duty Schedule [" + doctor.getDutySchedule() + "]: ");
-            String schedule = scanner.nextLine();
-            if (!schedule.isEmpty()) doctor.setDutySchedule(schedule);
+            String dutySchedule = scanner.nextLine();
+            if (!dutySchedule.isEmpty()) doctor.setDutySchedule(dutySchedule);
             
             //update availability
-            System.out.print("Available (y/n) [" + (doctor.isIsAvailable() ? "y" : "n") + "]: ");
+            System.out.print("Available (yes/no) [" + (doctor.isIsAvailable() ? "yes" : "no") + "]: ");
             String available = scanner.nextLine();
-            boolean wasAvailable = doctor.isIsAvailable();
-            if (!available.isEmpty()) doctor.setIsAvailable(available.equalsIgnoreCase("y"));
-            
-            //update leave status
-            System.out.print("On Leave (y/n) [" + (doctor.isOnLeave() ? "y" : "n") + "]: ");
-            String onLeave = scanner.nextLine();
-            boolean wasOnLeave = doctor.isOnLeave();
-            if (!onLeave.isEmpty()) {
-                boolean leave = onLeave.equalsIgnoreCase("y");
-                doctor.setOnLeave(leave);
-                if (leave) {
-                    System.out.print("Leave Start Date (YYYY-MM-DD): ");
-                    String startDate = scanner.nextLine();
-                    if (!startDate.isEmpty()) doctor.setLeaveDateStart(startDate);
-                    
-                    System.out.print("Leave End Date (YYYY-MM-DD): ");
-                    String endDate = scanner.nextLine();
-                    if (!endDate.isEmpty()) doctor.setLeaveDateEnd(endDate);
-                }
+            if (!available.isEmpty()) {
+                doctor.setIsAvailable(available.toLowerCase().equals("yes"));
             }
             
-            //handle duty list updates
-            boolean shouldRemoveFromDuty = false;
-            String removalReason = "";
+            //update leave status
+            System.out.print("On Leave (yes/no) [" + (doctor.isOnLeave() ? "yes" : "no") + "]: ");
+            String onLeave = scanner.nextLine();
+            if (!onLeave.isEmpty()) {
+                doctor.setOnLeave(onLeave.toLowerCase().equals("yes"));
+            }
             
-            if (onDutyDoctorList.contains(doctor)) {
-                if (!doctor.isIsAvailable() && wasAvailable) {
-                    shouldRemoveFromDuty = true;
-                    removalReason = "unavailable";
-                } else if (doctor.isOnLeave() && !wasOnLeave) {
-                    shouldRemoveFromDuty = true;
-                    removalReason = "on leave";
-                }
+            if (doctor.isOnLeave()) {
+                System.out.print("Leave Start Date [" + doctor.getLeaveDateStart() + "]: ");
+                String leaveStart = scanner.nextLine();
+                if (!leaveStart.isEmpty()) doctor.setLeaveDateStart(leaveStart);
                 
-                if (shouldRemoveFromDuty) {
-                    onDutyDoctorList.remove(doctor);
-                    System.out.println("⚠️  Doctor " + doctor.getName() + " has been automatically removed from duty (reason: " + removalReason + ").");
-                }
+                System.out.print("Leave End Date [" + doctor.getLeaveDateEnd() + "]: ");
+                String leaveEnd = scanner.nextLine();
+                if (!leaveEnd.isEmpty()) doctor.setLeaveDateEnd(leaveEnd);
             }
             
             System.out.println("\n✅ Doctor schedule updated successfully!");
             System.out.println("\nUpdated doctor information:");
             displayDoctorDetails(doctor);
+        } else {
+            System.out.println("❌ Doctor not found!");
+        }
+    }
+    
+    public void removeDoctor() {
+        System.out.println("\n" + StringUtility.repeatString("=", 60));
+        System.out.println("        REMOVE DOCTOR");
+        System.out.println(StringUtility.repeatString("=", 60));
+        
+        System.out.println("📋 CURRENT DOCTOR LIST:");
+        System.out.println(StringUtility.repeatString("-", 60));
+        System.out.printf("%-8s %-40s %-15s %-15s %-10s\n", "ID", "Name", "Specialization", "Contact", "Available");
+        System.out.println(StringUtility.repeatString("-", 60));
+        
+        Object[] doctorsArray = doctorList.toArray();
+        for (Object obj : doctorsArray) {
+            Doctor doctor = (Doctor) obj;
+            System.out.printf("%-8s %-40s %-15s %-15s %-10s\n", 
+                doctor.getDoctorId(), 
+                doctor.getName(), 
+                doctor.getSpecialization(), 
+                doctor.getContactNumber(), 
+                doctor.isIsAvailable() ? "Yes" : "No");
+        }
+        System.out.println(StringUtility.repeatString("-", 60));
+        System.out.println("Total Doctors: " + doctorsArray.length);
+        System.out.println(StringUtility.repeatString("=", 60));
+        
+        System.out.print("Enter doctor ID to remove: ");
+        String doctorId = scanner.nextLine();
+        
+        Doctor doctor = findDoctorById(doctorId);
+        if (doctor != null) {
+            System.out.println("Doctor to be removed:");
+            displayDoctorDetails(doctor);
+            
+            String confirm = InputValidator.getValidString(scanner, "Are you sure you want to remove this doctor? (yes/no): ");
+            if (confirm.toLowerCase().equals("yes")) {
+                boolean removedFromList = doctorList.remove(doctor);
+
+                boolean removedFromDuty = onDutyDoctorList.remove(doctor);
+                
+                if (removedFromList) {
+                    System.out.println("✅ Doctor removed successfully!");
+                    if (removedFromDuty) {
+                        System.out.println("✅ Doctor also removed from duty list.");
+                    }
+                } else {
+                    System.out.println("❌ Failed to remove doctor from system!");
+                }
+            } else {
+                System.out.println("❌ Doctor removal cancelled.");
+            }
         } else {
             System.out.println("❌ Doctor not found!");
         }

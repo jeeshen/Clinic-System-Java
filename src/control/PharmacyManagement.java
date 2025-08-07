@@ -6,6 +6,7 @@ import entity.Medicine;
 import dao.DataInitializer;
 import utility.StringUtility;
 import java.util.Scanner;
+import utility.InputValidator;
 
 public class PharmacyManagement {
     private SetAndQueueInterface<Medicine> medicineList = new SetAndQueue<>();
@@ -97,6 +98,55 @@ public class PharmacyManagement {
         }
         System.out.println("Press Enter to continue...");
         scanner.nextLine();
+    }
+    
+    public void removeMedicine() {
+        System.out.println("\n" + StringUtility.repeatString("=", 60));
+        System.out.println("        REMOVE MEDICINE");
+        System.out.println(StringUtility.repeatString("=", 60));
+        
+        System.out.println("📋 CURRENT MEDICINE LIST:");
+        System.out.println(StringUtility.repeatString("-", 60));
+        System.out.printf("%-8s %-20s %-15s %-8s %-10s %-10s\n", "ID", "Name", "Brand", "Stock", "Price", "Category");
+        System.out.println(StringUtility.repeatString("-", 60));
+        
+        Object[] medicinesArray = medicineList.toArray();
+        for (Object obj : medicinesArray) {
+            Medicine medicine = (Medicine) obj;
+            System.out.printf("%-8s %-20s %-15s %-8s %-10s %-10s\n", 
+                medicine.getMedicineId(), 
+                medicine.getName(), 
+                medicine.getBrand(), 
+                medicine.getStockQuantity(), 
+                "RM " + medicine.getPrice(), 
+                medicine.getCategory());
+        }
+        System.out.println(StringUtility.repeatString("-", 60));
+        System.out.println("Total Medicines: " + medicinesArray.length);
+        System.out.println(StringUtility.repeatString("=", 60));
+        
+        System.out.print("Enter medicine ID to remove: ");
+        String medicineId = scanner.nextLine();
+        
+        Medicine medicine = findMedicineById(medicineId);
+        if (medicine != null) {
+            System.out.println("Medicine to be removed:");
+            displayMedicineDetails(medicine);
+            
+            String confirm = InputValidator.getValidString(scanner, "Are you sure you want to remove this medicine? (yes/no): ");
+            if (confirm.toLowerCase().equals("yes")) {
+                boolean removed = medicineList.remove(medicine);
+                if (removed) {
+                    System.out.println("✅ Medicine removed successfully!");
+                } else {
+                    System.out.println("❌ Failed to remove medicine from system!");
+                }
+            } else {
+                System.out.println("❌ Medicine removal cancelled.");
+            }
+        } else {
+            System.out.println("❌ Medicine not found!");
+        }
     }
     
     public void displayMedicineDetails(Medicine medicine) {
@@ -348,7 +398,7 @@ public class PharmacyManagement {
                 lowStockMedicines.add(medicine);
             }
         }
-
+        
         String[] headers = {"ID", "Name", "Brand", "Stock", "Price", "Category"};
         Object[][] rows = new Object[medicinesArray.length][headers.length];
         for (int i = 0; i < medicinesArray.length; i++) {
@@ -381,7 +431,7 @@ public class PharmacyManagement {
                 StringUtility.greenBarChart(stock, maxStock, barWidth),
                 stock);
         }
-
+        
         //display low stock medicines
         if (lowStockCount > 0) {
             System.out.println("\nLOW STOCK MEDICINES (≤10 items):");
@@ -459,7 +509,7 @@ public class PharmacyManagement {
                 categoryIndex++;
             }
         }
-
+        
         String[] headers = {"ID", "Name", "Brand", "Category", "Stock", "Price"};
         Object[][] rows = new Object[medicinesArray.length][headers.length];
         for (int i = 0; i < medicinesArray.length; i++) {

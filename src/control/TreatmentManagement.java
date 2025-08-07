@@ -10,6 +10,7 @@ import entity.Medicine;
 import dao.DataInitializer;
 import java.util.Scanner;
 import utility.StringUtility;
+import utility.InputValidator;
 
 public class TreatmentManagement {
     private SetAndQueueInterface<Prescription> prescriptionList = new SetAndQueue<>();
@@ -216,6 +217,55 @@ public class TreatmentManagement {
         }
         System.out.println("Press Enter to continue...");
         scanner.nextLine();
+    }
+    
+    public void removePrescription() {
+        System.out.println("\n" + StringUtility.repeatString("=", 60));
+        System.out.println("        REMOVE PRESCRIPTION");
+        System.out.println(StringUtility.repeatString("=", 60));
+        
+        System.out.println("📋 CURRENT PRESCRIPTION LIST:");
+        System.out.println(StringUtility.repeatString("-", 60));
+        System.out.printf("%-15s %-10s %-10s %-20s %-12s %-10s\n", "Prescription ID", "Patient ID", "Doctor ID", "Diagnosis", "Total Cost", "Status");
+        System.out.println(StringUtility.repeatString("-", 60));
+        
+        Object[] prescriptionsArray = prescriptionList.toArray();
+        for (Object obj : prescriptionsArray) {
+            Prescription prescription = (Prescription) obj;
+            System.out.printf("%-15s %-10s %-10s %-20s %-12s %-10s\n", 
+                prescription.getPrescriptionId(), 
+                prescription.getPatientId(), 
+                prescription.getDoctorId(), 
+                prescription.getDiagnosis(), 
+                "RM " + String.format("%.2f", prescription.getTotalCost()), 
+                prescription.getStatus());
+        }
+        System.out.println(StringUtility.repeatString("-", 60));
+        System.out.println("Total Prescriptions: " + prescriptionsArray.length);
+        System.out.println(StringUtility.repeatString("=", 60));
+        
+        System.out.print("Enter prescription ID to remove: ");
+        String prescriptionId = scanner.nextLine();
+        
+        Prescription prescription = findPrescriptionById(prescriptionId);
+        if (prescription != null) {
+            System.out.println("Prescription to be removed:");
+            displayPrescriptionDetails(prescription);
+            
+            String confirm = InputValidator.getValidString(scanner, "Are you sure you want to remove this prescription? (yes/no): ");
+            if (confirm.toLowerCase().equals("yes")) {
+                boolean removed = prescriptionList.remove(prescription);
+                if (removed) {
+                    System.out.println("✅ Prescription removed successfully!");
+                } else {
+                    System.out.println("❌ Failed to remove prescription from system!");
+                }
+            } else {
+                System.out.println("❌ Prescription removal cancelled.");
+            }
+        } else {
+            System.out.println("❌ Prescription not found!");
+        }
     }
     
     public void displayPrescriptionDetails(Prescription prescription) {

@@ -60,11 +60,12 @@ public class DoctorManagementUI {
             System.out.println("3 . Search Doctor by Specialization");
             System.out.println("4 . Update Doctor Details");
             System.out.println("5 . Update Doctor Schedule");
+            System.out.println("6 . Remove Doctor");
             System.out.println("0 . Back to Main Menu");
             System.out.println(StringUtility.repeatString("-", 50));
             System.out.print("Enter your choice: ");
             
-            int choice = getUserInputInt(0, 5);
+            int choice = getUserInputInt(0, 6);
             
             switch (choice) {
                 case 1:
@@ -81,6 +82,9 @@ public class DoctorManagementUI {
                     break;
                 case 5:
                     doctorManagement.updateDoctorSchedule();
+                    break;
+                case 6:
+                    doctorManagement.removeDoctor();
                     break;
                 case 0:
                     back = true;

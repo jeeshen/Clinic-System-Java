@@ -400,6 +400,72 @@ public class PatientManagement {
         }
     }
     
+    public void removePatient() {
+        System.out.println("\n" + StringUtility.repeatString("=", 60));
+        System.out.println("        REMOVE PATIENT");
+        System.out.println(StringUtility.repeatString("=", 60));
+        
+        System.out.println("📋 CURRENT PATIENT LIST:");
+        System.out.println(StringUtility.repeatString("-", 60));
+        System.out.printf("%-8s %-20s %-8s %-10s %-15s %-10s\n", "ID", "Name", "Age", "Gender", "Contact", "Status");
+        System.out.println(StringUtility.repeatString("-", 60));
+        
+        Object[] patientsArray = patientList.toArray();
+        for (Object obj : patientsArray) {
+            Patient patient = (Patient) obj;
+            System.out.printf("%-8s %-20s %-8s %-10s %-15s %-10s\n", 
+                patient.getId(), 
+                patient.getName(), 
+                patient.getAge(), 
+                patient.getGender(), 
+                patient.getContactNumber(), 
+                patient.getStatus());
+        }
+        System.out.println(StringUtility.repeatString("-", 60));
+        System.out.println("Total Patients: " + patientsArray.length);
+        System.out.println(StringUtility.repeatString("=", 60));
+        
+        int patientId = InputValidator.getValidInt(scanner, 1, 9999, "Enter patient ID to remove: ");
+        
+        Patient patient = findPatientById(patientId);
+        if (patient != null) {
+            System.out.println("Patient to be removed:");
+            displayPatientDetails(patient);
+            
+            String confirm = InputValidator.getValidString(scanner, "Are you sure you want to remove this patient? (yes/no): ");
+            if (confirm.toLowerCase().equals("yes")) {
+                boolean removedFromList = patientList.remove(patient);
+                
+                boolean removedFromQueue = false;
+                SetAndQueueInterface<Patient> newQueue = new SetAndQueue<>();
+                Object[] queueArray = waitingPatientList.toQueueArray();
+                
+                for (Object obj : queueArray) {
+                    Patient queuePatient = (Patient) obj;
+                    if (queuePatient.getId() != patient.getId()) {
+                        newQueue.enqueue(queuePatient);
+                    } else {
+                        removedFromQueue = true;
+                    }
+                }
+                
+                if (removedFromQueue) {
+                    waitingPatientList = newQueue;
+                }
+                
+                if (removedFromList) {
+                    System.out.println("✅ Patient removed successfully!");
+                } else {
+                    System.out.println("❌ Failed to remove patient from system!");
+                }
+            } else {
+                System.out.println("❌ Patient removal cancelled.");
+            }
+        } else {
+            System.out.println("❌ Patient not found!");
+        }
+    }
+    
     public void generatePatientStatisticsReport() {
         System.out.println("\n" + StringUtility.repeatString("=", 70));
         System.out.println("        PATIENT STATISTICS REPORT");

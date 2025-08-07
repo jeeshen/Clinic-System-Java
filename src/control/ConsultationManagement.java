@@ -10,6 +10,7 @@ import utility.StringUtility;
 import java.time.LocalDateTime;
 import java.time.format.DateTimeFormatter;
 import java.util.Scanner;
+import utility.InputValidator;
 
 public class ConsultationManagement {
     private SetAndQueueInterface<Consultation> consultationList = new SetAndQueue<>();
@@ -209,6 +210,65 @@ public class ConsultationManagement {
         }
         System.out.println("Press Enter to continue...");
         scanner.nextLine();
+    }
+    
+    public void removeConsultation() {
+        System.out.println("\n" + StringUtility.repeatString("=", 90));
+        System.out.println("        REMOVE CONSULTATION");
+        System.out.println(StringUtility.repeatString("=", 90));
+        
+        System.out.println("📋 CURRENT CONSULTATION LIST:");
+        System.out.println(StringUtility.repeatString("-", 90));
+        System.out.printf("%-15s %-30s %-40s %-15s %-15s\n", "Consultation ID", "Patient Name", "Doctor Name", "Date", "Status");
+        System.out.println(StringUtility.repeatString("-", 90));
+        
+        Object[] consultationsArray = consultationList.toArray();
+        for (Object obj : consultationsArray) {
+            Consultation consultation = (Consultation) obj;
+            System.out.printf("%-15s %-30s %-40s %-15s %-15s\n", 
+                consultation.getConsultationId(), 
+                getPatientName(consultation.getPatientId()), 
+                getDoctorName(consultation.getDoctorId()), 
+                consultation.getConsultationDate(), 
+                consultation.getStatus());
+        }
+        System.out.println(StringUtility.repeatString("-", 60));
+        System.out.println("Total Consultations: " + consultationsArray.length);
+        System.out.println(StringUtility.repeatString("=", 60));
+        
+        System.out.print("Enter consultation ID to remove: ");
+        String consultationId = scanner.nextLine();
+        
+        Consultation consultation = findConsultationById(consultationId);
+        if (consultation != null) {
+            System.out.println("Consultation to be removed:");
+            displayConsultationDetails(consultation);
+            
+            String confirm = InputValidator.getValidString(scanner, "Are you sure you want to remove this consultation? (yes/no): ");
+            if (confirm.toLowerCase().equals("yes")) {
+                boolean removed = consultationList.remove(consultation);
+                if (removed) {
+                    System.out.println("✅ Consultation removed successfully!");
+                } else {
+                    System.out.println("❌ Failed to remove consultation from system!");
+                }
+            } else {
+                System.out.println("❌ Consultation removal cancelled.");
+            }
+        } else {
+            System.out.println("❌ Consultation not found!");
+        }
+    }
+    
+    private Consultation findConsultationById(String consultationId) {
+        Object[] consultationsArray = consultationList.toArray();
+        for (Object obj : consultationsArray) {
+            Consultation consultation = (Consultation) obj;
+            if (consultation.getConsultationId().equals(consultationId)) {
+                return consultation;
+            }
+        }
+        return null;
     }
     
     public void displayConsultationDetails(Consultation consultation) {

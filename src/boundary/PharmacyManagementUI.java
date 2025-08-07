@@ -30,12 +30,13 @@ public class PharmacyManagementUI {
             System.out.println("3 . Search Medicine by Name");
             System.out.println("4 . Update Medicine Information");
             System.out.println("5 . Update Medicine Stock");
-            System.out.println("6 . Dispense Medicines");
+            System.out.println("6 . Remove Medicine");
+            System.out.println("7 . Dispense Medicines");
             System.out.println("0 . Back to Main Menu");
             System.out.println(StringUtility.repeatString("-", 50));
             System.out.print("Enter your choice: ");
             
-            int choice = getUserInputInt(0, 6);
+            int choice = getUserInputInt(0, 7);
             
             switch (choice) {
                 case 1:
@@ -54,6 +55,9 @@ public class PharmacyManagementUI {
                     pharmacyManagement.updateMedicineStock();
                     break;
                 case 6:
+                    pharmacyManagement.removeMedicine();
+                    break;
+                case 7:
                     treatmentManagement.dispenseMedicines();
                     break;
                 case 0:
