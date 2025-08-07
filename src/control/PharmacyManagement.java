@@ -24,19 +24,18 @@ public class PharmacyManagement {
     }
     
     public void displayAllMedicinesSorted() {
-        System.out.println("\n" + StringUtility.repeatString("-", 80));
-        System.out.println("ALL MEDICINES (SORTED BY ID)");
-        System.out.println(StringUtility.repeatString("-", 80));
-        System.out.printf("%-12s %-20s %-15s %-10s %-8s %-10s\n", "ID", "Name", "Brand", "Stock", "Price", "Purpose");
-        System.out.println(StringUtility.repeatString("-", 80));
-        
         Object[] medicinesArray = medicineList.toArray();
-        Medicine[] medicineArray = new Medicine[medicinesArray.length];
-        for (int i = 0; i < medicinesArray.length; i++) {
-            medicineArray[i] = (Medicine) medicinesArray[i];
+        SetAndQueueInterface<Medicine> tempList = new SetAndQueue<>();
+        for (Object obj : medicinesArray) {
+            tempList.add((Medicine) obj);
         }
+        tempList.sort();
         
-        utility.BubbleSort.sort(medicineArray);
+        Object[] sortedMedicinesArray = tempList.toArray();
+        Medicine[] medicineArray = new Medicine[sortedMedicinesArray.length];
+        for (int i = 0; i < sortedMedicinesArray.length; i++) {
+            medicineArray[i] = (Medicine) sortedMedicinesArray[i];
+        }
         
         String[] headers = {"ID", "Name", "Brand", "Stock", "Price", "Purpose"};
         Object[][] rows = new Object[medicineArray.length][headers.length];
@@ -578,14 +577,9 @@ public class PharmacyManagement {
     }
     
     public Medicine findMedicineById(String medicineId) {
-        Object[] medicinesArray = medicineList.toArray();
-        for (Object obj : medicinesArray) {
-            Medicine medicine = (Medicine) obj;
-            if (medicine.getMedicineId().equals(medicineId)) {
-                return medicine;
-            }
-        }
-        return null;
+        Medicine dummy = new Medicine();
+        dummy.setMedicineId(medicineId);
+        return medicineList.search(dummy);
     }
     
     public Object[] getAllMedicines() {

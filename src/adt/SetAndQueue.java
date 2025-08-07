@@ -101,6 +101,57 @@ public class SetAndQueue<T> implements SetAndQueueInterface<T> {
         return result;
     }
     
+    //search and sort methods
+    @Override
+    public T search(T target) {
+        for (int i = 0; i < setSize; i++) {
+            if (elements[i] != null && elements[i].equals(target)) {
+                return elements[i];
+            }
+        }
+        return null;
+    }
+    
+    @Override
+    public void sort() {
+        if (setSize <= 1) return;
+        
+        //convert to array and sort
+        T[] arrayToSort = (T[]) new Object[setSize];
+        System.arraycopy(elements, 0, arrayToSort, 0, setSize);
+        
+        //use bubble sort
+        bubbleSort(arrayToSort);
+        
+        //copy back to original array
+        System.arraycopy(arrayToSort, 0, elements, 0, setSize);
+    }
+    
+    private void bubbleSort(T[] array) {
+        int n = array.length;
+        boolean swapped;
+        
+        for (int i = 0; i < n - 1; i++) {
+            swapped = false;
+            
+            for (int j = 0; j < n - i - 1; j++) {
+                if (array[j] != null && array[j + 1] != null && 
+                    ((Comparable<T>) array[j]).compareTo(array[j + 1]) > 0) {
+                    //swap elements
+                    T temp = array[j];
+                    array[j] = array[j + 1];
+                    array[j + 1] = temp;
+                    swapped = true;
+                }
+            }
+            
+            //if no swapping occurred, array is sorted
+            if (!swapped) {
+                break;
+            }
+        }
+    }
+    
     @Override
     public boolean containsAll(SetAndQueueInterface<T> otherSet) {
         T[] otherElements = (T[]) otherSet.toArray();

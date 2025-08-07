@@ -96,19 +96,19 @@ public class ConsultationManagement {
     }
     
     public void displayAllConsultationsSorted() {
-        System.out.println("\n" + StringUtility.repeatString("-", 100));
-        System.out.println("ALL CONSULTATIONS (SORTED BY DATE)");
-        System.out.println(StringUtility.repeatString("-", 100));
-        System.out.printf("%-15s %-20s %-20s %-15s %-15s\n", "Consultation ID", "Patient Name", "Doctor Name", "Date", "Status");
-        System.out.println(StringUtility.repeatString("-", 100));
-        
         Object[] consultationsArray = consultationList.toArray();
-        Consultation[] consultationArray = new Consultation[consultationsArray.length];
-        for (int i = 0; i < consultationsArray.length; i++) {
-            consultationArray[i] = (Consultation) consultationsArray[i];
+
+        SetAndQueueInterface<Consultation> tempList = new SetAndQueue<>();
+        for (Object obj : consultationsArray) {
+            tempList.add((Consultation) obj);
         }
+        tempList.sort();
         
-        utility.BubbleSort.sort(consultationArray);
+        Object[] sortedConsultationsArray = tempList.toArray();
+        Consultation[] consultationArray = new Consultation[sortedConsultationsArray.length];
+        for (int i = 0; i < sortedConsultationsArray.length; i++) {
+            consultationArray[i] = (Consultation) sortedConsultationsArray[i];
+        }
         
         String[] headers = {"Consultation ID", "Patient Name", "Doctor Name", "Date", "Status"};
         Object[][] rows = new Object[consultationArray.length][headers.length];

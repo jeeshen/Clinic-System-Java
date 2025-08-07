@@ -139,11 +139,19 @@ public class DoctorManagement {
     
     public void displayAllDoctorsSorted() {
         Object[] doctorsArray = doctorList.toArray();
-        Doctor[] doctorArray = new Doctor[doctorsArray.length];
-        for (int i = 0; i < doctorsArray.length; i++) {
-            doctorArray[i] = (Doctor) doctorsArray[i];
+
+        SetAndQueueInterface<Doctor> tempList = new SetAndQueue<>();
+        for (Object obj : doctorsArray) {
+            tempList.add((Doctor) obj);
         }
-        utility.BubbleSort.sort(doctorArray);
+        tempList.sort();
+        
+        Object[] sortedDoctorsArray = tempList.toArray();
+        Doctor[] doctorArray = new Doctor[sortedDoctorsArray.length];
+        for (int i = 0; i < sortedDoctorsArray.length; i++) {
+            doctorArray[i] = (Doctor) sortedDoctorsArray[i];
+        }
+        
         String[] headers = {"ID", "Name", "Specialization", "Contact", "Available"};
         Object[][] rows = new Object[doctorArray.length][headers.length];
         for (int i = 0; i < doctorArray.length; i++) {
@@ -233,11 +241,19 @@ public class DoctorManagement {
         System.out.println(StringUtility.repeatString("=", 60));
 
         Object[] doctorsArray = doctorList.toArray();
-        Doctor[] doctorArray = new Doctor[doctorsArray.length];
-        for (int i = 0; i < doctorsArray.length; i++) {
-            doctorArray[i] = (Doctor) doctorsArray[i];
+
+        SetAndQueueInterface<Doctor> tempList = new SetAndQueue<>();
+        for (Object obj : doctorsArray) {
+            tempList.add((Doctor) obj);
         }
-        utility.BubbleSort.sort(doctorArray);
+        tempList.sort();
+        
+        Object[] sortedDoctorsArray = tempList.toArray();
+        Doctor[] doctorArray = new Doctor[sortedDoctorsArray.length];
+        for (int i = 0; i < sortedDoctorsArray.length; i++) {
+            doctorArray[i] = (Doctor) sortedDoctorsArray[i];
+        }
+        
         String[] headers = {"ID", "Name", "Specialization", "Contact", "Available"};
         Object[][] rows = new Object[doctorArray.length][headers.length];
         for (int i = 0; i < doctorArray.length; i++) {
@@ -297,11 +313,19 @@ public class DoctorManagement {
         System.out.println(StringUtility.repeatString("=", 60));
 
         Object[] doctorsArray = doctorList.toArray();
-        Doctor[] doctorArray = new Doctor[doctorsArray.length];
-        for (int i = 0; i < doctorsArray.length; i++) {
-            doctorArray[i] = (Doctor) doctorsArray[i];
+
+        SetAndQueueInterface<Doctor> tempList = new SetAndQueue<>();
+        for (Object obj : doctorsArray) {
+            tempList.add((Doctor) obj);
         }
-        utility.BubbleSort.sort(doctorArray);
+        tempList.sort();
+        
+        Object[] sortedDoctorsArray = tempList.toArray();
+        Doctor[] doctorArray = new Doctor[sortedDoctorsArray.length];
+        for (int i = 0; i < sortedDoctorsArray.length; i++) {
+            doctorArray[i] = (Doctor) sortedDoctorsArray[i];
+        }
+        
         String[] headers = {"ID", "Name", "Specialization", "Contact", "Available"};
         Object[][] rows = new Object[doctorArray.length][headers.length];
         for (int i = 0; i < doctorArray.length; i++) {
@@ -507,14 +531,9 @@ public class DoctorManagement {
     }
     
     public Doctor findDoctorById(String doctorId) {
-        Object[] doctorsArray = doctorList.toArray();
-        for (Object obj : doctorsArray) {
-            Doctor doctor = (Doctor) obj;
-            if (doctor.getDoctorId().equals(doctorId)) {
-                return doctor;
-            }
-        }
-        return null;
+        Doctor dummy = new Doctor();
+        dummy.setDoctorId(doctorId);
+        return doctorList.search(dummy);
     }
     
     public Doctor[] getDoctorsOnDuty() {

@@ -259,12 +259,18 @@ public class PatientManagement {
     
     public void displayAllPatientsSorted() {
         Object[] patientsArray = patientList.toArray();
-        Patient[] patientArray = new Patient[patientsArray.length];
-        for (int i = 0; i < patientsArray.length; i++) {
-            patientArray[i] = (Patient) patientsArray[i];
+
+        SetAndQueueInterface<Patient> tempList = new SetAndQueue<>();
+        for (Object obj : patientsArray) {
+            tempList.add((Patient) obj);
         }
+        tempList.sort();
         
-        utility.BubbleSort.sort(patientArray);
+        Object[] sortedPatientsArray = tempList.toArray();
+        Patient[] patientArray = new Patient[sortedPatientsArray.length];
+        for (int i = 0; i < sortedPatientsArray.length; i++) {
+            patientArray[i] = (Patient) sortedPatientsArray[i];
+        }
         
         String[] headers = {"ID", "Name", "Age", "Gender", "Contact", "Status"};
         Object[][] rows = new Object[patientArray.length][headers.length];
@@ -338,6 +344,30 @@ public class PatientManagement {
     }
     
     public void updatePatientInformation() {
+        System.out.println("\n" + StringUtility.repeatString("=", 60));
+        System.out.println("        UPDATE PATIENT INFORMATION");
+        System.out.println(StringUtility.repeatString("=", 60));
+
+        System.out.println("📋 CURRENT PATIENT LIST:");
+        System.out.println(StringUtility.repeatString("-", 60));
+        System.out.printf("%-8s %-20s %-8s %-10s %-15s %-10s\n", "ID", "Name", "Age", "Gender", "Contact", "Status");
+        System.out.println(StringUtility.repeatString("-", 60));
+        
+        Object[] patientsArray = patientList.toArray();
+        for (Object obj : patientsArray) {
+            Patient patient = (Patient) obj;
+            System.out.printf("%-8s %-20s %-8s %-10s %-15s %-10s\n", 
+                patient.getId(), 
+                patient.getName(), 
+                patient.getAge(), 
+                patient.getGender(), 
+                patient.getContactNumber(), 
+                patient.getStatus());
+        }
+        System.out.println(StringUtility.repeatString("-", 60));
+        System.out.println("Total Patients: " + patientsArray.length);
+        System.out.println(StringUtility.repeatString("=", 60));
+        
         int patientId = InputValidator.getValidInt(scanner, 1, 9999, "Enter patient ID to update: ");
         
         Patient patient = findPatientById(patientId);
@@ -475,14 +505,9 @@ public class PatientManagement {
     }
 
     public Patient findPatientById(int patientId) {
-        Object[] patientsArray = patientList.toArray();
-        for (Object obj : patientsArray) {
-            Patient patient = (Patient) obj;
-            if (patient.getId() == patientId) {
-                return patient;
-            }
-        }
-        return null;
+        Patient dummy = new Patient();
+        dummy.setId(patientId);
+        return patientList.search(dummy);
     }
     
     private boolean isPatientExists(String phoneNumber) {

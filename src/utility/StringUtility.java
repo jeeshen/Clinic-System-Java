@@ -10,13 +10,11 @@ public class StringUtility {
         return result.toString();
     }
 
-    /**
-     * Formats a 2D array of objects as a table with headers and vertical dividers.
-     */
+    //format table with dividers
     public static String formatTableWithDividers(String[] headers, Object[][] rows) {
         StringBuilder sb = new StringBuilder();
         int[] colWidths = new int[headers.length];
-        // Calculate column widths
+        //calculate column widths
         for (int i = 0; i < headers.length; i++) {
             colWidths[i] = headers[i].length();
             for (Object[] row : rows) {
@@ -25,19 +23,19 @@ public class StringUtility {
                 }
             }
         }
-        // Header
+        //header
         sb.append("|");
         for (int i = 0; i < headers.length; i++) {
             sb.append(String.format(" %s %s|", headers[i], repeatString(" ", colWidths[i] - headers[i].length())));
         }
         sb.append("\n");
-        // Separator
+        //separator
         sb.append("|");
         for (int i = 0; i < headers.length; i++) {
             sb.append(repeatString("-", colWidths[i] + 2)).append("|");
         }
         sb.append("\n");
-        // Rows
+        //rows
         for (Object[] row : rows) {
             sb.append("|");
             for (int i = 0; i < headers.length; i++) {
@@ -49,9 +47,7 @@ public class StringUtility {
         return sb.toString();
     }
 
-    /**
-     * Returns a green horizontal bar for a value (for bar chart display in console) with fixed length.
-     */
+    //green bar chart
     public static String greenBarChart(int value, int max, int width) {
         final String GREEN = "\u001B[42m";
         final String RESET = "\u001B[0m";
@@ -59,21 +55,17 @@ public class StringUtility {
         return GREEN + repeatString(" ", barLength) + RESET + repeatString(" ", width - barLength);
     }
 
-    /**
-     * Returns the current date and time as a formatted string.
-     */
+    //get current date and time
     public static String getCurrentDateTime() {
         java.text.SimpleDateFormat sdf = new java.text.SimpleDateFormat("dd-MM-yyyy HH:mm:ss");
         return sdf.format(new java.util.Date());
     }
 
-    /**
-     * Formats a 2D array of objects as a table with headers, no vertical dividers, and horizontal lines.
-     */
+    //format table with no dividers
     public static String formatTableNoDividers(String title, String[] headers, Object[][] rows) {
         StringBuilder sb = new StringBuilder();
         int[] colWidths = new int[headers.length];
-        // Calculate column widths
+        //calculate column widths
         for (int i = 0; i < headers.length; i++) {
             colWidths[i] = headers[i].length();
             for (Object[] row : rows) {
@@ -85,22 +77,22 @@ public class StringUtility {
         int totalWidth = 0;
         for (int w : colWidths) totalWidth += w + 2; // 2 spaces padding
         totalWidth += headers.length - 1; // spaces between columns
-        // Top line
+        //top line
         sb.append(repeatString("-", totalWidth)).append("\n");
-        // Title (centered)
+        //title (centered)
         if (title != null && !title.isEmpty()) {
             int pad = (totalWidth - title.length()) / 2;
             sb.append(repeatString(" ", Math.max(0, pad))).append(title).append("\n");
             sb.append(repeatString("-", totalWidth)).append("\n");
         }
-        // Header
+        //header
         for (int i = 0; i < headers.length; i++) {
             sb.append(String.format("%-" + (colWidths[i] + 2) + "s", headers[i]));
             if (i < headers.length - 1) sb.append("");
         }
         sb.append("\n");
         sb.append(repeatString("-", totalWidth)).append("\n");
-        // Rows
+        //rows
         for (Object[] row : rows) {
             for (int i = 0; i < headers.length; i++) {
                 sb.append(String.format("%-" + (colWidths[i] + 2) + "s", row[i] != null ? row[i].toString() : ""));

@@ -107,19 +107,24 @@ public class TreatmentManagement {
     }
     
     public void displayAllPrescriptionsSorted() {
-        System.out.println("\n" + StringUtility.repeatString("-", 80));
+        System.out.println("\n" + StringUtility.repeatString("-", 100));
         System.out.println("ALL PRESCRIPTIONS (SORTED BY ID)");
-        System.out.println(StringUtility.repeatString("-", 80));
-        System.out.printf("%-15s %-10s %-10s %-20s %-15s %-10s\n", "Prescription ID", "Patient ID", "Doctor ID", "Diagnosis", "Total Cost", "Status");
-        System.out.println(StringUtility.repeatString("-", 80));
+        System.out.println(StringUtility.repeatString("-", 100));
+        System.out.printf("%-15s %-10s %-10s %-20s %-12s %-10s\n", "Prescription ID", "Patient ID", "Doctor ID", "Diagnosis", "Total Cost", "Status");
+        System.out.println(StringUtility.repeatString("-", 100));
         
         Object[] prescriptionsArray = prescriptionList.toArray();
-        Prescription[] prescriptionArray = new Prescription[prescriptionsArray.length];
-        for (int i = 0; i < prescriptionsArray.length; i++) {
-            prescriptionArray[i] = (Prescription) prescriptionsArray[i];
+        SetAndQueueInterface<Prescription> tempList = new SetAndQueue<>();
+        for (Object obj : prescriptionsArray) {
+            tempList.add((Prescription) obj);
         }
+        tempList.sort();
         
-        utility.BubbleSort.sort(prescriptionArray);
+        Object[] sortedPrescriptionsArray = tempList.toArray();
+        Prescription[] prescriptionArray = new Prescription[sortedPrescriptionsArray.length];
+        for (int i = 0; i < sortedPrescriptionsArray.length; i++) {
+            prescriptionArray[i] = (Prescription) sortedPrescriptionsArray[i];
+        }
         
         String[] headers = {"Prescription ID", "Patient ID", "Doctor ID", "Diagnosis", "Total Cost", "Status"};
         Object[][] rows = new Object[prescriptionArray.length][headers.length];
@@ -403,14 +408,9 @@ public class TreatmentManagement {
     }
     
     public Prescription findPrescriptionById(String prescriptionId) {
-        Object[] prescriptionsArray = prescriptionList.toArray();
-        for (Object obj : prescriptionsArray) {
-            Prescription prescription = (Prescription) obj;
-            if (prescription.getPrescriptionId().equals(prescriptionId)) {
-                return prescription;
-            }
-        }
-        return null;
+        Prescription dummy = new Prescription();
+        dummy.setPrescriptionId(prescriptionId);
+        return prescriptionList.search(dummy);
     }
     
     public Medicine findMedicineById(String medicineId) {

@@ -25,4 +25,8 @@ public interface SetAndQueueInterface<T> {
     public boolean isQueueEmpty();
     public void clearQueue();
     public Object[] toQueueArray(); //to translate queue to array for displaying
+
+    //search and sort methods
+    public T search(T target);
+    public void sort();
 }
