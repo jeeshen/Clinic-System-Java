@@ -2,6 +2,7 @@ package boundary;
 
 import control.PatientManagement;
 import java.util.Scanner;
+import utility.StringUtility;
 
 public class PatientManagementUI {
     private PatientManagement patientManagement;
@@ -15,9 +16,9 @@ public class PatientManagementUI {
     public void managePatientQueue() {
         boolean back = false;
         while (!back) {
-            System.out.println("\n" + repeatString("=", 50));
+            System.out.println("\n" + StringUtility.repeatString("=", 50));
             System.out.println("        PATIENT QUEUE MANAGEMENT");
-            System.out.println(repeatString("=", 50));
+            System.out.println(StringUtility.repeatString("=", 50));
             System.out.println("1 . Register New Patient");
             System.out.println("2 . Select Existing Patient");
             System.out.println("3 . View Waiting Queue");
@@ -25,7 +26,7 @@ public class PatientManagementUI {
             System.out.println("5 . View Next Patient in Queue");
             System.out.println("6 . Clear Patient Queue");
             System.out.println("0 . Back to Main Menu");
-            System.out.println(repeatString("-", 50));
+            System.out.println(StringUtility.repeatString("-", 50));
             System.out.print("Enter your choice: ");
             
             int choice = getUserInputInt(0, 6);
@@ -59,16 +60,16 @@ public class PatientManagementUI {
     public void managePatientRecords() {
         boolean back = false;
         while (!back) {
-            System.out.println("\n" + repeatString("=", 50));
+            System.out.println("\n" + StringUtility.repeatString("=", 50));
             System.out.println("        PATIENT RECORDS MANAGEMENT");
-            System.out.println(repeatString("=", 50));
+            System.out.println(StringUtility.repeatString("=", 50));
             System.out.println("1 . View All Patients (Sorted by ID)");
             System.out.println("2 . Search Patient by ID");
             System.out.println("3 . Search Patient by Name");
             System.out.println("4 . Update Patient Information");
             System.out.println("5 . Clear All Patient Records");
             System.out.println("0 . Back to Main Menu");
-            System.out.println(repeatString("-", 50));
+            System.out.println(StringUtility.repeatString("-", 50));
             System.out.print("Enter your choice: ");
             
             int choice = getUserInputInt(0, 5);
@@ -112,14 +113,6 @@ public class PatientManagementUI {
         } while (input < min || input > max);
         
         return input;
-    }
-
-    private String repeatString(String str, int count) {
-        StringBuilder sb = new StringBuilder();
-        for (int i = 0; i < count; i++) {
-            sb.append(str);
-        }
-        return sb.toString();
     }
 }
 

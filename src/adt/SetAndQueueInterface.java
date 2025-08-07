@@ -1,7 +1,7 @@
 package adt;
 
 public interface SetAndQueueInterface<T> {
-    //set
+    //set, all modules
     public boolean add(T newEntry);
     public boolean addAll(SetAndQueueInterface<T> otherSet);
     public boolean contains(T entry);
@@ -18,7 +18,7 @@ public interface SetAndQueueInterface<T> {
     public SetAndQueueInterface<T> intersection(SetAndQueueInterface<T> otherSet);
     public SetAndQueueInterface<T> difference(SetAndQueueInterface<T> otherSet);
     
-    //queue
+    //queue, patient only
     public void enqueue(T newEntry);
     public T dequeue();
     public T getFront();

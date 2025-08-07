@@ -85,14 +85,19 @@ public class Treatment {
 
     @Override
     public boolean equals(Object obj) {
-        if (this == obj) return true;
-        if (obj == null || getClass() != obj.getClass()) return false;
-        Treatment treatment = (Treatment) obj;
-        return java.util.Objects.equals(treatmentId, treatment.treatmentId) &&
-                java.util.Objects.equals(patientId, treatment.patientId) &&
-                java.util.Objects.equals(doctorId, treatment.doctorId) &&
-                java.util.Objects.equals(diagnosis, treatment.diagnosis) &&
-                java.util.Objects.equals(prescribedMedications, treatment.prescribedMedications) &&
-                java.util.Objects.equals(treatmentDate, treatment.treatmentDate);
+        if (this == obj) {
+            return true;
+        }
+        if (obj == null) {
+            return false;
+        }
+        if (getClass() != obj.getClass()) {
+            return false;
+        }
+        final Treatment other = (Treatment) obj;
+        if (!java.util.Objects.equals(this.treatmentId, other.treatmentId)) {
+            return false;
+        }
+        return true;
     }
 }

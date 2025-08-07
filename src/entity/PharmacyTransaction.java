@@ -73,13 +73,19 @@ public class PharmacyTransaction {
 
     @Override
     public boolean equals(Object obj) {
-        if (this == obj) return true;
-        if (obj == null || getClass() != obj.getClass()) return false;
-        PharmacyTransaction that = (PharmacyTransaction) obj;
-        return quantityDispensed == that.quantityDispensed &&
-                java.util.Objects.equals(transactionId, that.transactionId) &&
-                java.util.Objects.equals(patientId, that.patientId) &&
-                java.util.Objects.equals(medicineId, that.medicineId) &&
-                java.util.Objects.equals(dispenseDate, that.dispenseDate);
+        if (this == obj) {
+            return true;
+        }
+        if (obj == null) {
+            return false;
+        }
+        if (getClass() != obj.getClass()) {
+            return false;
+        }
+        final PharmacyTransaction other = (PharmacyTransaction) obj;
+        if (!java.util.Objects.equals(this.transactionId, other.transactionId)) {
+            return false;
+        }
+        return true;
     }
 }

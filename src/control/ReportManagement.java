@@ -3,10 +3,7 @@ package control;
 import java.util.Scanner;
 import adt.SetAndQueueInterface;
 import adt.SetAndQueue;
-import entity.Patient;
-import entity.Doctor;
-import entity.Consultation;
-import entity.Prescription;
+import utility.StringUtility;
 
 public class ReportManagement {
     private Scanner scanner;
@@ -16,141 +13,75 @@ public class ReportManagement {
     }
     
     public void generateComprehensiveMedicalReport(PatientManagement patientManagement, DoctorManagement doctorManagement, ConsultationManagement consultationManagement, TreatmentManagement treatmentManagement) {
-        System.out.println("\n" + repeatString("=", 80));
+        System.out.println("\n" + StringUtility.repeatString("=", 80));
         System.out.println("        COMPREHENSIVE MEDICAL REPORT");
-        System.out.println(repeatString("=", 80));
-        
-        //create sets for comprehensive analysis
-        SetAndQueueInterface<Patient> allPatients = new SetAndQueue<>();
-        SetAndQueueInterface<Doctor> allDoctors = new SetAndQueue<>();
-        SetAndQueueInterface<Patient> patientsWithConsultations = new SetAndQueue<>();
-        SetAndQueueInterface<Patient> patientsInQueue = new SetAndQueue<>();
-        SetAndQueueInterface<Doctor> doctorsOnDuty = new SetAndQueue<>();
-        SetAndQueueInterface<Doctor> availableDoctors = new SetAndQueue<>();
-        
-        //populate patient sets
-        Object[] patientsArray = patientManagement.getAllPatients();
-        for (Object obj : patientsArray) {
-            Patient patient = (Patient) obj;
-            allPatients.add(patient);
-        }
-        
-        //populate doctor sets
-        Object[] doctorsArray = doctorManagement.getAllDoctors();
-        for (Object obj : doctorsArray) {
-            Doctor doctor = (Doctor) obj;
-            allDoctors.add(doctor);
-            if (doctor.isIsAvailable()) {
-                availableDoctors.add(doctor);
-            }
-        }
-        
-        //get doctors on duty
-        Doctor[] onDutyDoctors = doctorManagement.getDoctorsOnDuty();
-        for (Doctor doctor : onDutyDoctors) {
-            doctorsOnDuty.add(doctor);
-        }
-        
-        //get patients with consultations
-        if (consultationManagement != null) {
-            Object[] consultationsArray = consultationManagement.getAllConsultations();
-            for (Object obj : consultationsArray) {
-                Consultation consultation = (Consultation) obj;
-                Patient patient = patientManagement.findPatientById(Integer.parseInt(consultation.getPatientId()));
-                if (patient != null) {
-                    patientsWithConsultations.add(patient);
-                }
-            }
-        }
-        
-        //get patients in queue
-        Object[] queueArray = patientManagement.getAllPatients();
-        for (Object obj : queueArray) {
-            Patient patient = (Patient) obj;
-            if (patient.isIsInWaiting()) {
-                patientsInQueue.add(patient);
-            }
-        }
-        
-        //perform set operations for comprehensive analysis
-        SetAndQueueInterface<Patient> activePatients = patientsWithConsultations.union(patientsInQueue);
-        SetAndQueueInterface<Patient> inactivePatients = allPatients.difference(activePatients);
-        SetAndQueueInterface<Doctor> availableNotOnDuty = availableDoctors.difference(doctorsOnDuty);
-        SetAndQueueInterface<Doctor> allActiveDoctors = availableDoctors.union(doctorsOnDuty);
-        
-        System.out.println("📊 SYSTEM OVERVIEW:");
-        System.out.println("• Total Patients: " + patientManagement.getTotalPatientCount());
-        System.out.println("• Total Doctors: " + doctorManagement.getTotalDoctorCount());
-        System.out.println("• Total Consultations: " + consultationManagement.getTotalConsultationCount());
-        System.out.println("• Total Prescriptions: " + treatmentManagement.getTotalPrescriptionCount());
-        System.out.println("• Total Revenue: RM " + String.format("%.2f", treatmentManagement.getTotalRevenue()));
-        System.out.println("• Paid Prescriptions: " + treatmentManagement.getPaidPrescriptionCount());
-        
-        System.out.println("\n📊 SYSTEM EFFICIENCY ANALYSIS:");
-        System.out.println("• Active Patients: " + activePatients.size());
-        System.out.println("• Inactive Patients: " + inactivePatients.size());
-        System.out.println("• Available Doctors Not on Duty: " + availableNotOnDuty.size());
-        System.out.println("• All Active Doctors: " + allActiveDoctors.size());
-        System.out.println("• System Efficiency: " + String.format("%.1f", (double)activePatients.size()/patientManagement.getTotalPatientCount()*100) + "%");
-        
-        System.out.println("\n📈 PERFORMANCE METRICS:");
-        double completionRate = (double) treatmentManagement.getPaidPrescriptionCount() / 
-                               treatmentManagement.getTotalPrescriptionCount() * 100;
-        System.out.println("• Prescription Completion Rate: " + String.format("%.1f", completionRate) + "%");
-        
-        System.out.println("\n🏥 OPERATIONAL STATUS:");
-        System.out.println("• Doctors on Duty: " + doctorManagement.getDoctorsOnDutyCount());
-        System.out.println("• Patients in Queue: " + patientManagement.getQueueSize());
-        
-        System.out.println(repeatString("=", 80));
+        System.out.println(StringUtility.repeatString("=", 80));
+        System.out.println("Generated at: " + StringUtility.getCurrentDateTime());
+        System.out.println(StringUtility.repeatString("-", 80));
+
+        int totalPatients = patientManagement.getTotalPatientCount();
+        int totalDoctors = doctorManagement.getTotalDoctorCount();
+        int totalConsultations = consultationManagement.getTotalConsultationCount();
+        int totalPrescriptions = treatmentManagement.getTotalPrescriptionCount();
+        double totalRevenue = treatmentManagement.getTotalRevenue();
+        int paidPrescriptions = treatmentManagement.getPaidPrescriptionCount();
+        int queueSize = patientManagement.getQueueSize();
+        int doctorsOnDuty = doctorManagement.getDoctorsOnDutyCount();
+
+        String[] headers = {"Metric", "Value"};
+        Object[][] rows = {
+            {"Total Patients", totalPatients},
+            {"Total Doctors", totalDoctors},
+            {"Total Consultations", totalConsultations},
+            {"Total Prescriptions", totalPrescriptions},
+            {"Total Revenue", String.format("RM %.2f", totalRevenue)},
+            {"Paid Prescriptions", paidPrescriptions},
+            {"Doctors on Duty", doctorsOnDuty},
+            {"Patients in Queue", queueSize}
+        };
+        System.out.println("\nSYSTEM OVERVIEW:");
+        System.out.print(StringUtility.formatTableWithDividers(headers, rows));
+        System.out.println("\nSUMMARY:");
+        System.out.println("• Total Patients: " + totalPatients);
+        System.out.println("• Total Doctors: " + totalDoctors);
+        System.out.println("• Total Consultations: " + totalConsultations);
+        System.out.println("• Total Prescriptions: " + totalPrescriptions);
+        System.out.println("• Total Revenue: RM " + String.format("%.2f", totalRevenue));
+        System.out.println("• Paid Prescriptions: " + paidPrescriptions);
+        System.out.println("• Doctors on Duty: " + doctorsOnDuty);
+        System.out.println("• Patients in Queue: " + queueSize);
+        System.out.println(StringUtility.repeatString("=", 80));
         System.out.println("Press Enter to continue...");
         scanner.nextLine();
     }
     
     public void generateAgeVsDiseaseAnalysisReport(PatientManagement patientManagement, TreatmentManagement treatmentManagement) {
-        System.out.println("\n" + repeatString("=", 80));
-        System.out.println("        AGE VS DISEASE ANALYSIS REPORT");
-        System.out.println(repeatString("=", 80));
-        
+        System.out.println("\n" + StringUtility.repeatString("=", 80));
+        System.out.println("        DISEASE AGE DISTRIBUTION REPORT");
+        System.out.println(StringUtility.repeatString("=", 80));
+        System.out.println("Generated at: " + StringUtility.getCurrentDateTime());
+        System.out.println(StringUtility.repeatString("-", 80));
+
         Object[] patientsArray = patientManagement.getAllPatients();
         Object[] prescriptionsArray = treatmentManagement.getAllPrescriptions();
-        
-        //create age groups
-        int[] ageGroups = {0, 20, 30, 40, 50, 60, 100}; // 0-19, 20-29, 30-39, 40-49, 50-59, 60+
+        int[] ageGroups = {0, 20, 30, 40, 50, 60, 100};
         String[] ageGroupNames = {"0-19", "20-29", "30-39", "40-49", "50-59", "60+"};
         int[] ageGroupCounts = new int[ageGroups.length - 1];
-        
-        //track diseases by age group
+        SetAndQueueInterface<String>[] diseaseByAgeGroup = new SetAndQueue[ageGroups.length - 1];
+        for (int i = 0; i < diseaseByAgeGroup.length; i++) diseaseByAgeGroup[i] = new SetAndQueue<>();
         SetAndQueueInterface<String> allDiseases = new SetAndQueue<>();
-        SetAndQueueInterface<Patient> patientsWithDiseases = new SetAndQueue<>();
-        SetAndQueueInterface<Patient> patientsWithoutDiseases = new SetAndQueue<>();
-        int[][] diseaseByAgeGroup = new int[ageGroups.length - 1][100]; //assuming max 100 diseases
-        String[] diseaseNames = new String[100];
-        int diseaseIndex = 0;
-        
-        //analyze prescriptions and patients
         for (Object prescriptionObj : prescriptionsArray) {
-            Prescription prescription = (Prescription) prescriptionObj;
+            entity.Prescription prescription = (entity.Prescription) prescriptionObj;
             String diagnosis = prescription.getDiagnosis();
             String patientId = prescription.getPatientId();
-            
-            //find patient age
             int patientAge = 0;
-            Patient currentPatient = null;
             for (Object patientObj : patientsArray) {
-                Patient patient = (Patient) patientObj;
+                entity.Patient patient = (entity.Patient) patientObj;
                 if (String.valueOf(patient.getId()).equals(patientId)) {
                     patientAge = patient.getAge();
-                    currentPatient = patient;
                     break;
                 }
             }
-            
-            if (currentPatient != null) {
-                patientsWithDiseases.add(currentPatient);
-            }
-            
-            //determine age group
             int ageGroupIndex = 0;
             for (int i = 0; i < ageGroups.length - 1; i++) {
                 if (patientAge >= ageGroups[i] && patientAge < ageGroups[i + 1]) {
@@ -158,194 +89,151 @@ public class ReportManagement {
                     break;
                 }
             }
-            
             ageGroupCounts[ageGroupIndex]++;
             allDiseases.add(diagnosis);
-            
-            //track disease by age group
-            boolean found = false;
-            for (int i = 0; i < diseaseIndex; i++) {
-                if (diseaseNames[i].equals(diagnosis)) {
-                    diseaseByAgeGroup[ageGroupIndex][i]++;
-                    found = true;
-                    break;
+            diseaseByAgeGroup[ageGroupIndex].add(diagnosis);
+        }
+        int maxAgeCount = 0;
+        for (int i = 0; i < ageGroupNames.length; i++) {
+            if (ageGroupCounts[i] > maxAgeCount) maxAgeCount = ageGroupCounts[i];
+        }
+        System.out.println("\nAGE GROUP DISTRIBUTION:");
+
+        int barWidth = 30;
+        for (int i = 0; i < ageGroupNames.length; i++) {
+            System.out.printf("%-30s   [%s] %d patients\n", ageGroupNames[i], StringUtility.greenBarChart(ageGroupCounts[i], maxAgeCount, barWidth), ageGroupCounts[i]);
+        }
+        System.out.println("\nDISEASES BY AGE GROUP:");
+        for (int i = 0; i < ageGroupNames.length; i++) {
+            if (!diseaseByAgeGroup[i].isEmpty()) {
+                System.out.println(ageGroupNames[i] + ":");;
+                Object[] diseasesArray = diseaseByAgeGroup[i].toArray();
+                Object[][] diseaseRows = new Object[diseasesArray.length][2];
+                int maxCases = 0;
+                for (int j = 0; j < diseasesArray.length; j++) {
+                    String diag = (String) diseasesArray[j];
+                    int count = countDiseaseInAgeGroup(diag, prescriptionsArray, patientsArray, ageGroups[i], ageGroups[i + 1]);
+                    diseaseRows[j][0] = diag;
+                    diseaseRows[j][1] = count;
+                    if (count > maxCases) maxCases = count;
+                }
+                for (int j = 0; j < diseasesArray.length; j++) {
+                    String diag = (String) diseasesArray[j];
+                    int count = countDiseaseInAgeGroup(diag, prescriptionsArray, patientsArray, ageGroups[i], ageGroups[i + 1]);
+                    System.out.printf("  %-30s [%s] %d cases\n", diag, StringUtility.greenBarChart(count, maxCases, barWidth), count);
                 }
             }
-            if (!found) {
-                diseaseNames[diseaseIndex] = diagnosis;
-                diseaseByAgeGroup[ageGroupIndex][diseaseIndex] = 1;
-                diseaseIndex++;
-            }
         }
-        
-        //create sets for all patients and find patients without diseases
-        SetAndQueueInterface<Patient> allPatients = new SetAndQueue<>();
-        for (Object obj : patientsArray) {
-            Patient patient = (Patient) obj;
-            allPatients.add(patient);
-        }
-        patientsWithoutDiseases = allPatients.difference(patientsWithDiseases);
-        
-        System.out.println("📊 AGE GROUP DISTRIBUTION:");
-        for (int i = 0; i < ageGroupNames.length; i++) {
-            int bars = (int) Math.round((double) ageGroupCounts[i] / getMaxValue(ageGroupCounts) * 25);
-            System.out.printf("%-8s: [%s] %d patients (%.1f%%)\n", 
-                ageGroupNames[i], createColoredBar(BLUE_BG, bars, 25), ageGroupCounts[i], 
-                (double)ageGroupCounts[i]/getTotalPatients(patientsArray)*100);
-        }
-        
-        System.out.println("\n📊 DISEASE PERCENTAGE ANALYSIS:");
-        System.out.println("• Patients with Diseases: " + patientsWithDiseases.size());
-        System.out.println("• Patients without Diseases: " + patientsWithoutDiseases.size());
-        System.out.println("• Total Patients Analyzed: " + allPatients.size());
-        System.out.println("• Disease Percentage: " + String.format("%.1f", (double)patientsWithDiseases.size()/allPatients.size()*100) + "%");
-        
-        System.out.println("\n🏥 DISEASE PATTERNS BY AGE GROUP:");
-        for (int i = 0; i < ageGroupNames.length; i++) {
-            if (ageGroupCounts[i] > 0) {
-                System.out.println("\n" + ageGroupNames[i] + " Age Group:");
-                for (int j = 0; j < diseaseIndex; j++) {
-                    if (diseaseByAgeGroup[i][j] > 0) {
-                        int bars = (int) Math.round((double) diseaseByAgeGroup[i][j] / getMaxValue(diseaseByAgeGroup[i]) * 25);
-                        System.out.printf("  %-30s: [%s] %d cases\n", 
-                            diseaseNames[j], createColoredBar(BLUE_BG, bars, 25), diseaseByAgeGroup[i][j]);
+
+        System.out.println("\nSUMMARY:");
+        System.out.println("• Total Patients: " + patientsArray.length);
+        System.out.println("• Total Diagnoses: " + allDiseases.size());
+        System.out.println(StringUtility.repeatString("=", 80));
+        System.out.println("Press Enter to continue...");
+        scanner.nextLine();
+    }
+    
+    private int countDiseaseInAgeGroup(String disease, Object[] prescriptionsArray, Object[] patientsArray, int minAge, int maxAge) {
+        int count = 0;
+        for (Object prescriptionObj : prescriptionsArray) {
+            entity.Prescription prescription = (entity.Prescription) prescriptionObj;
+            if (prescription.getDiagnosis().equals(disease)) {
+                String patientId = prescription.getPatientId();
+                for (Object patientObj : patientsArray) {
+                    entity.Patient patient = (entity.Patient) patientObj;
+                    if (String.valueOf(patient.getId()).equals(patientId)) {
+                        int age = patient.getAge();
+                        if (age >= minAge && age < maxAge) {
+                            count++;
+                        }
+                        break;
                     }
                 }
             }
         }
-        
-        System.out.println("");
-        System.out.println("Press Enter to continue...");
-        scanner.nextLine();
+        return count;
     }
     
-    public void generateDoctorVsWorkloadAnalysisReport(DoctorManagement doctorManagement, ConsultationManagement consultationManagement) {
-        System.out.println("\n" + repeatString("=", 80));
-        System.out.println("        DOCTOR VS WORKLOAD ANALYSIS REPORT");
-        System.out.println(repeatString("=", 80));
-        
-        Object[] doctorsArray = doctorManagement.getAllDoctors();
-        Object[] consultationsArray = consultationManagement.getAllConsultations();
-        
-        //track doctor workload
-        int[] doctorWorkload = new int[doctorsArray.length];
-        String[] doctorNames = new String[doctorsArray.length];
-        
-        //create sets for set operations analysis
-        SetAndQueueInterface<Doctor> allDoctors = new SetAndQueue<>();
-        SetAndQueueInterface<Doctor> doctorsWithConsultations = new SetAndQueue<>();
-        SetAndQueueInterface<Doctor> doctorsOnDuty = new SetAndQueue<>();
-        SetAndQueueInterface<Doctor> highWorkloadDoctors = new SetAndQueue<>();
-        SetAndQueueInterface<Doctor> mediumWorkloadDoctors = new SetAndQueue<>();
-        SetAndQueueInterface<Doctor> lowWorkloadDoctors = new SetAndQueue<>();
-        SetAndQueueInterface<Doctor> inactiveDoctors = new SetAndQueue<>();
-        
-        //initialize doctor names and populate sets
-        for (int i = 0; i < doctorsArray.length; i++) {
-            Doctor doctor = (Doctor) doctorsArray[i];
-            doctorNames[i] = doctor.getName();
-            allDoctors.add(doctor);
-            
-            //add to on-duty set if available
-            if (doctor.isIsAvailable()) {
-                doctorsOnDuty.add(doctor);
-            }
-        }
-        
-        //count consultations per doctor and categorize
-        for (Object consultationObj : consultationsArray) {
-            Consultation consultation = (Consultation) consultationObj;
-            String doctorId = consultation.getDoctorId();
-            
-            for (int i = 0; i < doctorsArray.length; i++) {
-                Doctor doctor = (Doctor) doctorsArray[i];
-                if (doctor.getDoctorId().equals(doctorId)) {
-                    doctorWorkload[i]++;
-                    doctorsWithConsultations.add(doctor);
-                    break;
+    public void generateMedicineUsageByDiseaseReport(TreatmentManagement treatmentManagement, PatientManagement patientManagement) {
+        System.out.println("\n" + StringUtility.repeatString("=", 80));
+        System.out.println("        MEDICINE USAGE BY DISEASE REPORT");
+        System.out.println(StringUtility.repeatString("=", 80));
+        System.out.println("Generated at: " + StringUtility.getCurrentDateTime());
+        System.out.println(StringUtility.repeatString("-", 80));
+
+        Object[] prescriptionsArray = treatmentManagement.getAllPrescriptions();
+        SetAndQueueInterface<String> medicineNames = new SetAndQueue<>();
+        SetAndQueueInterface<String>[] medicineToPatients = new SetAndQueue[100];
+        SetAndQueueInterface<String>[] medicineToDiseases = new SetAndQueue[100];
+        int maxPatients = 0;
+        int medicineIndex = 0;
+        for (Object obj : prescriptionsArray) {
+            entity.Prescription prescription = (entity.Prescription) obj;
+            String diagnosis = prescription.getDiagnosis();
+            String patientId = prescription.getPatientId();
+            entity.Patient patient = patientManagement.findPatientById(Integer.parseInt(patientId));
+            if (patient == null) continue;
+            adt.SetAndQueueInterface<entity.PrescribedMedicine> meds = prescription.getPrescribedMedicines();
+            Object[] medsArray = meds.toArray();
+            for (Object medObj : medsArray) {
+                entity.PrescribedMedicine med = (entity.PrescribedMedicine) medObj;
+                String medName = med.getMedicineName();
+                //find or create index for this medicine
+                int medIdx = -1;
+                Object[] existingMeds = medicineNames.toArray();
+                for (int i = 0; i < existingMeds.length; i++) {
+                    if (existingMeds[i].equals(medName)) {
+                        medIdx = i;
+                        break;
+                    }
                 }
+                if (medIdx == -1) {
+                    medIdx = medicineIndex++;
+                    medicineNames.add(medName);
+                    medicineToPatients[medIdx] = new SetAndQueue<>();
+                    medicineToDiseases[medIdx] = new SetAndQueue<>();
+                }
+                //track unique patients and diseases
+                medicineToPatients[medIdx].add(patientId);
+                medicineToDiseases[medIdx].add(diagnosis);
             }
         }
-        
-        //categorize doctors by workload
-        for (int i = 0; i < doctorsArray.length; i++) {
-            Doctor doctor = (Doctor) doctorsArray[i];
-            if (doctorWorkload[i] >= 5) {
-                highWorkloadDoctors.add(doctor);
-            } else if (doctorWorkload[i] >= 2) {
-                mediumWorkloadDoctors.add(doctor);
-            } else if (doctorWorkload[i] > 0) {
-                lowWorkloadDoctors.add(doctor);
-            } else {
-                inactiveDoctors.add(doctor);
+
+        String[] headers = {"Medicine", "Unique Patients", "Diseases"};
+        Object[] medNamesArray = medicineNames.toArray();
+        Object[][] rows = new Object[medNamesArray.length][headers.length];
+        for (int i = 0; i < medNamesArray.length; i++) {
+            String medName = (String) medNamesArray[i];
+            rows[i][0] = medName;
+            rows[i][1] = medicineToPatients[i].size();
+            //convert diseases set to comma-separated string
+            Object[] diseasesArray = medicineToDiseases[i].toArray();
+            StringBuilder diseasesStr = new StringBuilder();
+            for (int j = 0; j < diseasesArray.length; j++) {
+                if (j > 0) diseasesStr.append(", ");
+                diseasesStr.append(diseasesArray[j]);
+            }
+            rows[i][2] = diseasesStr.toString();
+            if (medicineToPatients[i].size() > maxPatients) {
+                maxPatients = medicineToPatients[i].size();
             }
         }
-        
-        //perform set operations
-        SetAndQueueInterface<Doctor> activeDoctors = doctorsWithConsultations.union(doctorsOnDuty);
-        SetAndQueueInterface<Doctor> doctorsWithConsultationsOnly = doctorsWithConsultations.difference(doctorsOnDuty);
-        SetAndQueueInterface<Doctor> doctorsOnDutyOnly = doctorsOnDuty.difference(doctorsWithConsultations);
-        SetAndQueueInterface<Doctor> doctorsWithBoth = doctorsWithConsultations.intersection(doctorsOnDuty);
-        
-        System.out.println("👨‍⚕️ DOCTOR WORKLOAD ANALYSIS:");
-        int maxWorkload = getMaxValue(doctorWorkload);
-        
-        for (int i = 0; i < doctorsArray.length; i++) {
-            if (doctorWorkload[i] > 0) {
-                int bars = (int) Math.round((double) doctorWorkload[i] / maxWorkload * 25);
-                System.out.printf("%-40s: [%s] %d consultations (%.1f%%)\n", 
-                    doctorNames[i], createColoredBar(BLUE_BG, bars, 25), doctorWorkload[i], 
-                    (double)doctorWorkload[i]/getTotalConsultations(consultationsArray)*100);
-            }
+        System.out.println("\nMEDICINE USAGE TABLE:");
+        System.out.print(StringUtility.formatTableWithDividers(headers, rows));
+
+        System.out.println("\nPATIENT COUNT PER MEDICINE:");
+        int barWidth = 30;
+        for (int i = 0; i < medNamesArray.length; i++) {
+            String medName = (String) medNamesArray[i];
+            int count = medicineToPatients[i].size();
+            System.out.printf("%-20s [%s] %d patients\n", medName, StringUtility.greenBarChart(count, maxPatients, barWidth), count);
         }
-        
-        System.out.println("\n📊 DOCTOR ACTIVITY ANALYSIS:");
-        System.out.println("• Doctors with Consultations Only: " + doctorsWithConsultationsOnly.size());
-        System.out.println("• Doctors on Duty Only: " + doctorsOnDutyOnly.size());
-        System.out.println("• Doctors with Both (Consultations & Duty): " + doctorsWithBoth.size());
-        System.out.println("• Total Active Doctors: " + activeDoctors.size());
-        System.out.println("• Completely Inactive Doctors: " + inactiveDoctors.size());
-        
-        //workload categories
-        System.out.println("\n📈 WORKLOAD CATEGORIES:");
-        System.out.println("• High Workload (≥5 consultations): " + highWorkloadDoctors.size() + " doctors");
-        System.out.println("• Medium Workload (2-4 consultations): " + mediumWorkloadDoctors.size() + " doctors");
-        System.out.println("• Low Workload (1 consultation): " + lowWorkloadDoctors.size() + " doctors");
-        System.out.println("• Inactive Doctors: " + inactiveDoctors.size() + " doctors");
-        
-        System.out.println("");
+
+        System.out.println("\nSUMMARY:");
+        System.out.println("• Total Medicines: " + medNamesArray.length);
+        System.out.println("• Max Unique Patients for a Medicine: " + maxPatients);
+        System.out.println(StringUtility.repeatString("=", 80));
         System.out.println("Press Enter to continue...");
         scanner.nextLine();
-    }
-    
-    private int getMaxValue(int[] array) {
-        int max = 0;
-        for (int value : array) {
-            if (value > max) max = value;
-        }
-        return max;
-    }
-    
-    private int getTotalPatients(Object[] patientsArray) {
-        return patientsArray.length;
-    }
-    
-    private int getTotalConsultations(Object[] consultationsArray) {
-        return consultationsArray.length;
-    }
-    
-    private static final String RESET = "\u001B[0m";
-    private static final String BLUE_BG = "\u001B[44m";
-    
-    private String createColoredBar(String color, int barCount, int totalWidth) {
-        return color + repeatString(" ", barCount) + RESET + repeatString(" ", totalWidth - barCount);
-    }
-    
-    private String repeatString(String str, int count) {
-        StringBuilder sb = new StringBuilder();
-        for (int i = 0; i < count; i++) {
-            sb.append(str);
-        }
-        return sb.toString();
     }
 } 

@@ -40,7 +40,9 @@ public class ClinicSystem {
         //connect to other controllers
         consultationUI.setDependencies(patientManagement, doctorManagement, treatmentManagement);
         consultationManagement.setDoctorManagement(doctorManagement);
+        consultationManagement.setPatientManagement(patientManagement);
         patientManagement.setConsultationManagement(consultationManagement);
+        doctorManagement.setConsultationManagement(consultationManagement);
         reportUI.setDependencies(patientManagement, doctorManagement, consultationManagement, treatmentManagement);
         pharmacyUI.setDependencies(treatmentManagement);
         treatmentManagement.setPharmacyManagement(pharmacyManagement);
@@ -99,9 +101,9 @@ public class ClinicSystem {
     }
     
     private void displayMainMenu() {
-        System.out.println("\n" + repeatString("=", 60));
+        System.out.println("\n" + utility.StringUtility.repeatString("=", 60));
         System.out.println("        CHUBBY CLINIC SYSTEM");
-        System.out.println(repeatString("=", 60));
+        System.out.println(utility.StringUtility.repeatString("=", 60));
         System.out.println("1 . Patient Registration & Queue Management");
         System.out.println("2 . Patient Records & Search");
         System.out.println("3 . Doctor Information & Duty Management");
@@ -114,16 +116,8 @@ public class ClinicSystem {
         System.out.println("10. Pharmacy Reports & Inventory");
         System.out.println("11. Process Payment");
         System.out.println("0 . Exit System");
-        System.out.println(repeatString("-", 60));
+        System.out.println(utility.StringUtility.repeatString("-", 60));
         System.out.print("Enter your choice: ");
-    }
-    
-    private String repeatString(String str, int count) {
-        StringBuilder sb = new StringBuilder();
-        for (int i = 0; i < count; i++) {
-            sb.append(str);
-        }
-        return sb.toString();
     }
     
     private int getUserInputInt(int min, int max) {

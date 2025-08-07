@@ -117,18 +117,20 @@ public class Medicine implements Comparable<Medicine> {
 
     @Override
     public boolean equals(Object obj) {
-        if (this == obj) return true;
-        if (obj == null || getClass() != obj.getClass()) return false;
-        Medicine medicine = (Medicine) obj;
-        return stockQuantity == medicine.stockQuantity &&
-                Double.compare(medicine.price, price) == 0 &&
-                java.util.Objects.equals(medicineId, medicine.medicineId) &&
-                java.util.Objects.equals(name, medicine.name) &&
-                java.util.Objects.equals(brand, medicine.brand) &&
-                java.util.Objects.equals(expiryDate, medicine.expiryDate) &&
-                java.util.Objects.equals(purpose, medicine.purpose) &&
-                java.util.Objects.equals(activeIngredient, medicine.activeIngredient) &&
-                java.util.Objects.equals(category, medicine.category);
+        if (this == obj) {
+            return true;
+        }
+        if (obj == null) {
+            return false;
+        }
+        if (getClass() != obj.getClass()) {
+            return false;
+        }
+        final Medicine other = (Medicine) obj;
+        if (!java.util.Objects.equals(this.medicineId, other.medicineId)) {
+            return false;
+        }
+        return true;
     }
     
     @Override

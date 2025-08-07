@@ -9,6 +9,7 @@ import entity.Doctor;
 import entity.Medicine;
 import dao.DataInitializer;
 import java.util.Scanner;
+import utility.StringUtility;
 
 public class TreatmentManagement {
     private SetAndQueueInterface<Prescription> prescriptionList = new SetAndQueue<>();
@@ -106,11 +107,11 @@ public class TreatmentManagement {
     }
     
     public void displayAllPrescriptionsSorted() {
-        System.out.println("\n" + repeatString("-", 80));
+        System.out.println("\n" + StringUtility.repeatString("-", 80));
         System.out.println("ALL PRESCRIPTIONS (SORTED BY ID)");
-        System.out.println(repeatString("-", 80));
+        System.out.println(StringUtility.repeatString("-", 80));
         System.out.printf("%-15s %-10s %-10s %-20s %-15s %-10s\n", "Prescription ID", "Patient ID", "Doctor ID", "Diagnosis", "Total Cost", "Status");
-        System.out.println(repeatString("-", 80));
+        System.out.println(StringUtility.repeatString("-", 80));
         
         Object[] prescriptionsArray = prescriptionList.toArray();
         Prescription[] prescriptionArray = new Prescription[prescriptionsArray.length];
@@ -120,14 +121,22 @@ public class TreatmentManagement {
         
         utility.BubbleSort.sort(prescriptionArray);
         
-        for (Prescription prescription : prescriptionArray) {
-            System.out.printf("%-15s %-10s %-10s %-20s %-15s %-10s\n", 
-                prescription.getPrescriptionId(), prescription.getPatientId(),
-                prescription.getDoctorId(), prescription.getDiagnosis(),
-                "RM " + String.format("%.2f", prescription.getTotalCost()),
-                prescription.getStatus());
+        String[] headers = {"Prescription ID", "Patient ID", "Doctor ID", "Diagnosis", "Total Cost", "Status"};
+        Object[][] rows = new Object[prescriptionArray.length][headers.length];
+        for (int i = 0; i < prescriptionArray.length; i++) {
+            Prescription prescription = prescriptionArray[i];
+            rows[i][0] = prescription.getPrescriptionId();
+            rows[i][1] = prescription.getPatientId();
+            rows[i][2] = prescription.getDoctorId();
+            rows[i][3] = prescription.getDiagnosis();
+            rows[i][4] = "RM " + String.format("%.2f", prescription.getTotalCost());
+            rows[i][5] = prescription.getStatus();
         }
-        System.out.println(repeatString("-", 80));
+        System.out.print(StringUtility.formatTableNoDividers(
+            "ALL PRESCRIPTIONS (SORTED BY ID)",
+            headers,
+            rows
+        ));
         System.out.println("Press Enter to continue...");
         scanner.nextLine();
     }
@@ -149,27 +158,27 @@ public class TreatmentManagement {
         String patientId = scanner.nextLine();
         
         Object[] prescriptionsArray = prescriptionList.toArray();
-        System.out.println("\nPrescriptions by Patient ID: " + patientId);
-        System.out.println(repeatString("-", 80));
-        System.out.printf("%-15s %-10s %-20s %-15s %-10s\n", "Prescription ID", "Doctor ID", "Diagnosis", "Total Cost", "Status");
-        System.out.println(repeatString("-", 80));
-        
-        boolean found = false;
+        String[] headers = {"Prescription ID", "Doctor ID", "Diagnosis", "Total Cost", "Status"};
+        SetAndQueueInterface<Object[]> rowList = new SetAndQueue<>();
         for (Object obj : prescriptionsArray) {
             Prescription prescription = (Prescription) obj;
             if (prescription.getPatientId().equals(patientId)) {
-                System.out.printf("%-15s %-10s %-20s %-15s %-10s\n", 
-                    prescription.getPrescriptionId(), prescription.getDoctorId(),
-                    prescription.getDiagnosis(), "RM " + String.format("%.2f", prescription.getTotalCost()),
-                    prescription.getStatus());
-                found = true;
+                rowList.add(new Object[]{prescription.getPrescriptionId(), prescription.getDoctorId(), prescription.getDiagnosis(), "RM " + String.format("%.2f", prescription.getTotalCost()), prescription.getStatus()});
             }
         }
-        
-        if (!found) {
+        Object[][] rows = new Object[rowList.size()][headers.length];
+        Object[] rowArray = rowList.toArray();
+        for (int i = 0; i < rowArray.length; i++) {
+            rows[i] = (Object[]) rowArray[i];
+        }
+        System.out.print(StringUtility.formatTableNoDividers(
+            "PRESCRIPTIONS BY PATIENT ID: " + patientId,
+            headers,
+            rows
+        ));
+        if (rowList.isEmpty()) {
             System.out.println("No prescriptions found for this patient.");
         }
-        System.out.println(repeatString("-", 80));
         System.out.println("Press Enter to continue...");
         scanner.nextLine();
     }
@@ -179,35 +188,35 @@ public class TreatmentManagement {
         String doctorId = scanner.nextLine();
         
         Object[] prescriptionsArray = prescriptionList.toArray();
-        System.out.println("\nPrescriptions by Doctor ID: " + doctorId);
-        System.out.println(repeatString("-", 80));
-        System.out.printf("%-15s %-10s %-20s %-15s %-10s\n", "Prescription ID", "Patient ID", "Diagnosis", "Total Cost", "Status");
-        System.out.println(repeatString("-", 80));
-        
-        boolean found = false;
+        String[] headers = {"Prescription ID", "Patient ID", "Diagnosis", "Total Cost", "Status"};
+        SetAndQueueInterface<Object[]> rowList = new SetAndQueue<>();
         for (Object obj : prescriptionsArray) {
             Prescription prescription = (Prescription) obj;
             if (prescription.getDoctorId().equals(doctorId)) {
-                System.out.printf("%-15s %-10s %-20s %-15s %-10s\n", 
-                    prescription.getPrescriptionId(), prescription.getPatientId(),
-                    prescription.getDiagnosis(), "RM " + String.format("%.2f", prescription.getTotalCost()),
-                    prescription.getStatus());
-                found = true;
+                rowList.add(new Object[]{prescription.getPrescriptionId(), prescription.getPatientId(), prescription.getDiagnosis(), "RM " + String.format("%.2f", prescription.getTotalCost()), prescription.getStatus()});
             }
         }
-        
-        if (!found) {
+        Object[][] rows = new Object[rowList.size()][headers.length];
+        Object[] rowArray = rowList.toArray();
+        for (int i = 0; i < rowArray.length; i++) {
+            rows[i] = (Object[]) rowArray[i];
+        }
+        System.out.print(StringUtility.formatTableNoDividers(
+            "PRESCRIPTIONS BY DOCTOR ID: " + doctorId,
+            headers,
+            rows
+        ));
+        if (rowList.isEmpty()) {
             System.out.println("No prescriptions found for this doctor.");
         }
-        System.out.println(repeatString("-", 80));
         System.out.println("Press Enter to continue...");
         scanner.nextLine();
     }
     
     public void displayPrescriptionDetails(Prescription prescription) {
-        System.out.println("\n" + repeatString("-", 60));
+        System.out.println("\n" + StringUtility.repeatString("-", 60));
         System.out.println("PRESCRIPTION DETAILS");
-        System.out.println(repeatString("-", 60));
+        System.out.println(StringUtility.repeatString("-", 60));
         System.out.println("Prescription ID: " + prescription.getPrescriptionId());
         System.out.println("Consultation ID: " + prescription.getConsultationId());
         System.out.println("Patient ID: " + prescription.getPatientId());
@@ -222,7 +231,7 @@ public class TreatmentManagement {
         Object[] prescribedMedicinesArray = prescription.getPrescribedMedicines().toArray();
         if (prescribedMedicinesArray.length > 0) {
             System.out.printf("%-20s %-10s %-20s %-10s\n", "Medicine", "Quantity", "Dosage", "Dispensed");
-            System.out.println(repeatString("-", 60));
+            System.out.println(StringUtility.repeatString("-", 60));
             for (Object obj : prescribedMedicinesArray) {
                 PrescribedMedicine pm = (PrescribedMedicine) obj;
                 System.out.printf("%-20s %-10s %-20s %-10s\n", 
@@ -233,201 +242,155 @@ public class TreatmentManagement {
             System.out.println("No medicines prescribed.");
         }
         
-        System.out.println(repeatString("-", 60));
+        System.out.println(StringUtility.repeatString("-", 60));
         System.out.println("Press Enter to continue...");
         scanner.nextLine();
     }
     
     public void generateTreatmentStatisticsReport() {
-        System.out.println("\n" + repeatString("=", 80));
+        System.out.println("\n" + StringUtility.repeatString("=", 80));
         System.out.println("        TREATMENT STATISTICS REPORT");
-        System.out.println(repeatString("=", 80));
-        
+        System.out.println(StringUtility.repeatString("=", 80));
+        System.out.println("Generated at: " + StringUtility.getCurrentDateTime());
+        System.out.println(StringUtility.repeatString("-", 80));
+
         Object[] prescriptionsArray = prescriptionList.toArray();
         int totalPrescriptions = prescriptionsArray.length;
-        
         int paidCount = 0;
 
-        SetAndQueueInterface<String> diagnosisSet = new SetAndQueue<>();
-        SetAndQueueInterface<String> dates = new SetAndQueue<>();  
-
-        int[] diagnosisCounts = new int[100];
-        String[] diagnosisArray = new String[100];
-        int diagnosisIndex = 0;
+        SetAndQueueInterface<String> uniqueDiagnoses = new SetAndQueue<>();
+        int maxDiagnosis = 0;
         
         for (Object obj : prescriptionsArray) {
             Prescription prescription = (Prescription) obj;
-
-            if (prescription.isPaid()) {
-                paidCount++;
-            }
-            
-            //diagnosis analysis
+            if (prescription.isPaid()) paidCount++;
             String diagnosis = prescription.getDiagnosis();
-            diagnosisSet.add(diagnosis);
-            
-            //count diagnoses
-            boolean found = false;
-            for (int i = 0; i < diagnosisIndex; i++) {
-                if (diagnosisArray[i].equals(diagnosis)) {
-                    diagnosisCounts[i]++;
-                    found = true;
-                    break;
-                }
-            }
-            if (!found) {
-                diagnosisArray[diagnosisIndex] = diagnosis;
-                diagnosisCounts[diagnosisIndex] = 1;
-                diagnosisIndex++;
-            }
-            
-            //date analysis
-            String date = prescription.getPrescriptionDate();
-            dates.add(date);
+            uniqueDiagnoses.add(diagnosis);
         }
 
-        System.out.println("📊 PRESCRIPTION OVERVIEW:");
+        Object[] diagnosesArray = uniqueDiagnoses.toArray();
+        int[] diagnosisCounts = new int[diagnosesArray.length];
+        
+        for (int i = 0; i < diagnosesArray.length; i++) {
+            String diagnosis = (String) diagnosesArray[i];
+            int count = countDiagnosisOccurrences(diagnosis, prescriptionsArray);
+            diagnosisCounts[i] = count;
+            if (count > maxDiagnosis) {
+                maxDiagnosis = count;
+            }
+        }
+
+        String[] headers = {"Prescription ID", "Patient ID", "Diagnosis", "Date", "Paid"};
+        Object[][] rows = new Object[prescriptionsArray.length][headers.length];
+        for (int i = 0; i < prescriptionsArray.length; i++) {
+            Prescription p = (Prescription) prescriptionsArray[i];
+            rows[i][0] = p.getPrescriptionId();
+            rows[i][1] = p.getPatientId();
+            rows[i][2] = p.getDiagnosis();
+            rows[i][3] = p.getPrescriptionDate();
+            rows[i][4] = p.isPaid() ? "Yes" : "No";
+        }
+        System.out.println("\nPRESCRIPTION LIST:");
+        System.out.print(StringUtility.formatTableWithDividers(headers, rows));
+
+        System.out.println("\nDIAGNOSIS COUNTS:");
+        int barWidth = 30;
+        for (int i = 0; i < diagnosesArray.length; i++) {
+            String diag = (String) diagnosesArray[i];
+            int count = diagnosisCounts[i];
+            System.out.printf("%-30s [%s] %d cases\n", diag, StringUtility.greenBarChart(count, maxDiagnosis, barWidth), count);
+        }
+
+        System.out.println("\nSUMMARY:");
         System.out.println("• Total Prescriptions: " + totalPrescriptions);
         System.out.println("• Paid Prescriptions: " + paidCount);
-
-        System.out.println("\n🏥 DIAGNOSIS ANALYSIS:");
-        System.out.println("• Total Unique Diagnoses: " + diagnosisSet.size());
-
-        System.out.println("• Top 5 Diagnoses:");
-        for (int i = 0; i < Math.min(5, diagnosisIndex); i++) {
-            //find the diagnosis with highest count
-            int maxIndex = 0;
-            for (int j = 1; j < diagnosisIndex; j++) {
-                if (diagnosisCounts[j] > diagnosisCounts[maxIndex]) {
-                    maxIndex = j;
-                }
-            }
-            int bars = (int) Math.round((double) diagnosisCounts[maxIndex] / totalPrescriptions * 20);
-            System.out.printf("  %d. %-20s: [%s] %d cases (%.1f%%)\n", 
-                i+1, diagnosisArray[maxIndex], 
-                createColoredBar(BLUE_BG, bars, 20),
-                diagnosisCounts[maxIndex], 
-                (double)diagnosisCounts[maxIndex]/totalPrescriptions*100);
-            //mark as used by setting to -1
-            diagnosisCounts[maxIndex] = -1;
-        }
-
-        System.out.println("\n📅 PRESCRIPTION TRENDS:");
-        System.out.println("• Total Active Days: " + dates.size());
-        System.out.println("• Average Prescriptions per Day: " + String.format("%.1f", (double)totalPrescriptions/dates.size()));
-
-        System.out.println("• Daily Prescription Distribution:");
-        Object[] datesArray = dates.toArray();
-        for (Object dateObj : datesArray) {
-            String date = (String) dateObj;
-            int count = 0;
-            for (Object obj : prescriptionsArray) {
-                Prescription prescription = (Prescription) obj;
-                if (prescription.getPrescriptionDate().equals(date)) {
-                    count++;
-                }
-            }
-            int bars = (int) Math.round((double) count / getMaxPrescriptions(prescriptionsArray) * 15);
-            System.out.printf("  %s: [%s] %d prescriptions\n", 
-                date, 
-                createColoredBar(BLUE_BG, bars, 15),
-                count);
-        }
-
-        System.out.println("");
+        System.out.println(StringUtility.repeatString("=", 80));
         System.out.println("Press Enter to continue...");
         scanner.nextLine();
     }
     
-    private int getMaxPrescriptions(Object[] prescriptionsArray) {
-        //count prescriptions per date
-        SetAndQueueInterface<String> dates = new SetAndQueue<>();
+    private int countDiagnosisOccurrences(String diagnosis, Object[] prescriptionsArray) {
+        int count = 0;
         for (Object obj : prescriptionsArray) {
             Prescription prescription = (Prescription) obj;
-            dates.add(prescription.getPrescriptionDate());
-        }
-        
-        int maxCount = 0;
-        Object[] datesArray = dates.toArray();
-        for (Object dateObj : datesArray) {
-            String date = (String) dateObj;
-            int count = 0;
-            for (Object obj : prescriptionsArray) {
-                Prescription prescription = (Prescription) obj;
-                if (prescription.getPrescriptionDate().equals(date)) {
-                    count++;
-                }
+            if (prescription.getDiagnosis().equals(diagnosis)) {
+                count++;
             }
-            if (count > maxCount) maxCount = count;
         }
-        return maxCount;
+        return count;
     }
     
     public void generateDiagnosisAnalysisReport() {
-        System.out.println("\n" + repeatString("=", 60));
+        System.out.println("\n" + StringUtility.repeatString("=", 60));
         System.out.println("        DIAGNOSIS ANALYSIS REPORT");
-        System.out.println(repeatString("=", 60));
-        
+        System.out.println(StringUtility.repeatString("=", 60));
+        System.out.println("Generated at: " + StringUtility.getCurrentDateTime());
+        System.out.println(StringUtility.repeatString("-", 60));
+
         Object[] prescriptionsArray = prescriptionList.toArray();
-        SetAndQueueInterface<String> diagnosisSet = new SetAndQueue<>();
-        
-        //count diagnoses manually
-        int[] diagnosisCounts = new int[100];
-        String[] diagnosisArray = new String[100];
-        int diagnosisIndex = 0;
+        SetAndQueueInterface<String> uniqueDiagnoses = new SetAndQueue<>();
+        int maxDiagnosis = 0;
         
         for (Object obj : prescriptionsArray) {
             Prescription prescription = (Prescription) obj;
             String diagnosis = prescription.getDiagnosis();
-            diagnosisSet.add(diagnosis);
-            
-            //count diagnoses
-            boolean found = false;
-            for (int i = 0; i < diagnosisIndex; i++) {
-                if (diagnosisArray[i].equals(diagnosis)) {
-                    diagnosisCounts[i]++;
-                    found = true;
-                    break;
-                }
-            }
-            if (!found) {
-                diagnosisArray[diagnosisIndex] = diagnosis;
-                diagnosisCounts[diagnosisIndex] = 1;
-                diagnosisIndex++;
+            uniqueDiagnoses.add(diagnosis);
+        }
+
+        Object[] diagnosesArray = uniqueDiagnoses.toArray();
+        int[] diagnosisCounts = new int[diagnosesArray.length];
+        
+        for (int i = 0; i < diagnosesArray.length; i++) {
+            String diagnosis = (String) diagnosesArray[i];
+            int count = countDiagnosisOccurrences(diagnosis, prescriptionsArray);
+            diagnosisCounts[i] = count;
+            if (count > maxDiagnosis) {
+                maxDiagnosis = count;
             }
         }
+
+        String[] headers = {"Diagnosis", "Cases"};
+        Object[][] rows = new Object[diagnosesArray.length][headers.length];
         
-        System.out.println("📊 Diagnosis Distribution:");
-        for (int i = 0; i < diagnosisIndex; i++) {
-            System.out.println("• " + diagnosisArray[i] + ": " + diagnosisCounts[i] + " cases");
+        for (int i = 0; i < diagnosesArray.length; i++) {
+            String diag = (String) diagnosesArray[i];
+            rows[i][0] = diag;
+            rows[i][1] = diagnosisCounts[i];
         }
         
-        System.out.println("\n📈 Diagnosis Chart:");
-        if (diagnosisIndex > 0) {
-            int totalCases = 0;
-            for (int i = 0; i < diagnosisIndex; i++) {
-                totalCases += diagnosisCounts[i];
-            }
-            
-            for (int i = 0; i < diagnosisIndex; i++) {
-                int bars = totalCases > 0 ? (int) Math.round((double) diagnosisCounts[i] / totalCases * 25) : 0;
-                System.out.printf("%-30s [%s] %d cases (%.1f%%)\n", 
-                    diagnosisArray[i] + ":", 
-                    createColoredBar(BLUE_BG, bars, 25),
-                    diagnosisCounts[i], 
-                    (double)diagnosisCounts[i]/totalCases*100);
-                System.out.println("");
-            }
+        System.out.println("\nDIAGNOSIS ANALYSIS:");
+        System.out.print(StringUtility.formatTableWithDividers(headers, rows));
+
+        System.out.println("\nDIAGNOSIS DISTRIBUTION:");
+        int barWidth = 30;
+        for (int i = 0; i < diagnosesArray.length; i++) {
+            String diag = (String) diagnosesArray[i];
+            int count = diagnosisCounts[i];
+            System.out.printf("%-30s [%s] %d cases\n", diag, StringUtility.greenBarChart(count, maxDiagnosis, barWidth), count);
         }
-        
-        System.out.println("\nPress Enter to continue...");
+
+        System.out.println("\nSUMMARY:");
+        System.out.println("• Total Diagnoses: " + diagnosesArray.length);
+        System.out.println("• Most Common Diagnosis: " + getMostCommonDiagnosis(diagnosesArray, diagnosisCounts));
+        System.out.println(StringUtility.repeatString("=", 60));
+        System.out.println("Press Enter to continue...");
         scanner.nextLine();
     }
     
+    private String getMostCommonDiagnosis(Object[] diagnosesArray, int[] diagnosisCounts) {
+        int maxIndex = 0;
+        for (int i = 1; i < diagnosisCounts.length; i++) {
+            if (diagnosisCounts[i] > diagnosisCounts[maxIndex]) {
+                maxIndex = i;
+            }
+        }
+        return (String) diagnosesArray[maxIndex];
+    }
+    
     public void displayAvailableMedicines() {
-        System.out.println(repeatString("-", 80));
+        System.out.println(StringUtility.repeatString("-", 80));
         System.out.printf("%-12s %-20s %-15s %-10s %-8s %-10s\n", "ID", "Name", "Brand", "Stock", "Price", "Purpose");
-        System.out.println(repeatString("-", 80));
+        System.out.println(StringUtility.repeatString("-", 80));
         
         Object[] medicinesArray = medicineList.toArray();
         for (Object obj : medicinesArray) {
@@ -436,7 +399,7 @@ public class TreatmentManagement {
                 medicine.getMedicineId(), medicine.getName(), medicine.getBrand(),
                 medicine.getStockQuantity(), "RM " + medicine.getPrice(), medicine.getPurpose());
         }
-        System.out.println(repeatString("-", 80));
+        System.out.println(StringUtility.repeatString("-", 80));
     }
     
     public Prescription findPrescriptionById(String prescriptionId) {
@@ -508,14 +471,14 @@ public class TreatmentManagement {
     }
 
     public void processPayment() {
-        System.out.println("\n" + repeatString("=", 60));
+        System.out.println("\n" + StringUtility.repeatString("=", 60));
         System.out.println("        PAYMENT PROCESSING");
-        System.out.println(repeatString("=", 60));
+        System.out.println(StringUtility.repeatString("=", 60));
 
         System.out.println("Unpaid Prescriptions:");
-        System.out.println(repeatString("-", 80));
+        System.out.println(StringUtility.repeatString("-", 80));
         System.out.printf("%-15s %-10s %-20s %-15s %-10s\n", "Prescription ID", "Patient ID", "Diagnosis", "Total Cost", "Status");
-        System.out.println(repeatString("-", 80));
+        System.out.println(StringUtility.repeatString("-", 80));
         
         Object[] prescriptionsArray = prescriptionList.toArray();
         boolean hasUnpaid = false;
@@ -533,13 +496,13 @@ public class TreatmentManagement {
         
         if (!hasUnpaid) {
             System.out.println("No unpaid prescriptions found.");
-            System.out.println(repeatString("-", 80));
+            System.out.println(StringUtility.repeatString("-", 80));
             System.out.println("Press Enter to continue...");
             scanner.nextLine();
             return;
         }
         
-        System.out.println(repeatString("-", 80));
+        System.out.println(StringUtility.repeatString("-", 80));
 
         System.out.print("Enter prescription ID to process payment: ");
         String prescriptionId = scanner.nextLine();
@@ -595,9 +558,9 @@ public class TreatmentManagement {
 
         prescription.setPaid(true);
 
-        System.out.println("\n" + repeatString("=", 50));
+        System.out.println("\n" + StringUtility.repeatString("=", 50));
         System.out.println("        PAYMENT RECEIPT");
-        System.out.println(repeatString("=", 50));
+        System.out.println(StringUtility.repeatString("=", 50));
         System.out.println("Prescription ID: " + prescription.getPrescriptionId());
         System.out.println("Patient ID: " + prescription.getPatientId());
         System.out.println("Diagnosis: " + prescription.getDiagnosis());
@@ -608,7 +571,7 @@ public class TreatmentManagement {
         System.out.println("Payment Status: PAID");
         System.out.println("Date: " + java.time.LocalDate.now());
         System.out.println("Time: " + java.time.LocalTime.now().toString().substring(0, 8));
-        System.out.println(repeatString("=", 50));
+        System.out.println(StringUtility.repeatString("=", 50));
         System.out.println("Thank you for your payment!");
         
         System.out.println("\nPress Enter to continue...");
@@ -634,15 +597,15 @@ public class TreatmentManagement {
     }
 
     public void dispenseMedicines() {
-        System.out.println("\n" + repeatString("=", 60));
+        System.out.println("\n" + StringUtility.repeatString("=", 60));
         System.out.println("        MEDICINE DISPENSING");
-        System.out.println(repeatString("=", 60));
+        System.out.println(StringUtility.repeatString("=", 60));
         
         //display prescriptions with undispensed medicines
         System.out.println("Prescriptions with Undispensed Medicines:");
-        System.out.println(repeatString("-", 80));
+        System.out.println(StringUtility.repeatString("-", 80));
         System.out.printf("%-15s %-10s %-20s %-15s %-10s\n", "Prescription ID", "Patient ID", "Diagnosis", "Total Cost", "Status");
-        System.out.println(repeatString("-", 80));
+        System.out.println(StringUtility.repeatString("-", 80));
         
         Object[] prescriptionsArray = prescriptionList.toArray();
         boolean hasUndispensed = false;
@@ -660,13 +623,13 @@ public class TreatmentManagement {
         
         if (!hasUndispensed) {
             System.out.println("No prescriptions with undispensed medicines found.");
-            System.out.println(repeatString("-", 80));
+            System.out.println(StringUtility.repeatString("-", 80));
             System.out.println("Press Enter to continue...");
             scanner.nextLine();
             return;
         }
         
-        System.out.println(repeatString("-", 80));
+        System.out.println(StringUtility.repeatString("-", 80));
         
         //get prescription ID for dispensing
         System.out.print("Enter prescription ID to dispense medicines: ");
@@ -703,9 +666,9 @@ public class TreatmentManagement {
         System.out.println("Date: " + prescription.getPrescriptionDate());
         
         System.out.println("\nPrescribed Medicines:");
-        System.out.println(repeatString("-", 100));
+        System.out.println(StringUtility.repeatString("-", 100));
         System.out.printf("%-20s %-10s %-20s %-10s %-10s %-10s\n", "Medicine", "Quantity", "Dosage", "Instructions", "Price", "Dispensed");
-        System.out.println(repeatString("-", 100));
+        System.out.println(StringUtility.repeatString("-", 100));
         
         Object[] prescribedMedicinesArray = prescription.getPrescribedMedicines().toArray();
         boolean allDispensed = true;
@@ -729,7 +692,7 @@ public class TreatmentManagement {
             return;
         }
         
-        System.out.println(repeatString("-", 100));
+        System.out.println(StringUtility.repeatString("-", 100));
         
         //dispense medicines
         System.out.println("\nDispensing Options:");
@@ -844,9 +807,9 @@ public class TreatmentManagement {
     }
     
     public void generateDispensingStatisticsReport() {
-        System.out.println("\n" + repeatString("=", 60));
+        System.out.println("\n" + StringUtility.repeatString("=", 60));
         System.out.println("        DISPENSING STATISTICS REPORT");
-        System.out.println(repeatString("=", 60));
+        System.out.println(StringUtility.repeatString("=", 60));
         
         Object[] prescriptionsArray = prescriptionList.toArray();
         int totalPrescriptions = prescriptionsArray.length;
@@ -888,15 +851,7 @@ public class TreatmentManagement {
     private static final String RESET = "\u001B[0m";
     private static final String BLUE_BG = "\u001B[44m";
     
-    private String repeatString(String str, int count) {
-        StringBuilder sb = new StringBuilder();
-        for (int i = 0; i < count; i++) {
-            sb.append(str);
-        }
-        return sb.toString();
-    }
-    
     private String createColoredBar(String color, int barCount, int totalWidth) {
-        return color + repeatString(" ", barCount) + RESET + repeatString(" ", totalWidth - barCount);
+        return color + StringUtility.repeatString(" ", barCount) + RESET + StringUtility.repeatString(" ", totalWidth - barCount);
     }
 } 

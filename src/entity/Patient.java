@@ -10,14 +10,13 @@ public class Patient implements Comparable<Patient> {
     private String address;
     private String registrationDate;
     private String medicalHistory;
-    private boolean isInWaiting;
-    private String currentStatus; //waiting, in consultation, completed
+    private String status; // was currentStatus
 
     public Patient() {
-        this(0, "", 0, "", "", "", "", "", "", false, "");
+        this(0, "", 0, "", "", "", "", "", "", "");
     }
 
-    public Patient(int id, String name, int age, String gender, String allegy, String contactNumber, String address, String registrationDate, String medicalHistory, boolean isInWaiting, String currentStatus) {
+    public Patient(int id, String name, int age, String gender, String allegy, String contactNumber, String address, String registrationDate, String medicalHistory, String status) {
         this.id = id;
         this.name = name;
         this.age = age;
@@ -27,8 +26,7 @@ public class Patient implements Comparable<Patient> {
         this.address = address;
         this.registrationDate = registrationDate;
         this.medicalHistory = medicalHistory;
-        this.isInWaiting = isInWaiting;
-        this.currentStatus = currentStatus;
+        this.status = status;
     }
 
     public int getId() {
@@ -67,12 +65,12 @@ public class Patient implements Comparable<Patient> {
         return medicalHistory;
     }
 
-    public boolean isIsInWaiting() {
-        return isInWaiting;
+    public String getStatus() { 
+        return status; 
     }
 
-    public String getCurrentStatus() {
-        return currentStatus;
+    public void setStatus(String status) {
+        this.status = status; 
     }
 
     public void setId(int id) {
@@ -111,14 +109,6 @@ public class Patient implements Comparable<Patient> {
         this.medicalHistory = medicalHistory;
     }
 
-    public void setIsInWaiting(boolean isInWaiting) {
-        this.isInWaiting = isInWaiting;
-    }
-
-    public void setCurrentStatus(String currentStatus) {
-        this.currentStatus = currentStatus;
-    }
-
     @Override
     public String toString() {
         return "Patient{" +
@@ -131,27 +121,26 @@ public class Patient implements Comparable<Patient> {
                 ", address='" + address + '\'' +
                 ", registrationDate='" + registrationDate + '\'' +
                 ", medicalHistory='" + medicalHistory + '\'' +
-                ", isInWaiting=" + isInWaiting +
-                ", currentStatus='" + currentStatus + '\'' +
+                ", status='" + status + '\'' +
                 '}';
     }
 
     @Override
     public boolean equals(Object obj) {
-        if (this == obj) return true;
-        if (obj == null || getClass() != obj.getClass()) return false;
-        Patient patient = (Patient) obj;
-        return id == patient.id &&
-                age == patient.age &&
-                isInWaiting == patient.isInWaiting &&
-                java.util.Objects.equals(name, patient.name) &&
-                java.util.Objects.equals(gender, patient.gender) &&
-                java.util.Objects.equals(allegy, patient.allegy) &&
-                java.util.Objects.equals(contactNumber, patient.contactNumber) &&
-                java.util.Objects.equals(address, patient.address) &&
-                java.util.Objects.equals(registrationDate, patient.registrationDate) &&
-                java.util.Objects.equals(medicalHistory, patient.medicalHistory) &&
-                java.util.Objects.equals(currentStatus, patient.currentStatus);
+        if (this == obj) {
+            return true;
+        }
+        if (obj == null) {
+            return false;
+        }
+        if (getClass() != obj.getClass()) {
+            return false;
+        }
+        final Patient other = (Patient) obj;
+        if (!java.util.Objects.equals(this.id, other.id)) {
+            return false;
+        }
+        return true;
     }
     
     @Override

@@ -42,31 +42,31 @@ public class DataInitializer {
     public static Patient[] initializeSamplePatients() {
         Patient[] patients = new Patient[25];
         
-        patients[0] = new Patient(1, "Ahmad bin Abdullah", 35, "Male", "Penicillin", "012-3456789", "123 Jalan Tunku Abdul Rahman, Kuala Lumpur", "01-07-2025", "Hypertension", false, "Waiting");
-        patients[1] = new Patient(2, "Siti binti Mohamed", 28, "Female", "None", "012-3456790", "456 Jalan Sultan Ismail, Petaling Jaya", "02-07-2025", "Diabetes", false, "Waiting");
-        patients[2] = new Patient(3, "Raj a/l Kumar", 45, "Male", "Sulfa", "012-3456791", "789 Jalan Bukit Bintang, Kuala Lumpur", "03-07-2025", "Asthma", false, "Waiting");
-        patients[3] = new Patient(4, "Lim Siew Mei", 32, "Female", "None", "012-3456792", "321 Jalan Ampang, Kuala Lumpur", "04-07-2025", "None", false, "Waiting");
-        patients[4] = new Patient(5, "Tan Ah Kow", 50, "Male", "Codeine", "012-3456793", "654 Jalan Pudu, Kuala Lumpur", "05-07-2025", "Heart Disease", false, "Waiting");
-        patients[5] = new Patient(6, "Nurul Huda binti Ismail", 26, "Female", "Latex", "012-3456794", "987 Jalan Cheras, Kuala Lumpur", "06-07-2025", "Migraine", false, "Waiting");
-        patients[6] = new Patient(7, "Krishnan a/l Muthu", 38, "Male", "None", "012-3456795", "147 Jalan Klang Lama, Kuala Lumpur", "07-07-2025", "Depression", false, "Waiting");
-        patients[7] = new Patient(8, "Wong Mei Ling", 42, "Female", "Iodine", "012-3456796", "258 Jalan Ipoh, Kuala Lumpur", "08-07-2025", "Thyroid Disorder", false, "Waiting");
-        patients[8] = new Patient(9, "Mohamed Ali bin Hassan", 29, "Male", "None", "012-3456797", "369 Jalan Gombak, Kuala Lumpur", "09-07-2025", "Anxiety", false, "Waiting");
-        patients[9] = new Patient(10, "Cheah Siew Fong", 33, "Female", "Shellfish", "012-3456798", "741 Jalan Damansara, Petaling Jaya", "10-07-2025", "None", false, "Waiting");
-        patients[10] = new Patient(11, "Arun a/l Subramaniam", 47, "Male", "None", "012-3456799", "852 Jalan Bangsar, Kuala Lumpur", "11-07-2025", "High Cholesterol", false, "Waiting");
-        patients[11] = new Patient(12, "Fatimah binti Omar", 31, "Female", "Peanuts", "012-3456800", "963 Jalan TAR, Kuala Lumpur", "12-07-2025", "None", false, "Waiting");
-        patients[12] = new Patient(13, "Lee Chong Wei", 39, "Male", "None", "012-3456801", "159 Jalan Imbi, Kuala Lumpur", "13-07-2025", "Sleep Apnea", false, "Waiting");
-        patients[13] = new Patient(14, "Aisha binti Yusof", 25, "Female", "None", "012-3456802", "357 Jalan Raja Chulan, Kuala Lumpur", "14-07-2025", "None", false, "Waiting");
-        patients[14] = new Patient(15, "Gan Eng Seng", 44, "Male", "Aspirin", "012-3456803", "486 Jalan Tuanku Abdul Rahman, Kuala Lumpur", "15-07-2025", "Gout", false, "Waiting");
-        patients[15] = new Patient(16, "Zainab binti Ahmad", 36, "Female", "None", "012-3456804", "753 Jalan Raja Laut, Kuala Lumpur", "16-07-2025", "Hypertension", false, "Waiting");
-        patients[16] = new Patient(17, "Kumar a/l Rajendran", 41, "Male", "Sulfa", "012-3456805", "951 Jalan Sultan, Kuala Lumpur", "17-07-2025", "Diabetes", false, "Waiting");
-        patients[17] = new Patient(18, "Chan Mei Lin", 27, "Female", "Latex", "012-3456806", "357 Jalan Pahang, Kuala Lumpur", "18-07-2025", "Asthma", false, "Waiting");
-        patients[18] = new Patient(19, "Ismail bin Omar", 52, "Male", "None", "012-3456807", "159 Jalan Masjid India, Kuala Lumpur", "19-07-2025", "Heart Disease", false, "Waiting");
-        patients[19] = new Patient(20, "Priya a/p Ramasamy", 34, "Female", "Penicillin", "012-3456808", "753 Jalan Petaling, Kuala Lumpur", "20-07-2025", "Migraine", false, "Waiting");
-        patients[20] = new Patient(21, "Ong Teck Seng", 48, "Male", "None", "012-3456809", "951 Jalan Chow Kit, Kuala Lumpur", "21-07-2025", "Depression", false, "Waiting");
-        patients[21] = new Patient(22, "Noraini binti Zainal", 30, "Female", "Iodine", "012-3456810", "357 Jalan Tun Perak, Kuala Lumpur", "22-07-2025", "Thyroid Disorder", false, "Waiting");
-        patients[22] = new Patient(23, "Muthu a/l Velu", 37, "Male", "None", "012-3456811", "159 Jalan Dang Wangi, Kuala Lumpur", "23-07-2025", "Anxiety", false, "Waiting");
-        patients[23] = new Patient(24, "Lau Siew Mei", 29, "Female", "Shellfish", "012-3456812", "753 Jalan Tun Razak, Kuala Lumpur", "24-07-2025", "None", false, "Waiting");
-        patients[24] = new Patient(25, "Hassan bin Ali", 46, "Male", "None", "012-3456813", "951 Jalan Ampang, Kuala Lumpur", "25-07-2025", "High Cholesterol", false, "Waiting");
+        patients[0] = new Patient(1, "Ahmad bin Abdullah", 35, "Male", "Penicillin", "012-3456789", "123 Jalan Tunku Abdul Rahman, Kuala Lumpur", "01-07-2025", "Hypertension", "Active");
+        patients[1] = new Patient(2, "Siti binti Mohamed", 28, "Female", "None", "012-3456790", "456 Jalan Sultan Ismail, Petaling Jaya", "02-07-2025", "Diabetes", "Active");
+        patients[2] = new Patient(3, "Raj a/l Kumar", 45, "Male", "Sulfa", "012-3456791", "789 Jalan Bukit Bintang, Kuala Lumpur", "03-07-2025", "Asthma", "Active");
+        patients[3] = new Patient(4, "Lim Siew Mei", 32, "Female", "None", "012-3456792", "321 Jalan Ampang, Kuala Lumpur", "04-07-2025", "None", "Active");
+        patients[4] = new Patient(5, "Tan Ah Kow", 50, "Male", "Codeine", "012-3456793", "654 Jalan Pudu, Kuala Lumpur", "05-07-2025", "Heart Disease", "Active");
+        patients[5] = new Patient(6, "Nurul Huda binti Ismail", 26, "Female", "Latex", "012-3456794", "987 Jalan Cheras, Kuala Lumpur", "06-07-2025", "Migraine", "Active");
+        patients[6] = new Patient(7, "Krishnan a/l Muthu", 38, "Male", "None", "012-3456795", "147 Jalan Klang Lama, Kuala Lumpur", "07-07-2025", "Depression", "Active");
+        patients[7] = new Patient(8, "Wong Mei Ling", 42, "Female", "Iodine", "012-3456796", "258 Jalan Ipoh, Kuala Lumpur", "08-07-2025", "Thyroid Disorder", "Active");
+        patients[8] = new Patient(9, "Mohamed Ali bin Hassan", 29, "Male", "None", "012-3456797", "369 Jalan Gombak, Kuala Lumpur", "09-07-2025", "Anxiety", "Active");
+        patients[9] = new Patient(10, "Cheah Siew Fong", 33, "Female", "Shellfish", "012-3456798", "741 Jalan Damansara, Petaling Jaya", "10-07-2025", "None", "Active");
+        patients[10] = new Patient(11, "Arun a/l Subramaniam", 47, "Male", "None", "012-3456799", "852 Jalan Bangsar, Kuala Lumpur", "11-07-2025", "High Cholesterol", "Active");
+        patients[11] = new Patient(12, "Fatimah binti Omar", 31, "Female", "Peanuts", "012-3456800", "963 Jalan TAR, Kuala Lumpur", "12-07-2025", "None", "Active");
+        patients[12] = new Patient(13, "Lee Chong Wei", 39, "Male", "None", "012-3456801", "159 Jalan Imbi, Kuala Lumpur", "13-07-2025", "Sleep Apnea", "Active");
+        patients[13] = new Patient(14, "Aisha binti Yusof", 25, "Female", "None", "012-3456802", "357 Jalan Raja Chulan, Kuala Lumpur", "14-07-2025", "None", "Active");
+        patients[14] = new Patient(15, "Gan Eng Seng", 44, "Male", "Aspirin", "012-3456803", "486 Jalan Tuanku Abdul Rahman, Kuala Lumpur", "15-07-2025", "Gout", "Active");
+        patients[15] = new Patient(16, "Zainab binti Ahmad", 36, "Female", "None", "012-3456804", "753 Jalan Raja Laut, Kuala Lumpur", "16-07-2025", "Hypertension", "Active");
+        patients[16] = new Patient(17, "Kumar a/l Rajendran", 41, "Male", "Sulfa", "012-3456805", "951 Jalan Sultan, Kuala Lumpur", "17-07-2025", "Diabetes", "Active");
+        patients[17] = new Patient(18, "Chan Mei Lin", 27, "Female", "Latex", "012-3456806", "357 Jalan Pahang, Kuala Lumpur", "18-07-2025", "Asthma", "Active");
+        patients[18] = new Patient(19, "Ismail bin Omar", 52, "Male", "None", "012-3456807", "159 Jalan Masjid India, Kuala Lumpur", "19-07-2025", "Heart Disease", "Active");
+        patients[19] = new Patient(20, "Priya a/p Ramasamy", 34, "Female", "Penicillin", "012-3456808", "753 Jalan Petaling, Kuala Lumpur", "20-07-2025", "Migraine", "Active");
+        patients[20] = new Patient(21, "Ong Teck Seng", 48, "Male", "None", "012-3456809", "951 Jalan Chow Kit, Kuala Lumpur", "21-07-2025", "Depression", "Active");
+        patients[21] = new Patient(22, "Noraini binti Zainal", 30, "Female", "Iodine", "012-3456810", "357 Jalan Tun Perak, Kuala Lumpur", "22-07-2025", "Thyroid Disorder", "Active");
+        patients[22] = new Patient(23, "Muthu a/l Velu", 37, "Male", "None", "012-3456811", "159 Jalan Dang Wangi, Kuala Lumpur", "23-07-2025", "Anxiety", "Active");
+        patients[23] = new Patient(24, "Lau Siew Mei", 29, "Female", "Shellfish", "012-3456812", "753 Jalan Tun Razak, Kuala Lumpur", "24-07-2025", "None", "Active");
+        patients[24] = new Patient(25, "Hassan bin Ali", 46, "Male", "None", "012-3456813", "951 Jalan Ampang, Kuala Lumpur", "25-07-2025", "High Cholesterol", "Active");
         
         return patients;
     }

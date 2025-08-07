@@ -38,12 +38,22 @@ public class PharmacyManagement {
         
         utility.BubbleSort.sort(medicineArray);
         
-        for (Medicine medicine : medicineArray) {
-            System.out.printf("%-12s %-20s %-15s %-10s %-8s %-10s\n", 
-                medicine.getMedicineId(), medicine.getName(), medicine.getBrand(),
-                medicine.getStockQuantity(), "RM " + medicine.getPrice(), medicine.getPurpose());
+        String[] headers = {"ID", "Name", "Brand", "Stock", "Price", "Purpose"};
+        Object[][] rows = new Object[medicineArray.length][headers.length];
+        for (int i = 0; i < medicineArray.length; i++) {
+            Medicine medicine = medicineArray[i];
+            rows[i][0] = medicine.getMedicineId();
+            rows[i][1] = medicine.getName();
+            rows[i][2] = medicine.getBrand();
+            rows[i][3] = medicine.getStockQuantity();
+            rows[i][4] = "RM " + medicine.getPrice();
+            rows[i][5] = medicine.getPurpose();
         }
-        System.out.println(StringUtility.repeatString("-", 80));
+        System.out.print(StringUtility.formatTableNoDividers(
+            "ALL MEDICINES (SORTED BY ID)",
+            headers,
+            rows
+        ));
         System.out.println("Press Enter to continue...");
         scanner.nextLine();
     }
@@ -65,26 +75,27 @@ public class PharmacyManagement {
         String name = scanner.nextLine();
         
         Object[] medicinesArray = medicineList.toArray();
-        System.out.println("\nMedicines with name containing '" + name + "':");
-        System.out.println(StringUtility.repeatString("-", 80));
-        System.out.printf("%-12s %-20s %-15s %-10s %-8s\n", "ID", "Name", "Brand", "Stock", "Price");
-        System.out.println(StringUtility.repeatString("-", 80));
-        
-        boolean found = false;
+        String[] headers = {"ID", "Name", "Brand", "Stock", "Price"};
+        SetAndQueueInterface<Object[]> rowList = new SetAndQueue<>();
         for (Object obj : medicinesArray) {
             Medicine medicine = (Medicine) obj;
             if (medicine.getName().toLowerCase().contains(name.toLowerCase())) {
-                System.out.printf("%-12s %-20s %-15s %-10s %-8s\n", 
-                    medicine.getMedicineId(), medicine.getName(), medicine.getBrand(),
-                    medicine.getStockQuantity(), "RM " + medicine.getPrice());
-                found = true;
+                rowList.add(new Object[]{medicine.getMedicineId(), medicine.getName(), medicine.getBrand(), medicine.getStockQuantity(), "RM " + medicine.getPrice()});
             }
         }
-        
-        if (!found) {
+        Object[][] rows = new Object[rowList.size()][headers.length];
+        Object[] rowArray = rowList.toArray();
+        for (int i = 0; i < rowArray.length; i++) {
+            rows[i] = (Object[]) rowArray[i];
+        }
+        System.out.print(StringUtility.formatTableNoDividers(
+            "MEDICINES WITH NAME CONTAINING '" + name + "'",
+            headers,
+            rows
+        ));
+        if (rowList.isEmpty()) {
             System.out.println("No medicines found with this name.");
         }
-        System.out.println(StringUtility.repeatString("-", 80));
         System.out.println("Press Enter to continue...");
         scanner.nextLine();
     }
@@ -118,8 +129,10 @@ public class PharmacyManagement {
         System.out.println(StringUtility.repeatString("-", 80));
         
         Object[] medicinesArray = medicineList.toArray();
-        for (Object obj : medicinesArray) {
-            Medicine medicine = (Medicine) obj;
+        String[] headers = {"ID", "Name", "Brand", "Stock", "Price", "Status"};
+        Object[][] rows = new Object[medicinesArray.length][headers.length];
+        for (int i = 0; i < medicinesArray.length; i++) {
+            Medicine medicine = (Medicine) medicinesArray[i];
             String status;
             if (medicine.getStockQuantity() == 0) {
                 status = "OUT OF STOCK";
@@ -130,17 +143,18 @@ public class PharmacyManagement {
             } else {
                 status = "OK";
             }
-            
-            System.out.printf("%-12s %-25s %-15s %-10s %-10s %-10s\n", 
-                medicine.getMedicineId(), 
-                medicine.getName(), 
-                medicine.getBrand(),
-                medicine.getStockQuantity(),
-                "RM " + String.format("%.2f", medicine.getPrice()),
-                status);
+            rows[i][0] = medicine.getMedicineId();
+            rows[i][1] = medicine.getName();
+            rows[i][2] = medicine.getBrand();
+            rows[i][3] = medicine.getStockQuantity();
+            rows[i][4] = "RM " + String.format("%.2f", medicine.getPrice());
+            rows[i][5] = status;
         }
-        
-        System.out.println(StringUtility.repeatString("-", 80));
+        System.out.print(StringUtility.formatTableNoDividers(
+            "CURRENT MEDICINE LIST",
+            headers,
+            rows
+        ));
         System.out.println("Total Medicines: " + medicinesArray.length);
         System.out.println(StringUtility.repeatString("=", 80));
         
@@ -225,8 +239,10 @@ public class PharmacyManagement {
         System.out.println(StringUtility.repeatString("-", 80));
         
         Object[] medicinesArray = medicineList.toArray();
-        for (Object obj : medicinesArray) {
-            Medicine medicine = (Medicine) obj;
+        String[] headers = {"ID", "Name", "Brand", "Stock", "Price", "Status"};
+        Object[][] rows = new Object[medicinesArray.length][headers.length];
+        for (int i = 0; i < medicinesArray.length; i++) {
+            Medicine medicine = (Medicine) medicinesArray[i];
             String status;
             if (medicine.getStockQuantity() == 0) {
                 status = "OUT OF STOCK";
@@ -237,17 +253,18 @@ public class PharmacyManagement {
             } else {
                 status = "OK";
             }
-            
-            System.out.printf("%-12s %-25s %-15s %-10s %-10s %-10s\n", 
-                medicine.getMedicineId(), 
-                medicine.getName(), 
-                medicine.getBrand(),
-                medicine.getStockQuantity(),
-                "RM " + String.format("%.2f", medicine.getPrice()),
-                status);
+            rows[i][0] = medicine.getMedicineId();
+            rows[i][1] = medicine.getName();
+            rows[i][2] = medicine.getBrand();
+            rows[i][3] = medicine.getStockQuantity();
+            rows[i][4] = "RM " + String.format("%.2f", medicine.getPrice());
+            rows[i][5] = status;
         }
-        
-        System.out.println(StringUtility.repeatString("-", 80));
+        System.out.print(StringUtility.formatTableNoDividers(
+            "CURRENT MEDICINE LIST",
+            headers,
+            rows
+        ));
         System.out.println("Total Medicines: " + medicinesArray.length);
         System.out.println(StringUtility.repeatString("=", 80));
         
@@ -306,6 +323,8 @@ public class PharmacyManagement {
         System.out.println("\n" + StringUtility.repeatString("=", 60));
         System.out.println("        MEDICINE STOCK REPORT");
         System.out.println(StringUtility.repeatString("=", 60));
+        System.out.println("Generated at: " + StringUtility.getCurrentDateTime());
+        System.out.println(StringUtility.repeatString("-", 60));
         
         Object[] medicinesArray = medicineList.toArray();
         int totalMedicines = medicinesArray.length;
@@ -316,7 +335,6 @@ public class PharmacyManagement {
         SetAndQueueInterface<Medicine> lowStockMedicines = new SetAndQueue<>();
         SetAndQueueInterface<Medicine> outOfStockMedicines = new SetAndQueue<>();
         
-        System.out.println("📊 Stock Status:");
         for (Object obj : medicinesArray) {
             Medicine medicine = (Medicine) obj;
             int stock = medicine.getStockQuantity();
@@ -331,51 +349,81 @@ public class PharmacyManagement {
                 lowStockMedicines.add(medicine);
             }
         }
+
+        String[] headers = {"ID", "Name", "Brand", "Stock", "Price", "Category"};
+        Object[][] rows = new Object[medicinesArray.length][headers.length];
+        for (int i = 0; i < medicinesArray.length; i++) {
+            Medicine m = (Medicine) medicinesArray[i];
+            rows[i][0] = m.getMedicineId();
+            rows[i][1] = m.getName();
+            rows[i][2] = m.getBrand();
+            rows[i][3] = m.getStockQuantity();
+            rows[i][4] = String.format("RM %.2f", m.getPrice());
+            rows[i][5] = m.getCategory();
+        }
+        System.out.println("\nMEDICINE LIST:");
+        System.out.print(StringUtility.formatTableWithDividers(headers, rows));
+
+        System.out.println("\nSTOCK STATUS DISTRIBUTION:");
+        int barWidth = 30;
+        int maxStock = 0;
+        for (Object obj : medicinesArray) {
+            Medicine medicine = (Medicine) obj;
+            if (medicine.getStockQuantity() > maxStock) {
+                maxStock = medicine.getStockQuantity();
+            }
+        }
         
-        System.out.println("• Total Medicines: " + totalMedicines);
-        System.out.println("• Low Stock (≤10): " + lowStockCount);
-        System.out.println("• Out of Stock: " + outOfStockCount);
-        System.out.println("• Total Inventory Value: RM " + String.format("%.2f", totalInventoryValue));
-        
+        for (Object obj : medicinesArray) {
+            Medicine medicine = (Medicine) obj;
+            int stock = medicine.getStockQuantity();
+            System.out.printf("%-25s [%s] %d\n", 
+                medicine.getName() + ":", 
+                StringUtility.greenBarChart(stock, maxStock, barWidth),
+                stock);
+        }
+
         //display low stock medicines
         if (lowStockCount > 0) {
-            System.out.println("\n⚠️  LOW STOCK MEDICINES (≤10 items):");
-            System.out.println(StringUtility.repeatString("-", 60));
-            System.out.printf("%-12s %-20s %-10s %-8s %-10s\n", "ID", "Name", "Stock", "Price", "Status");
-            System.out.println(StringUtility.repeatString("-", 60));
-            
+            System.out.println("\nLOW STOCK MEDICINES (≤10 items):");
+            String[] lowStockHeaders = {"ID", "Name", "Stock", "Price", "Status"};
+            Object[][] lowStockRows = new Object[lowStockCount][lowStockHeaders.length];
             Object[] lowStockArray = lowStockMedicines.toArray();
-            for (Object obj : lowStockArray) {
-                Medicine medicine = (Medicine) obj;
+            for (int i = 0; i < lowStockCount; i++) {
+                Medicine medicine = (Medicine) lowStockArray[i];
                 String status = medicine.getStockQuantity() <= 5 ? "CRITICAL" : "LOW";
-                System.out.printf("%-12s %-20s %-10s %-8s %-10s\n", 
-                    medicine.getMedicineId(), 
-                    medicine.getName(), 
-                    medicine.getStockQuantity(),
-                    "RM " + String.format("%.2f", medicine.getPrice()),
-                    status);
+                lowStockRows[i][0] = medicine.getMedicineId();
+                lowStockRows[i][1] = medicine.getName();
+                lowStockRows[i][2] = medicine.getStockQuantity();
+                lowStockRows[i][3] = String.format("RM %.2f", medicine.getPrice());
+                lowStockRows[i][4] = status;
             }
+            System.out.print(StringUtility.formatTableWithDividers(lowStockHeaders, lowStockRows));
         }
         
         //display out of stock medicines
         if (outOfStockCount > 0) {
-            System.out.println("\n🚨 OUT OF STOCK MEDICINES:");
-            System.out.println(StringUtility.repeatString("-", 60));
-            System.out.printf("%-12s %-20s %-8s %-10s\n", "ID", "Name", "Price", "Status");
-            System.out.println(StringUtility.repeatString("-", 60));
-            
+            System.out.println("\nOUT OF STOCK MEDICINES:");
+            String[] outOfStockHeaders = {"ID", "Name", "Price", "Status"};
+            Object[][] outOfStockRows = new Object[outOfStockCount][outOfStockHeaders.length];
             Object[] outOfStockArray = outOfStockMedicines.toArray();
-            for (Object obj : outOfStockArray) {
-                Medicine medicine = (Medicine) obj;
-                System.out.printf("%-12s %-20s %-8s %-10s\n", 
-                    medicine.getMedicineId(), 
-                    medicine.getName(),
-                    "RM " + String.format("%.2f", medicine.getPrice()),
-                    "OUT OF STOCK");
+            for (int i = 0; i < outOfStockCount; i++) {
+                Medicine medicine = (Medicine) outOfStockArray[i];
+                outOfStockRows[i][0] = medicine.getMedicineId();
+                outOfStockRows[i][1] = medicine.getName();
+                outOfStockRows[i][2] = String.format("RM %.2f", medicine.getPrice());
+                outOfStockRows[i][3] = "OUT OF STOCK";
             }
+            System.out.print(StringUtility.formatTableWithDividers(outOfStockHeaders, outOfStockRows));
         }
 
-        System.out.println("\nPress Enter to continue...");
+        System.out.println("\nSUMMARY:");
+        System.out.println("• Total Medicines: " + totalMedicines);
+        System.out.println("• Low Stock (≤10): " + lowStockCount);
+        System.out.println("• Out of Stock: " + outOfStockCount);
+        System.out.println("• Total Inventory Value: RM " + String.format("%.2f", totalInventoryValue));
+        System.out.println(StringUtility.repeatString("=", 60));
+        System.out.println("Press Enter to continue...");
         scanner.nextLine();
     }
     
@@ -383,6 +431,8 @@ public class PharmacyManagement {
         System.out.println("\n" + StringUtility.repeatString("=", 60));
         System.out.println("        MEDICINE CATEGORY REPORT");
         System.out.println(StringUtility.repeatString("=", 60));
+        System.out.println("Generated at: " + StringUtility.getCurrentDateTime());
+        System.out.println(StringUtility.repeatString("-", 60));
         
         Object[] medicinesArray = medicineList.toArray();
         SetAndQueueInterface<String> categorySet = new SetAndQueue<>();
@@ -410,64 +460,46 @@ public class PharmacyManagement {
                 categoryIndex++;
             }
         }
-        
-        System.out.println("📊 Medicine Categories:");
+
+        String[] headers = {"ID", "Name", "Brand", "Category", "Stock", "Price"};
+        Object[][] rows = new Object[medicinesArray.length][headers.length];
+        for (int i = 0; i < medicinesArray.length; i++) {
+            Medicine m = (Medicine) medicinesArray[i];
+            rows[i][0] = m.getMedicineId();
+            rows[i][1] = m.getName();
+            rows[i][2] = m.getBrand();
+            rows[i][3] = m.getPurpose();
+            rows[i][4] = m.getStockQuantity();
+            rows[i][5] = String.format("RM %.2f", m.getPrice());
+        }
+        System.out.println("\nMEDICINE LIST:");
+        System.out.print(StringUtility.formatTableWithDividers(headers, rows));
+
+        System.out.println("\nCATEGORY DISTRIBUTION:");
+        int barWidth = 30;
+        int maxCategory = 0;
         for (int i = 0; i < categoryIndex; i++) {
-            System.out.println("• " + categoryArray[i] + ": " + categoryCounts[i] + " medicines");
+            if (categoryCounts[i] > maxCategory) {
+                maxCategory = categoryCounts[i];
+            }
         }
         
-        System.out.println("\nPress Enter to continue...");
-        scanner.nextLine();
-    }
-    
-    public void generateMedicinePriceAnalysis() {
-        System.out.println("\n" + StringUtility.repeatString("=", 60));
-        System.out.println("        MEDICINE PRICE ANALYSIS");
+        for (int i = 0; i < categoryIndex; i++) {
+            String category = categoryArray[i];
+            int count = categoryCounts[i];
+            double percentage = (double) count / medicinesArray.length * 100;
+            System.out.printf("%-25s [%s] %d medicines (%.1f%%)\n", 
+                category + ":", 
+                StringUtility.greenBarChart(count, maxCategory, barWidth),
+                count, 
+                percentage);
+        }
+
+        System.out.println("\nSUMMARY:");
+        System.out.println("• Total Medicines: " + medicinesArray.length);
+        System.out.println("• Total Categories: " + categoryIndex);
         System.out.println(StringUtility.repeatString("=", 60));
-        
-        Object[] medicinesArray = medicineList.toArray();
-        double totalValue = 0.0, minPrice = Double.MAX_VALUE, maxPrice = 0.0;
-        
-        for (Object obj : medicinesArray) {
-            Medicine medicine = (Medicine) obj;
-            double price = medicine.getPrice();
-            totalValue += price * medicine.getStockQuantity();
-            if (price < minPrice) minPrice = price;
-            if (price > maxPrice) maxPrice = price;
-        }
-        
-        System.out.println("📊 Price Analysis:");
-        System.out.println("• Minimum Price: RM " + String.format("%.2f", minPrice));
-        System.out.println("• Maximum Price: RM " + String.format("%.2f", maxPrice));
-        System.out.println("• Total Inventory Value: RM " + String.format("%.2f", totalValue));
-        
-        System.out.println("\nPress Enter to continue...");
-        scanner.nextLine();
-    }
-    
-    public void generateComprehensivePharmacyReport() {
-        System.out.println("\n" + StringUtility.repeatString("=", 60));
-        System.out.println("        COMPREHENSIVE PHARMACY REPORT");
-        System.out.println(StringUtility.repeatString("=", 60));
-        
-        Object[] medicinesArray = medicineList.toArray();
-        int totalMedicines = medicinesArray.length;
-        int totalStock = 0;
-        double totalValue = 0.0;
-        
-        for (Object obj : medicinesArray) {
-            Medicine medicine = (Medicine) obj;
-            totalStock += medicine.getStockQuantity();
-            totalValue += medicine.getPrice() * medicine.getStockQuantity();
-        }
-        
-        System.out.println("📊 Pharmacy Overview:");
-        System.out.println("• Total Medicines: " + totalMedicines);
-        System.out.println("• Total Stock Items: " + totalStock);
-        System.out.println("• Total Inventory Value: RM " + String.format("%.2f", totalValue));
-        System.out.println("• Average Stock per Medicine: " + String.format("%.1f", (double)totalStock/totalMedicines));
-        
-        System.out.println("\nPress Enter to continue...");
+        System.out.println("Press Enter to continue...");
         scanner.nextLine();
     }
     
@@ -475,16 +507,13 @@ public class PharmacyManagement {
         System.out.println("\n" + StringUtility.repeatString("=", 60));
         System.out.println("        INVENTORY VALUE REPORT");
         System.out.println(StringUtility.repeatString("=", 60));
+        System.out.println("Generated at: " + StringUtility.getCurrentDateTime());
+        System.out.println(StringUtility.repeatString("-", 60));
         
         Object[] medicinesArray = medicineList.toArray();
         double totalInventoryValue = 0.0;
         int totalItems = 0;
         int lowStockItems = 0;
-        
-        System.out.println("📊 Inventory Value Analysis:");
-        System.out.println(StringUtility.repeatString("-", 80));
-        System.out.printf("%-20s %-10s %-10s %-15s %-15s\n", "Medicine", "Stock", "Unit Price", "Total Value", "Status");
-        System.out.println(StringUtility.repeatString("-", 80));
         
         for (Object obj : medicinesArray) {
             Medicine medicine = (Medicine) obj;
@@ -492,29 +521,59 @@ public class PharmacyManagement {
             totalInventoryValue += itemValue;
             totalItems += medicine.getStockQuantity();
             
-            String status = medicine.getStockQuantity() <= 10 ? "LOW STOCK" : "OK";
             if (medicine.getStockQuantity() <= 10) {
                 lowStockItems++;
             }
-            
-            System.out.printf("%-20s %-10s %-10s %-15s %-15s\n", 
-                medicine.getName(), medicine.getStockQuantity(), 
-                "RM " + String.format("%.2f", medicine.getPrice()),
-                "RM " + String.format("%.2f", itemValue), status);
+        }
+
+        String[] headers = {"ID", "Name", "Stock", "Unit Price", "Total Value", "Status"};
+        Object[][] rows = new Object[medicinesArray.length][headers.length];
+        for (int i = 0; i < medicinesArray.length; i++) {
+            Medicine m = (Medicine) medicinesArray[i];
+            double itemValue = m.getStockQuantity() * m.getPrice();
+            String status = m.getStockQuantity() <= 10 ? "LOW STOCK" : "OK";
+            rows[i][0] = m.getMedicineId();
+            rows[i][1] = m.getName();
+            rows[i][2] = m.getStockQuantity();
+            rows[i][3] = String.format("RM %.2f", m.getPrice());
+            rows[i][4] = String.format("RM %.2f", itemValue);
+            rows[i][5] = status;
+        }
+        System.out.println("\nMEDICINE LIST:");
+        System.out.print(StringUtility.formatTableWithDividers(headers, rows));
+
+        System.out.println("\nINVENTORY VALUE DISTRIBUTION:");
+        int barWidth = 30;
+        double maxValue = 0.0;
+        for (Object obj : medicinesArray) {
+            Medicine medicine = (Medicine) obj;
+            double itemValue = medicine.getStockQuantity() * medicine.getPrice();
+            if (itemValue > maxValue) {
+                maxValue = itemValue;
+            }
         }
         
-        System.out.println(StringUtility.repeatString("-", 80));
-        System.out.println("\n📈 Summary:");
+        for (Object obj : medicinesArray) {
+            Medicine medicine = (Medicine) obj;
+            double itemValue = medicine.getStockQuantity() * medicine.getPrice();
+            System.out.printf("%-25s [%s] RM %.2f\n", 
+                medicine.getName() + ":", 
+                StringUtility.greenBarChart((int)(itemValue * 100), (int)(maxValue * 100), barWidth),
+                itemValue);
+        }
+
+        System.out.println("\nSUMMARY:");
+        System.out.println("• Total Medicines: " + medicinesArray.length);
         System.out.println("• Total Inventory Value: RM " + String.format("%.2f", totalInventoryValue));
         System.out.println("• Total Items in Stock: " + totalItems);
         System.out.println("• Low Stock Items (≤10): " + lowStockItems);
         System.out.println("• Average Item Value: RM " + String.format("%.2f", totalInventoryValue/totalItems));
         
         if (lowStockItems > 0) {
-            System.out.println("\n⚠️  WARNING: " + lowStockItems + " items are running low on stock!");
+            System.out.println("• WARNING: " + lowStockItems + " items are running low on stock!");
         }
-        
-        System.out.println("\nPress Enter to continue...");
+        System.out.println(StringUtility.repeatString("=", 60));
+        System.out.println("Press Enter to continue...");
         scanner.nextLine();
     }
     
@@ -532,24 +591,4 @@ public class PharmacyManagement {
     public Object[] getAllMedicines() {
         return medicineList.toArray();
     }
-    
-    private int getUserInputInt(int min, int max) {
-        int input;
-        do {
-            while (!scanner.hasNextInt()) {
-                System.out.print("Invalid input! Please enter a number between " + min + " and " + max + ": ");
-                scanner.next();
-            }
-            input = scanner.nextInt();
-            scanner.nextLine();
-            
-            if (input < min || input > max) {
-                System.out.print("Please enter a number between " + min + " and " + max + ": ");
-            }
-        } while (input < min || input > max);
-        
-        return input;
-    }
-
-
 }

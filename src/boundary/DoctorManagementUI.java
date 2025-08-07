@@ -2,6 +2,7 @@ package boundary;
 
 import control.DoctorManagement;
 import java.util.Scanner;
+import utility.StringUtility;
 
 public class DoctorManagementUI {
     private DoctorManagement doctorManagement;
@@ -15,15 +16,15 @@ public class DoctorManagementUI {
     public void manageDoctorsOnDuty() {
         boolean back = false;
         while (!back) {
-            System.out.println("\n" + repeatString("=", 50));
+            System.out.println("\n" + StringUtility.repeatString("=", 50));
             System.out.println("        DOCTORS ON DUTY MANAGEMENT");
-            System.out.println(repeatString("=", 50));
+            System.out.println(StringUtility.repeatString("=", 50));
             System.out.println("1 . View All Doctors");
             System.out.println("2 . View Doctors on Duty");
             System.out.println("3 . Add Doctor to Duty");
             System.out.println("4 . Remove Doctor from Duty");
             System.out.println("0 . Back to Main Menu");
-            System.out.println(repeatString("-", 50));
+            System.out.println(StringUtility.repeatString("-", 50));
             System.out.print("Enter your choice: ");
             
             int choice = getUserInputInt(0, 4);
@@ -51,16 +52,16 @@ public class DoctorManagementUI {
     public void manageDoctorAvailability() {
         boolean back = false;
         while (!back) {
-            System.out.println("\n" + repeatString("=", 50));
+            System.out.println("\n" + StringUtility.repeatString("=", 50));
             System.out.println("        DOCTOR AVAILABILITY MANAGEMENT");
-            System.out.println(repeatString("=", 50));
+            System.out.println(StringUtility.repeatString("=", 50));
             System.out.println("1 . View All Doctors (Sorted by ID)");
             System.out.println("2 . Search Doctor by ID");
             System.out.println("3 . Search Doctor by Specialization");
             System.out.println("4 . Update Doctor Details");
             System.out.println("5 . Update Doctor Schedule");
             System.out.println("0 . Back to Main Menu");
-            System.out.println(repeatString("-", 50));
+            System.out.println(StringUtility.repeatString("-", 50));
             System.out.print("Enter your choice: ");
             
             int choice = getUserInputInt(0, 5);
@@ -104,13 +105,5 @@ public class DoctorManagementUI {
         } while (input < min || input > max);
         
         return input;
-    }
-    
-    private String repeatString(String str, int count) {
-        StringBuilder sb = new StringBuilder();
-        for (int i = 0; i < count; i++) {
-            sb.append(str);
-        }
-        return sb.toString();
     }
 } 

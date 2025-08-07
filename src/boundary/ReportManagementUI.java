@@ -6,6 +6,7 @@ import control.DoctorManagement;
 import control.ConsultationManagement;
 import control.TreatmentManagement;
 import java.util.Scanner;
+import utility.StringUtility;
 
 public class ReportManagementUI {
     private ReportManagement reportManagement;
@@ -30,22 +31,24 @@ public class ReportManagementUI {
     public void generateMedicalReports() {
         boolean back = false;
         while (!back) {
-            System.out.println("\n" + repeatString("=", 50));
-            System.out.println("        MEDICAL REPORTS & ANALYTICS");
-            System.out.println(repeatString("=", 50));
+            System.out.println("\n" + StringUtility.repeatString("=", 50));
+            System.out.println("        MEDICAL REPORTS");
+            System.out.println(StringUtility.repeatString("=", 50));
             System.out.println("1 . Patient Statistics Report");
             System.out.println("2 . Doctor Performance Report");
             System.out.println("3 . Doctor Availability Report");
-            System.out.println("4 . Treatment Statistics Report");
-            System.out.println("5 . Diagnosis Analysis Report");
-            System.out.println("6 . Age vs Disease Analysis Report");
-            System.out.println("7 . Doctor vs Workload Analysis Report");
-            System.out.println("8 . Comprehensive Medical Report");
+            System.out.println("4 . Doctor Specialization Report");
+            System.out.println("5 . Consultation Statistics Report");
+            System.out.println("6 . Treatment Statistics Report");
+            System.out.println("7 . Diagnosis Analysis Report");
+            System.out.println("8 . Disease Age Distribution Report");
+            System.out.println("9 . Medicine Usage by Disease Report");
+            System.out.println("10. Comprehensive Medical Report");
             System.out.println("0 . Back to Main Menu");
-            System.out.println(repeatString("-", 50));
+            System.out.println(StringUtility.repeatString("-", 50));
             System.out.print("Enter your choice: ");
             
-            int choice = getUserInputInt(0, 8);
+            int choice = getUserInputInt(0, 10);
             
             switch (choice) {
                 case 1:
@@ -56,10 +59,10 @@ public class ReportManagementUI {
                     }
                     break;
                 case 2:
-                    if (consultationManagement != null) {
-                        consultationManagement.generateDoctorPerformanceReport();
+                    if (doctorManagement != null) {
+                        doctorManagement.generateDoctorPerformanceReport();
                     } else {
-                        System.out.println("Consultation management not available!");
+                        System.out.println("Doctor management not available!");
                     }
                     break;
                 case 3:
@@ -70,34 +73,48 @@ public class ReportManagementUI {
                     }
                     break;
                 case 4:
+                    if (doctorManagement != null) {
+                        doctorManagement.generateDoctorSpecializationReport();
+                    } else {
+                        System.out.println("Doctor management not available!");
+                    }
+                    break;
+                case 5:
+                    if (consultationManagement != null) {
+                        consultationManagement.generateConsultationStatisticsReport();
+                    } else {
+                        System.out.println("Consultation management not available!");
+                    }
+                    break;
+                case 6:
                     if (treatmentManagement != null) {
                         treatmentManagement.generateTreatmentStatisticsReport();
                     } else {
                         System.out.println("Treatment management not available!");
                     }
                     break;
-                case 5:
+                case 7:
                     if (treatmentManagement != null) {
                         treatmentManagement.generateDiagnosisAnalysisReport();
                     } else {
                         System.out.println("Treatment management not available!");
                     }
                     break;
-                case 6:
+                case 8:
                     if (patientManagement != null && treatmentManagement != null) {
                         reportManagement.generateAgeVsDiseaseAnalysisReport(patientManagement, treatmentManagement);
                     } else {
                         System.out.println("Patient and Treatment management not available!");
                     }
                     break;
-                case 7:
-                    if (doctorManagement != null && consultationManagement != null) {
-                        reportManagement.generateDoctorVsWorkloadAnalysisReport(doctorManagement, consultationManagement);
+                case 9:
+                    if (treatmentManagement != null && patientManagement != null) {
+                        reportManagement.generateMedicineUsageByDiseaseReport(treatmentManagement, patientManagement);
                     } else {
-                        System.out.println("Doctor and Consultation management not available!");
+                        System.out.println("Treatment and Patient management not available!");
                     }
                     break;
-                case 8:
+                case 10:
                     if (patientManagement != null && doctorManagement != null && 
                         consultationManagement != null && treatmentManagement != null) {
                         reportManagement.generateComprehensiveMedicalReport(
@@ -129,13 +146,5 @@ public class ReportManagementUI {
         } while (input < min || input > max);
         
         return input;
-    }
-
-    private String repeatString(String str, int count) {
-        StringBuilder sb = new StringBuilder();
-        for (int i = 0; i < count; i++) {
-            sb.append(str);
-        }
-        return sb.toString();
     }
 } 

@@ -73,18 +73,20 @@ public class Prescription implements Comparable<Prescription> {
 
     @Override
     public boolean equals(Object obj) {
-        if (this == obj) return true;
-        if (obj == null || getClass() != obj.getClass()) return false;
-        Prescription that = (Prescription) obj;
-        return Double.compare(that.totalCost, totalCost) == 0 &&
-                isPaid == that.isPaid &&
-                java.util.Objects.equals(prescriptionId, that.prescriptionId) &&
-                java.util.Objects.equals(consultationId, that.consultationId) &&
-                java.util.Objects.equals(patientId, that.patientId) &&
-                java.util.Objects.equals(doctorId, that.doctorId) &&
-                java.util.Objects.equals(diagnosis, that.diagnosis) &&
-                java.util.Objects.equals(prescriptionDate, that.prescriptionDate) &&
-                java.util.Objects.equals(status, that.status);
+        if (this == obj) {
+            return true;
+        }
+        if (obj == null) {
+            return false;
+        }
+        if (getClass() != obj.getClass()) {
+            return false;
+        }
+        final Prescription other = (Prescription) obj;
+        if (!java.util.Objects.equals(this.prescriptionId, other.prescriptionId)) {
+            return false;
+        }
+        return true;
     }
     
     @Override

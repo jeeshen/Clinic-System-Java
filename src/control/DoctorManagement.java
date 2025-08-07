@@ -3,17 +3,24 @@ package control;
 import adt.SetAndQueueInterface;
 import adt.SetAndQueue;
 import entity.Doctor;
+import entity.Consultation;
 import dao.DataInitializer;
 import java.util.Scanner;
+import utility.StringUtility;
 
 public class DoctorManagement {
     private SetAndQueueInterface<Doctor> doctorList = new SetAndQueue<>();
     private SetAndQueueInterface<Doctor> onDutyDoctorList = new SetAndQueue<>();
     private Scanner scanner;
+    private ConsultationManagement consultationManagement;
     
     public DoctorManagement() {
         scanner = new Scanner(System.in);
         loadSampleData();
+    }
+    
+    public void setConsultationManagement(ConsultationManagement consultationManagement) {
+        this.consultationManagement = consultationManagement;
     }
     
     private void loadSampleData() {
@@ -27,73 +34,76 @@ public class DoctorManagement {
     }
     
     public void displayAllDoctors() {
-        System.out.println("\n" + repeatString("-", 95));
-        System.out.printf("%-10s %-35s %-20s %-15s %-10s\n", "ID", "Name", "Specialization", "Contact", "Available");
-        System.out.println(repeatString("-", 95));
-        
         Object[] doctorsArray = doctorList.toArray();
-        for (Object obj : doctorsArray) {
-            Doctor doctor = (Doctor) obj;
-            System.out.printf("%-10s %-35s %-20s %-15s %-10s\n", 
-                doctor.getDoctorId(), 
-                doctor.getName(), 
-                doctor.getSpecialization(), 
-                doctor.getContactNumber(),
-                doctor.isIsAvailable() ? "Yes" : "No");
+        String[] headers = {"ID", "Name", "Specialization", "Contact", "Available"};
+        Object[][] rows = new Object[doctorsArray.length][headers.length];
+        for (int i = 0; i < doctorsArray.length; i++) {
+            Doctor doctor = (Doctor) doctorsArray[i];
+            rows[i][0] = doctor.getDoctorId();
+            rows[i][1] = doctor.getName();
+            rows[i][2] = doctor.getSpecialization();
+            rows[i][3] = doctor.getContactNumber();
+            rows[i][4] = doctor.isIsAvailable() ? "Yes" : "No";
         }
-        System.out.println(repeatString("-", 95));
+        System.out.print(StringUtility.formatTableNoDividers(
+            "ALL DOCTORS",
+            headers,
+            rows
+        ));
         System.out.println("Press Enter to continue...");
         scanner.nextLine();
     }
     
     public void displayDoctorsOnDuty() {
-        System.out.println("\n" + repeatString("-", 95));
-        System.out.printf("%-10s %-35s %-20s %-15s\n", "ID", "Name", "Specialization", "Contact");
-        System.out.println(repeatString("-", 95));
-        
         Object[] doctorsArray = onDutyDoctorList.toArray();
-        for (Object obj : doctorsArray) {
-            Doctor doctor = (Doctor) obj;
-            System.out.printf("%-10s %-35s %-20s %-15s\n", 
-                doctor.getDoctorId(), 
-                doctor.getName(), 
-                doctor.getSpecialization(), 
-                doctor.getContactNumber());
+        String[] headers = {"ID", "Name", "Specialization", "Contact"};
+        Object[][] rows = new Object[doctorsArray.length][headers.length];
+        for (int i = 0; i < doctorsArray.length; i++) {
+            Doctor doctor = (Doctor) doctorsArray[i];
+            rows[i][0] = doctor.getDoctorId();
+            rows[i][1] = doctor.getName();
+            rows[i][2] = doctor.getSpecialization();
+            rows[i][3] = doctor.getContactNumber();
         }
-        System.out.println(repeatString("-", 95));
+        System.out.print(StringUtility.formatTableNoDividers(
+            "DOCTORS ON DUTY",
+            headers,
+            rows
+        ));
         System.out.println("Press Enter to continue...");
         scanner.nextLine();
     }
     
     public void addDoctorToDuty() {
-        System.out.println("\n" + repeatString("-", 105));
-        System.out.println("AVAILABLE DOCTORS FOR DUTY");
-        System.out.println(repeatString("-", 105));
-        System.out.printf("%-10s %-35s %-20s %-15s %-10s %-10s\n", "ID", "Name", "Specialization", "Contact", "Available", "On Leave");
-        System.out.println(repeatString("-", 105));
-        
         Object[] doctorsArray = doctorList.toArray();
-        boolean hasAvailableDoctors = false;
+        String[] headers = {"ID", "Name", "Specialization", "Contact", "Available", "On Leave"};
+        Object[][] rows = new Object[doctorsArray.length][headers.length];
+        int rowIdx = 0;
         for (Object obj : doctorsArray) {
             Doctor doctor = (Doctor) obj;
             if (!onDutyDoctorList.contains(doctor) && doctor.isIsAvailable() && !doctor.isOnLeave()) {
-                System.out.printf("%-10s %-35s %-20s %-15s %-10s %-10s\n", 
-                    doctor.getDoctorId(), 
-                    doctor.getName(), 
-                    doctor.getSpecialization(), 
-                    doctor.getContactNumber(),
-                    doctor.isIsAvailable() ? "Yes" : "No",
-                    doctor.isOnLeave() ? "Yes" : "No");
-                hasAvailableDoctors = true;
+                rows[rowIdx][0] = doctor.getDoctorId();
+                rows[rowIdx][1] = doctor.getName();
+                rows[rowIdx][2] = doctor.getSpecialization();
+                rows[rowIdx][3] = doctor.getContactNumber();
+                rows[rowIdx][4] = doctor.isIsAvailable() ? "Yes" : "No";
+                rows[rowIdx][5] = doctor.isOnLeave() ? "Yes" : "No";
+                rowIdx++;
             }
         }
-        
-        if (!hasAvailableDoctors) {
+        if (rowIdx == 0) {
             System.out.println("No doctors available to add to duty (all doctors are already on duty).");
             return;
         }
-        System.out.println(repeatString("-", 105));
-        
+        Object[][] filteredRows = new Object[rowIdx][headers.length];
+        for (int i = 0; i < rowIdx; i++) {
+            filteredRows[i] = rows[i];
+        }
+        System.out.print(StringUtility.formatTableNoDividers(
+            "AVAILABLE DOCTORS FOR DUTY",
+            headers,
+            filteredRows
+        ));
         System.out.print("\nEnter Doctor ID to add to duty: ");
         String doctorId = scanner.nextLine();
         
@@ -128,26 +138,27 @@ public class DoctorManagement {
     }
     
     public void displayAllDoctorsSorted() {
-        System.out.println("\n" + repeatString("-", 95));
-        System.out.println("ALL DOCTORS (SORTED BY ID)");
-        System.out.println(repeatString("-", 95));
-        System.out.printf("%-10s %-35s %-30s %-15s %-10s\n", "ID", "Name", "Specialization", "Contact", "Available");
-        System.out.println(repeatString("-", 95));
-        
         Object[] doctorsArray = doctorList.toArray();
         Doctor[] doctorArray = new Doctor[doctorsArray.length];
         for (int i = 0; i < doctorsArray.length; i++) {
             doctorArray[i] = (Doctor) doctorsArray[i];
         }
-        
         utility.BubbleSort.sort(doctorArray);
-        
-        for (Doctor doctor : doctorArray) {
-            System.out.printf("%-10s %-35s %-30s %-15s %-10s\n", 
-                doctor.getDoctorId(), doctor.getName(), doctor.getSpecialization(), 
-                doctor.getContactNumber(), doctor.isIsAvailable() ? "Yes" : "No");
+        String[] headers = {"ID", "Name", "Specialization", "Contact", "Available"};
+        Object[][] rows = new Object[doctorArray.length][headers.length];
+        for (int i = 0; i < doctorArray.length; i++) {
+            Doctor doctor = doctorArray[i];
+            rows[i][0] = doctor.getDoctorId();
+            rows[i][1] = doctor.getName();
+            rows[i][2] = doctor.getSpecialization();
+            rows[i][3] = doctor.getContactNumber();
+            rows[i][4] = doctor.isIsAvailable() ? "Yes" : "No";
         }
-        System.out.println(repeatString("-", 95));
+        System.out.print(StringUtility.formatTableNoDividers(
+            "ALL DOCTORS (SORTED BY ID)",
+            headers,
+            rows
+        ));
         System.out.println("Press Enter to continue...");
         scanner.nextLine();
     }
@@ -169,34 +180,37 @@ public class DoctorManagement {
         String specialization = scanner.nextLine();
         
         Object[] doctorsArray = doctorList.toArray();
-        System.out.println("\nDoctors with specialization '" + specialization + "':");
-        System.out.println(repeatString("-", 70));
-        System.out.printf("%-10s %-30s %-15s %-10s\n", "ID", "Name", "Contact", "Available");
-        System.out.println(repeatString("-", 70));
-        
-        boolean found = false;
+        String[] headers = {"ID", "Name", "Contact", "Available"};
+        SetAndQueueInterface<Object[]> rowList = new SetAndQueue<>();
         for (Object obj : doctorsArray) {
             Doctor doctor = (Doctor) obj;
             if (doctor.getSpecialization().toLowerCase().contains(specialization.toLowerCase())) {
-                System.out.printf("%-10s %-30s %-15s %-10s\n", 
-                    doctor.getDoctorId(), doctor.getName(), 
-                    doctor.getContactNumber(), doctor.isIsAvailable() ? "Yes" : "No");
-                found = true;
+                rowList.add(new Object[]{doctor.getDoctorId(), doctor.getName(), doctor.getContactNumber(), doctor.isIsAvailable() ? "Yes" : "No"});
             }
         }
+        Object[][] rows = new Object[rowList.size()][headers.length];
+        Object[] rowArray = rowList.toArray();
+        for (int i = 0; i < rowArray.length; i++) {
+            rows[i] = (Object[]) rowArray[i];
+        }
+        System.out.print(StringUtility.formatTableNoDividers(
+            "DOCTORS WITH SPECIALIZATION",
+            headers,
+            rows
+        ));
         
-        if (!found) {
+        if (rowList.isEmpty()) {
             System.out.println("No doctors found with this specialization.");
         }
-        System.out.println(repeatString("-", 70));
+        System.out.println(StringUtility.repeatString("-", 70));
         System.out.println("Press Enter to continue...");
         scanner.nextLine();
     }
     
     public void displayDoctorDetails(Doctor doctor) {
-        System.out.println("\n" + repeatString("-", 60));
+        System.out.println("\n" + StringUtility.repeatString("-", 60));
         System.out.println("DOCTOR DETAILS");
-        System.out.println(repeatString("-", 60));
+        System.out.println(StringUtility.repeatString("-", 60));
         System.out.println("ID: " + doctor.getDoctorId());
         System.out.println("Name: " + doctor.getName());
         System.out.println("Specialization: " + doctor.getSpecialization());
@@ -208,37 +222,39 @@ public class DoctorManagement {
         if (doctor.isOnLeave()) {
             System.out.println("Leave Period: " + doctor.getLeaveDateStart() + " to " + doctor.getLeaveDateEnd());
         }
-        System.out.println(repeatString("-", 60));
+        System.out.println(StringUtility.repeatString("-", 60));
         System.out.println("Press Enter to continue...");
         scanner.nextLine();
     }
     
     public void updateDoctorDetails() {
-        System.out.println("\n" + repeatString("=", 60));
+        System.out.println("\n" + StringUtility.repeatString("=", 60));
         System.out.println("        UPDATE DOCTOR DETAILS");
-        System.out.println(repeatString("=", 60));
+        System.out.println(StringUtility.repeatString("=", 60));
 
-        System.out.println("📋 AVAILABLE DOCTORS:");
-        System.out.println(repeatString("-", 95));
-        System.out.printf("%-10s %-35s %-30s %-15s %-10s\n", "ID", "Name", "Specialization", "Contact", "Available");
-        System.out.println(repeatString("-", 95));
-        
         Object[] doctorsArray = doctorList.toArray();
         Doctor[] doctorArray = new Doctor[doctorsArray.length];
         for (int i = 0; i < doctorsArray.length; i++) {
             doctorArray[i] = (Doctor) doctorsArray[i];
         }
-        
         utility.BubbleSort.sort(doctorArray);
-        
-        for (Doctor doctor : doctorArray) {
-            System.out.printf("%-10s %-35s %-30s %-15s %-10s\n", 
-                doctor.getDoctorId(), doctor.getName(), doctor.getSpecialization(), 
-                doctor.getContactNumber(), doctor.isIsAvailable() ? "Yes" : "No");
+        String[] headers = {"ID", "Name", "Specialization", "Contact", "Available"};
+        Object[][] rows = new Object[doctorArray.length][headers.length];
+        for (int i = 0; i < doctorArray.length; i++) {
+            Doctor doctor = doctorArray[i];
+            rows[i][0] = doctor.getDoctorId();
+            rows[i][1] = doctor.getName();
+            rows[i][2] = doctor.getSpecialization();
+            rows[i][3] = doctor.getContactNumber();
+            rows[i][4] = doctor.isIsAvailable() ? "Yes" : "No";
         }
-        System.out.println(repeatString("-", 95));
+        System.out.print(StringUtility.formatTableNoDividers(
+            "AVAILABLE DOCTORS",
+            headers,
+            rows
+        ));
         System.out.println("Total Doctors: " + doctorArray.length);
-        System.out.println(repeatString("=", 60));
+        System.out.println(StringUtility.repeatString("=", 60));
         
         System.out.print("Enter doctor ID to update: ");
         String doctorId = scanner.nextLine();
@@ -248,9 +264,9 @@ public class DoctorManagement {
             System.out.println("\nCurrent doctor information:");
             displayDoctorDetails(doctor);
             
-            System.out.println("\n" + repeatString("-", 60));
+            System.out.println("\n" + StringUtility.repeatString("-", 60));
             System.out.println("Enter new information (press Enter to keep current value):");
-            System.out.println(repeatString("-", 60));
+            System.out.println(StringUtility.repeatString("-", 60));
             
             //update name
             System.out.print("Name [" + doctor.getName() + "]: ");
@@ -276,31 +292,33 @@ public class DoctorManagement {
     }
     
     public void updateDoctorSchedule() {
-        System.out.println("\n" + repeatString("=", 60));
+        System.out.println("\n" + StringUtility.repeatString("=", 60));
         System.out.println("        UPDATE DOCTOR SCHEDULE");
-        System.out.println(repeatString("=", 60));
+        System.out.println(StringUtility.repeatString("=", 60));
 
-        System.out.println("📋 AVAILABLE DOCTORS:");
-        System.out.println(repeatString("-", 95));
-        System.out.printf("%-10s %-35s %-30s %-15s %-10s\n", "ID", "Name", "Specialization", "Contact", "Available");
-        System.out.println(repeatString("-", 95));
-        
         Object[] doctorsArray = doctorList.toArray();
         Doctor[] doctorArray = new Doctor[doctorsArray.length];
         for (int i = 0; i < doctorsArray.length; i++) {
             doctorArray[i] = (Doctor) doctorsArray[i];
         }
-        
         utility.BubbleSort.sort(doctorArray);
-        
-        for (Doctor doctor : doctorArray) {
-            System.out.printf("%-10s %-35s %-30s %-15s %-10s\n", 
-                doctor.getDoctorId(), doctor.getName(), doctor.getSpecialization(), 
-                doctor.getContactNumber(), doctor.isIsAvailable() ? "Yes" : "No");
+        String[] headers = {"ID", "Name", "Specialization", "Contact", "Available"};
+        Object[][] rows = new Object[doctorArray.length][headers.length];
+        for (int i = 0; i < doctorArray.length; i++) {
+            Doctor doctor = doctorArray[i];
+            rows[i][0] = doctor.getDoctorId();
+            rows[i][1] = doctor.getName();
+            rows[i][2] = doctor.getSpecialization();
+            rows[i][3] = doctor.getContactNumber();
+            rows[i][4] = doctor.isIsAvailable() ? "Yes" : "No";
         }
-        System.out.println(repeatString("-", 95));
+        System.out.print(StringUtility.formatTableNoDividers(
+            "AVAILABLE DOCTORS",
+            headers,
+            rows
+        ));
         System.out.println("Total Doctors: " + doctorArray.length);
-        System.out.println(repeatString("=", 60));
+        System.out.println(StringUtility.repeatString("=", 60));
         
         System.out.print("Enter doctor ID to update schedule: ");
         String doctorId = scanner.nextLine();
@@ -310,9 +328,9 @@ public class DoctorManagement {
             System.out.println("\nCurrent doctor information:");
             displayDoctorDetails(doctor);
             
-            System.out.println("\n" + repeatString("-", 60));
+            System.out.println("\n" + StringUtility.repeatString("-", 60));
             System.out.println("Enter new schedule information (press Enter to keep current value):");
-            System.out.println(repeatString("-", 60));
+            System.out.println(StringUtility.repeatString("-", 60));
             
             //update duty schedule
             System.out.print("Duty Schedule [" + doctor.getDutySchedule() + "]: ");
@@ -371,80 +389,53 @@ public class DoctorManagement {
     }
     
     public void generateDoctorAvailabilityReport() {
-        System.out.println("\n" + repeatString("=", 60));
+        System.out.println("\n" + StringUtility.repeatString("=", 60));
         System.out.println("        DOCTOR AVAILABILITY REPORT");
-        System.out.println(repeatString("=", 60));
-        
+        System.out.println(StringUtility.repeatString("=", 60));
+        System.out.println("Generated at: " + StringUtility.getCurrentDateTime());
+        System.out.println(StringUtility.repeatString("-", 60));
+
         Object[] doctorsArray = doctorList.toArray();
         int totalDoctors = doctorsArray.length;
         int availableCount = 0, onLeaveCount = 0, onDutyCount = 0;
-        
-        //create sets for set operations analysis
-        SetAndQueueInterface<Doctor> availableDoctors = new SetAndQueue<>();
-        SetAndQueueInterface<Doctor> onLeaveDoctors = new SetAndQueue<>();
-        SetAndQueueInterface<Doctor> unavailableDoctors = new SetAndQueue<>();
-        
-        for (Object obj : doctorsArray) {
-            Doctor doctor = (Doctor) obj;
-            if (doctor.isIsAvailable()) {
-                availableCount++;
-                availableDoctors.add(doctor);
-            } else {
-                unavailableDoctors.add(doctor);
-            }
-            if (doctor.isOnLeave()) {
-                onLeaveCount++;
-                onLeaveDoctors.add(doctor);
-            }
+
+        String[] headers = {"ID", "Name", "Specialty", "Available", "On Leave", "On Duty"};
+        Object[][] rows = new Object[doctorsArray.length][headers.length];
+        for (int i = 0; i < doctorsArray.length; i++) {
+            Doctor d = (Doctor) doctorsArray[i];
+            boolean available = d.isIsAvailable();
+            boolean onLeave = d.isOnLeave();
+            boolean onDuty = onDutyDoctorList.contains(d);
+            if (available) availableCount++;
+            if (onLeave) onLeaveCount++;
+            if (onDuty) onDutyCount++;
+            rows[i][0] = d.getDoctorId();
+            rows[i][1] = d.getName();
+            rows[i][2] = d.getSpecialization();
+            rows[i][3] = available ? "Yes" : "No";
+            rows[i][4] = onLeave ? "Yes" : "No";
+            rows[i][5] = onDuty ? "Yes" : "No";
         }
-        
-        onDutyCount = onDutyDoctorList.size();
-        
-        //perform set operations
-        SetAndQueueInterface<Doctor> availableNotOnDuty = availableDoctors.difference(onDutyDoctorList);
-        SetAndQueueInterface<Doctor> onLeaveNotOnDuty = onLeaveDoctors.difference(onDutyDoctorList);
-        SetAndQueueInterface<Doctor> availableAndOnDuty = availableDoctors.intersection(onDutyDoctorList);
-        SetAndQueueInterface<Doctor> allActiveDoctors = availableDoctors.union(onDutyDoctorList);
-        
-        System.out.println("📊 Doctor Availability:");
+        System.out.println("\nDOCTOR LIST:");
+        System.out.print(StringUtility.formatTableWithDividers(headers, rows));
+
+        System.out.println("\nSUMMARY:");
         System.out.println("• Total Doctors: " + totalDoctors);
         System.out.println("• Available Doctors: " + availableCount);
         System.out.println("• Doctors on Leave: " + onLeaveCount);
         System.out.println("• Doctors on Duty: " + onDutyCount);
-        System.out.println("• Unavailable Doctors: " + (totalDoctors - availableCount));
-        
-        System.out.println("\n📊 Doctor Activity Analysis:");
-        System.out.println("• Available but Not on Duty: " + availableNotOnDuty.size());
-        System.out.println("• On Leave but Not on Duty: " + onLeaveNotOnDuty.size());
-        System.out.println("• Available and On Duty: " + availableAndOnDuty.size());
-        System.out.println("• Total Active Doctors: " + allActiveDoctors.size());
-        System.out.println("• Completely Inactive: " + (totalDoctors - allActiveDoctors.size()));
-        
-        System.out.println("\n📈 Availability Distribution:");
-        if (totalDoctors > 0) {
-            int availableBars = (int) Math.round((double) availableCount / totalDoctors * 20);
-            int onLeaveBars = (int) Math.round((double) onLeaveCount / totalDoctors * 20);
-            int onDutyBars = (int) Math.round((double) onDutyCount / totalDoctors * 20);
-            int unavailableBars = (int) Math.round((double) (totalDoctors - availableCount) / totalDoctors * 20);
-            
-            System.out.printf("%-12s [%s] %2d (%.1f%%)\n", "Available:", createColoredBar(BLUE_BG, availableBars, 20), availableCount, (double)availableCount/totalDoctors*100);
-            System.out.println("");
-            System.out.printf("%-12s [%s] %2d (%.1f%%)\n", "On Leave:", createColoredBar(BLUE_BG, onLeaveBars, 20), onLeaveCount, (double)onLeaveCount/totalDoctors*100);
-            System.out.println("");
-            System.out.printf("%-12s [%s] %2d (%.1f%%)\n", "On Duty:", createColoredBar(BLUE_BG, onDutyBars, 20), onDutyCount, (double)onDutyCount/totalDoctors*100);
-            System.out.println("");
-            System.out.printf("%-12s [%s] %2d (%.1f%%)\n", "Unavailable:", createColoredBar(BLUE_BG, unavailableBars, 20), (totalDoctors - availableCount), (double)(totalDoctors - availableCount)/totalDoctors*100);
-        }
-        
-        System.out.println("\nPress Enter to continue...");
+        System.out.println(StringUtility.repeatString("=", 60));
+        System.out.println("Press Enter to continue...");
         scanner.nextLine();
     }
     
     public void generateDoctorSpecializationReport() {
-        System.out.println("\n" + repeatString("=", 60));
+        System.out.println("\n" + StringUtility.repeatString("=", 60));
         System.out.println("        DOCTOR SPECIALIZATION REPORT");
-        System.out.println(repeatString("=", 60));
-        
+        System.out.println(StringUtility.repeatString("=", 60));
+        System.out.println("Generated at: " + StringUtility.getCurrentDateTime());
+        System.out.println(StringUtility.repeatString("-", 60));
+
         Object[] doctorsArray = doctorList.toArray();
         int totalDoctors = doctorsArray.length;
         SetAndQueueInterface<String> specializationSet = new SetAndQueue<>();
@@ -473,26 +464,45 @@ public class DoctorManagement {
                 specializationIndex++;
             }
         }
-        
-        System.out.println("📊 Specialization Distribution:");
-        for (int i = 0; i < specializationIndex; i++) {
-            System.out.println("• " + specializationArray[i] + ": " + specializationCounts[i] + " doctors");
+
+        String[] headers = {"ID", "Name", "Specialization", "Contact", "Available"};
+        Object[][] rows = new Object[doctorsArray.length][headers.length];
+        for (int i = 0; i < doctorsArray.length; i++) {
+            Doctor d = (Doctor) doctorsArray[i];
+            rows[i][0] = d.getDoctorId();
+            rows[i][1] = d.getName();
+            rows[i][2] = d.getSpecialization();
+            rows[i][3] = d.getContactNumber();
+            rows[i][4] = d.isIsAvailable() ? "Yes" : "No";
         }
-        
-        System.out.println("\n📈 Specialization Chart:");
-        if (totalDoctors > 0) {
-            for (int i = 0; i < specializationIndex; i++) {
-                int bars = (int) Math.round((double) specializationCounts[i] / totalDoctors * 25);
-                System.out.printf("%-20s [%s] %d doctors (%.1f%%)\n", 
-                    specializationArray[i] + ":", 
-                    createColoredBar(BLUE_BG, bars, 25),
-                    specializationCounts[i], 
-                    (double)specializationCounts[i]/totalDoctors*100);
-                System.out.println("");
+        System.out.println("\nDOCTOR LIST:");
+        System.out.print(StringUtility.formatTableWithDividers(headers, rows));
+
+        System.out.println("\nSPECIALIZATION DISTRIBUTION:");
+        int barWidth = 30;
+        int maxSpecialization = 0;
+        for (int i = 0; i < specializationIndex; i++) {
+            if (specializationCounts[i] > maxSpecialization) {
+                maxSpecialization = specializationCounts[i];
             }
         }
         
-        System.out.println("\nPress Enter to continue...");
+        for (int i = 0; i < specializationIndex; i++) {
+            String specialization = specializationArray[i];
+            int count = specializationCounts[i];
+            double percentage = (double) count / totalDoctors * 100;
+            System.out.printf("%-25s [%s] %d doctors (%.1f%%)\n", 
+                specialization + ":", 
+                StringUtility.greenBarChart(count, maxSpecialization, barWidth),
+                count, 
+                percentage);
+        }
+
+        System.out.println("\nSUMMARY:");
+        System.out.println("• Total Doctors: " + totalDoctors);
+        System.out.println("• Total Specializations: " + specializationIndex);
+        System.out.println(StringUtility.repeatString("=", 60));
+        System.out.println("Press Enter to continue...");
         scanner.nextLine();
     }
     
@@ -528,18 +538,104 @@ public class DoctorManagement {
         return doctorList.toArray();
     }
 
-    private static final String RESET = "\u001B[0m";
-    private static final String BLUE_BG = "\u001B[44m";
-    
-    private String repeatString(String str, int count) {
-        StringBuilder sb = new StringBuilder();
-        for (int i = 0; i < count; i++) {
-            sb.append(str);
+    private int countConsultationsForDoctor(String doctorId, Object[] consultationsArray) {
+        int count = 0;
+        for (Object obj : consultationsArray) {
+            Consultation consultation = (Consultation) obj;
+            if (consultation.getDoctorId().equals(doctorId)) {
+                count++;
+            }
         }
-        return sb.toString();
+        return count;
     }
     
-    private String createColoredBar(String color, int barCount, int totalWidth) {
-        return color + repeatString(" ", barCount) + RESET + repeatString(" ", totalWidth - barCount);
+    public void generateDoctorPerformanceReport() {
+        if (consultationManagement == null) {
+            System.out.println("Consultation management not available!");
+            return;
+        }
+        
+        System.out.println("\n" + utility.StringUtility.repeatString("=", 80));
+        System.out.println("        DOCTOR PERFORMANCE REPORT");
+        System.out.println(utility.StringUtility.repeatString("=", 80));
+        System.out.println("Generated at: " + utility.StringUtility.getCurrentDateTime());
+        System.out.println(utility.StringUtility.repeatString("-", 80));
+
+        Object[] consultationsArray = consultationManagement.getAllConsultations();
+
+        SetAndQueueInterface<String> uniqueDoctors = new SetAndQueue<>();
+        int maxConsultations = 0;
+        
+        for (Object obj : consultationsArray) {
+            Consultation consultation = (Consultation) obj;
+            String doctorId = consultation.getDoctorId();
+            uniqueDoctors.add(doctorId);
+            int consultationCount = countConsultationsForDoctor(doctorId, consultationsArray);
+            if (consultationCount > maxConsultations) {
+                maxConsultations = consultationCount;
+            }
+        }
+
+        Object[] doctorsArray = uniqueDoctors.toArray();
+        int[] consultationCounts = new int[doctorsArray.length];
+        int[] daysWorkedCounts = new int[doctorsArray.length];
+        for (int i = 0; i < doctorsArray.length; i++) {
+            String doctorId = (String) doctorsArray[i];
+            consultationCounts[i] = countConsultationsForDoctor(doctorId, consultationsArray);
+            daysWorkedCounts[i] = countUniqueConsultationDaysForDoctor(doctorId, consultationsArray);
+        }
+
+        String[] headers = {"Doctor Name", "Doctor ID", "Consultations", "Days Worked"};
+        Object[][] rows = new Object[doctorsArray.length][headers.length];
+        for (int i = 0; i < doctorsArray.length; i++) {
+            String doctorId = (String) doctorsArray[i];
+            rows[i][0] = getDoctorName(doctorId);
+            rows[i][1] = doctorId;
+            rows[i][2] = consultationCounts[i];
+            rows[i][3] = daysWorkedCounts[i];
+        }
+        System.out.println("\nDOCTOR PERFORMANCE:");
+        System.out.print(utility.StringUtility.formatTableWithDividers(headers, rows));
+        
+        //calculate max days worked for bar chart scaling
+        int maxDaysWorked = 0;
+        for (int i = 0; i < daysWorkedCounts.length; i++) {
+            if (daysWorkedCounts[i] > maxDaysWorked) {
+                maxDaysWorked = daysWorkedCounts[i];
+            }
+        }
+        
+        System.out.println("\nDAYS WORKED PER DOCTOR:");
+        int barWidth = 30;
+        for (int i = 0; i < doctorsArray.length; i++) {
+            String doctorId = (String) doctorsArray[i];
+            int daysWorked = daysWorkedCounts[i];
+            System.out.printf("%-35s [%s] %d days\n", getDoctorName(doctorId), utility.StringUtility.greenBarChart(daysWorked, maxDaysWorked, barWidth), daysWorked);
+        }
+        System.out.println("\nSUMMARY:");
+        System.out.println("• Total Consultations: " + consultationsArray.length);
+        System.out.println("• Total Doctors: " + doctorsArray.length);
+        System.out.println(utility.StringUtility.repeatString("=", 80));
+        System.out.println("Press Enter to continue...");
+        scanner.nextLine();
+    }
+
+    private int countUniqueConsultationDaysForDoctor(String doctorId, Object[] consultationsArray) {
+        java.util.HashSet<String> uniqueDates = new java.util.HashSet<>();
+        for (Object obj : consultationsArray) {
+            Consultation consultation = (Consultation) obj;
+            if (consultation.getDoctorId().equals(doctorId)) {
+                uniqueDates.add(consultation.getConsultationDate());
+            }
+        }
+        return uniqueDates.size();
+    }
+    
+    private String getDoctorName(String doctorId) {
+        Doctor doctor = findDoctorById(doctorId);
+        if (doctor != null) {
+            return doctor.getName();
+        }
+        return "Unknown Doctor";
     }
 } 

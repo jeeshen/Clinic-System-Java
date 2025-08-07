@@ -83,15 +83,20 @@ public class Consultation implements Comparable<Consultation> {
 
     @Override
     public boolean equals(Object obj) {
-        if (this == obj) return true;
-        if (obj == null || getClass() != obj.getClass()) return false;
-        Consultation that = (Consultation) obj;
-        return java.util.Objects.equals(consultationId, that.consultationId) &&
-                java.util.Objects.equals(patientId, that.patientId) &&
-                java.util.Objects.equals(doctorId, that.doctorId) &&
-                java.util.Objects.equals(consultationDate, that.consultationDate) &&
-                java.util.Objects.equals(status, that.status) &&
-                java.util.Objects.equals(notes, that.notes);
+        if (this == obj) {
+            return true;
+        }
+        if (obj == null) {
+            return false;
+        }
+        if (getClass() != obj.getClass()) {
+            return false;
+        }
+        final Consultation other = (Consultation) obj;
+        if (!java.util.Objects.equals(this.consultationId, other.consultationId)) {
+            return false;
+        }
+        return true;
     }
     
     @Override

@@ -16,6 +16,7 @@ public class ConsultationManagement {
     private Scanner scanner;
     private int consultationIdCounter = 2001;
     private DoctorManagement doctorManagement;
+    private PatientManagement patientManagement;
     
     public ConsultationManagement() {
         scanner = new Scanner(System.in);
@@ -24,6 +25,10 @@ public class ConsultationManagement {
     
     public void setDoctorManagement(DoctorManagement doctorManagement) {
         this.doctorManagement = doctorManagement;
+    }
+    
+    public void setPatientManagement(PatientManagement patientManagement) {
+        this.patientManagement = patientManagement;
     }
     
     private void loadSampleData() {
@@ -64,8 +69,7 @@ public class ConsultationManagement {
             System.out.println("Error: No patient available in queue!");
             return;
         }
-        currentPatient.setIsInWaiting(false);
-        currentPatient.setCurrentStatus("in consultation");
+        currentPatient.setStatus("In consultation");
         
         System.out.println("\nConsulting with patient: " + currentPatient.getName());
         System.out.println("Doctor: " + selectedDoctor.getName());
@@ -85,18 +89,18 @@ public class ConsultationManagement {
         //create prescription through treatment management
         treatmentManagement.createPrescription(consultationId, currentPatient, selectedDoctor, diagnosis, consultationDate);
         
-        currentPatient.setCurrentStatus("Consulted");
+        currentPatient.setStatus("Consulted");
         
         System.out.println("\nConsultation completed successfully!");
         System.out.println("Consultation ID: " + consultationId);
     }
     
     public void displayAllConsultationsSorted() {
-        System.out.println("\n" + StringUtility.repeatString("-", 80));
+        System.out.println("\n" + StringUtility.repeatString("-", 100));
         System.out.println("ALL CONSULTATIONS (SORTED BY DATE)");
-        System.out.println(StringUtility.repeatString("-", 80));
-        System.out.printf("%-15s %-10s %-10s %-20s %-15s\n", "Consultation ID", "Patient ID", "Doctor ID", "Date", "Status");
-        System.out.println(StringUtility.repeatString("-", 80));
+        System.out.println(StringUtility.repeatString("-", 100));
+        System.out.printf("%-15s %-20s %-20s %-15s %-15s\n", "Consultation ID", "Patient Name", "Doctor Name", "Date", "Status");
+        System.out.println(StringUtility.repeatString("-", 100));
         
         Object[] consultationsArray = consultationList.toArray();
         Consultation[] consultationArray = new Consultation[consultationsArray.length];
@@ -106,13 +110,21 @@ public class ConsultationManagement {
         
         utility.BubbleSort.sort(consultationArray);
         
-        for (Consultation consultation : consultationArray) {
-            System.out.printf("%-15s %-10s %-10s %-20s %-15s\n", 
-                consultation.getConsultationId(), consultation.getPatientId(),
-                consultation.getDoctorId(), consultation.getConsultationDate(),
-                consultation.getStatus());
+        String[] headers = {"Consultation ID", "Patient Name", "Doctor Name", "Date", "Status"};
+        Object[][] rows = new Object[consultationArray.length][headers.length];
+        for (int i = 0; i < consultationArray.length; i++) {
+            Consultation consultation = consultationArray[i];
+            rows[i][0] = consultation.getConsultationId();
+            rows[i][1] = getPatientName(consultation.getPatientId());
+            rows[i][2] = getDoctorName(consultation.getDoctorId());
+            rows[i][3] = consultation.getConsultationDate();
+            rows[i][4] = consultation.getStatus();
         }
-        System.out.println(StringUtility.repeatString("-", 80));
+        System.out.print(StringUtility.formatTableNoDividers(
+            "ALL CONSULTATIONS (SORTED BY DATE)",
+            headers,
+            rows
+        ));
         System.out.println("Press Enter to continue...");
         scanner.nextLine();
     }
@@ -144,26 +156,27 @@ public class ConsultationManagement {
         String doctorId = scanner.nextLine();
         
         Object[] consultationsArray = consultationList.toArray();
-        System.out.println("\nConsultations by Doctor ID: " + doctorId);
-        System.out.println(StringUtility.repeatString("-", 80));
-        System.out.printf("%-15s %-10s %-20s %-15s\n", "Consultation ID", "Patient ID", "Date", "Status");
-        System.out.println(StringUtility.repeatString("-", 80));
-        
-        boolean found = false;
+        String[] headers = {"Consultation ID", "Patient Name", "Date", "Status"};
+        SetAndQueueInterface<Object[]> rowList = new SetAndQueue<>();
         for (Object obj : consultationsArray) {
             Consultation consultation = (Consultation) obj;
             if (consultation.getDoctorId().equals(doctorId)) {
-                System.out.printf("%-15s %-10s %-20s %-15s\n", 
-                    consultation.getConsultationId(), consultation.getPatientId(),
-                    consultation.getConsultationDate(), consultation.getStatus());
-                found = true;
+                rowList.add(new Object[]{consultation.getConsultationId(), getPatientName(consultation.getPatientId()), consultation.getConsultationDate(), consultation.getStatus()});
             }
         }
-        
-        if (!found) {
+        Object[][] rows = new Object[rowList.size()][headers.length];
+        Object[] rowArray = rowList.toArray();
+        for (int i = 0; i < rowArray.length; i++) {
+            rows[i] = (Object[]) rowArray[i];
+        }
+        System.out.print(StringUtility.formatTableNoDividers(
+            "CONSULTATIONS BY DOCTOR: " + getDoctorName(doctorId),
+            headers,
+            rows
+        ));
+        if (rowList.isEmpty()) {
             System.out.println("No consultations found for this doctor.");
         }
-        System.out.println(StringUtility.repeatString("-", 80));
         System.out.println("Press Enter to continue...");
         scanner.nextLine();
     }
@@ -173,26 +186,27 @@ public class ConsultationManagement {
         String patientId = scanner.nextLine();
         
         Object[] consultationsArray = consultationList.toArray();
-        System.out.println("\nConsultations by Patient ID: " + patientId);
-        System.out.println(StringUtility.repeatString("-", 80));
-        System.out.printf("%-15s %-10s %-20s %-15s\n", "Consultation ID", "Doctor ID", "Date", "Status");
-        System.out.println(StringUtility.repeatString("-", 80));
-        
-        boolean found = false;
+        String[] headers = {"Consultation ID", "Doctor Name", "Date", "Status"};
+        SetAndQueueInterface<Object[]> rowList = new SetAndQueue<>();
         for (Object obj : consultationsArray) {
             Consultation consultation = (Consultation) obj;
             if (consultation.getPatientId().equals(patientId)) {
-                System.out.printf("%-15s %-10s %-20s %-15s\n", 
-                    consultation.getConsultationId(), consultation.getDoctorId(),
-                    consultation.getConsultationDate(), consultation.getStatus());
-                found = true;
+                rowList.add(new Object[]{consultation.getConsultationId(), getDoctorName(consultation.getDoctorId()), consultation.getConsultationDate(), consultation.getStatus()});
             }
         }
-        
-        if (!found) {
+        Object[][] rows = new Object[rowList.size()][headers.length];
+        Object[] rowArray = rowList.toArray();
+        for (int i = 0; i < rowArray.length; i++) {
+            rows[i] = (Object[]) rowArray[i];
+        }
+        System.out.print(StringUtility.formatTableNoDividers(
+            "CONSULTATIONS BY PATIENT: " + getPatientName(patientId),
+            headers,
+            rows
+        ));
+        if (rowList.isEmpty()) {
             System.out.println("No consultations found for this patient.");
         }
-        System.out.println(StringUtility.repeatString("-", 80));
         System.out.println("Press Enter to continue...");
         scanner.nextLine();
     }
@@ -202,8 +216,8 @@ public class ConsultationManagement {
         System.out.println("CONSULTATION DETAILS");
         System.out.println(StringUtility.repeatString("-", 60));
         System.out.println("Consultation ID: " + consultation.getConsultationId());
-        System.out.println("Patient ID: " + consultation.getPatientId());
-        System.out.println("Doctor ID: " + consultation.getDoctorId());
+        System.out.println("Patient: " + getPatientName(consultation.getPatientId()) + " (ID: " + consultation.getPatientId() + ")");
+        System.out.println("Doctor: " + getDoctorName(consultation.getDoctorId()) + " (ID: " + consultation.getDoctorId() + ")");
         System.out.println("Date: " + consultation.getConsultationDate());
         System.out.println("Status: " + consultation.getStatus());
         System.out.println("Notes: " + (consultation.getNotes().isEmpty() ? "None" : consultation.getNotes()));
@@ -214,184 +228,76 @@ public class ConsultationManagement {
     }
     
     public void generateConsultationStatisticsReport() {
-        System.out.println("\n" + StringUtility.repeatString("=", 80));
+        System.out.println("\n" + utility.StringUtility.repeatString("=", 80));
         System.out.println("        CONSULTATION STATISTICS REPORT");
-        System.out.println(StringUtility.repeatString("=", 80));
-        
+        System.out.println(utility.StringUtility.repeatString("=", 80));
+        System.out.println("Generated at: " + utility.StringUtility.getCurrentDateTime());
+        System.out.println(utility.StringUtility.repeatString("-", 80));
+
         Object[] consultationsArray = consultationList.toArray();
         int totalConsultations = consultationsArray.length;
 
-        SetAndQueueInterface<String> doctorIds = new SetAndQueue<>();
-        SetAndQueueInterface<String> patientIds = new SetAndQueue<>();
-        SetAndQueueInterface<String> dates = new SetAndQueue<>();
-        
-        //count doctor consultations manually
-        int[] doctorCounts = new int[100];
-        String[] doctorIdArray = new String[100];
-        int doctorIndex = 0;
+        SetAndQueueInterface<String> uniqueDoctors = new SetAndQueue<>();
+        int maxConsultations = 0;
         
         for (Object obj : consultationsArray) {
             Consultation consultation = (Consultation) obj;
-            
-            //track unique doctors
             String doctorId = consultation.getDoctorId();
-            doctorIds.add(doctorId);
-            
-            //count consultations per doctor
-            boolean found = false;
-            for (int i = 0; i < doctorIndex; i++) {
-                if (doctorIdArray[i].equals(doctorId)) {
-                    doctorCounts[i]++;
-                    found = true;
-                    break;
-                }
+            uniqueDoctors.add(doctorId);
+
+            int consultationCount = countConsultationsForDoctor(doctorId, consultationsArray);
+            if (consultationCount > maxConsultations) {
+                maxConsultations = consultationCount;
             }
-            if (!found) {
-                doctorIdArray[doctorIndex] = doctorId;
-                doctorCounts[doctorIndex] = 1;
-                doctorIndex++;
-            }
-            
-            //track unique dates
-            String date = consultation.getConsultationDate();
-            dates.add(date);
-            
-            //track unique patients
-            String patientId = consultation.getPatientId();
-            patientIds.add(patientId);
         }
 
-        System.out.println("📊 CONSULTATION OVERVIEW:");
+        Object[] doctorsArray = uniqueDoctors.toArray();
+        int[] consultationCounts = new int[doctorsArray.length];
+        
+        for (int i = 0; i < doctorsArray.length; i++) {
+            String doctorId = (String) doctorsArray[i];
+            consultationCounts[i] = countConsultationsForDoctor(doctorId, consultationsArray);
+        }
+
+        String[] headers = {"Consultation ID", "Doctor Name", "Patient Name", "Date", "Status"};
+        Object[][] rows = new Object[consultationsArray.length][headers.length];
+        for (int i = 0; i < consultationsArray.length; i++) {
+            Consultation c = (Consultation) consultationsArray[i];
+            rows[i][0] = c.getConsultationId();
+            rows[i][1] = getDoctorName(c.getDoctorId());
+            rows[i][2] = getPatientName(c.getPatientId());
+            rows[i][3] = c.getConsultationDate();
+            rows[i][4] = c.getStatus();
+        }
+        System.out.println("\nCONSULTATION LIST:");
+        System.out.print(utility.StringUtility.formatTableWithDividers(headers, rows));
+
+        System.out.println("\nCONSULTATIONS PER DOCTOR:");
+        int barWidth = 30;
+        for (int i = 0; i < doctorsArray.length; i++) {
+            String doctorId = (String) doctorsArray[i];
+            int count = consultationCounts[i];
+            System.out.printf("%-35s [%s] %d\n", getDoctorName(doctorId), utility.StringUtility.greenBarChart(count, maxConsultations, barWidth), count);
+        }
+
+        System.out.println("\nSUMMARY:");
         System.out.println("• Total Consultations: " + totalConsultations);
-        System.out.println("• Average Consultations per Day: " + String.format("%.1f", (double)totalConsultations/dates.size()));
-        
-        System.out.println("\n👨‍⚕️ DOCTOR PERFORMANCE ANALYSIS:");
-        System.out.println("• Total Doctors Involved: " + doctorIds.size());
-        
-        //find top performing doctors
-        System.out.println("• Top 3 Performing Doctors:");
-        for (int i = 0; i < Math.min(3, doctorIndex); i++) {
-            //find the doctor with highest count
-            int maxIndex = 0;
-            for (int j = 1; j < doctorIndex; j++) {
-                if (doctorCounts[j] > doctorCounts[maxIndex]) {
-                    maxIndex = j;
-                }
-            }
-            
-            String doctorName = getDoctorName(doctorIdArray[maxIndex]);
-            System.out.printf("  %d. %s (%s): %d consultations\n", 
-                i+1, doctorName, doctorIdArray[maxIndex], doctorCounts[maxIndex]);
-            //mark as used by setting to -1
-            doctorCounts[maxIndex] = -1;
-        }
-        
-        System.out.println("\n📅 CONSULTATION TRENDS:");
-        System.out.println("• Total Active Days: " + dates.size());
-
-        System.out.println("• Daily Consultation Distribution:");
-        Object[] datesArray = dates.toArray();
-        for (Object dateObj : datesArray) {
-            String date = (String) dateObj;
-            int count = 0;
-            for (Object obj : consultationsArray) {
-                Consultation consultation = (Consultation) obj;
-                if (consultation.getConsultationDate().equals(date)) {
-                    count++;
-                }
-            }
-            int bars = (int) Math.round((double) count / getMaxConsultations(consultationsArray) * 20);
-            System.out.printf("  %s: [%s] %d consultations\n", 
-                date, 
-                createColoredBar(BLUE_BG, bars, 20),
-                count);
-        }
-        
+        System.out.println(utility.StringUtility.repeatString("=", 80));
         System.out.println("Press Enter to continue...");
         scanner.nextLine();
     }
     
-    private int getMaxConsultations(Object[] consultationsArray) {
-        //count consultations per date
-        SetAndQueueInterface<String> dates = new SetAndQueue<>();
-        for (Object obj : consultationsArray) {
-            Consultation consultation = (Consultation) obj;
-            dates.add(consultation.getConsultationDate());
-        }
-        
-        int maxCount = 0;
-        Object[] datesArray = dates.toArray();
-        for (Object dateObj : datesArray) {
-            String date = (String) dateObj;
-            int count = 0;
-            for (Object obj : consultationsArray) {
-                Consultation consultation = (Consultation) obj;
-                if (consultation.getConsultationDate().equals(date)) {
-                    count++;
-                }
-            }
-            if (count > maxCount) maxCount = count;
-        }
-        return maxCount;
-    }
+
     
-    public void generateDoctorPerformanceReport() {
-        System.out.println("\n" + StringUtility.repeatString("=", 60));
-        System.out.println("        DOCTOR PERFORMANCE REPORT");
-        System.out.println(StringUtility.repeatString("=", 60));
-        
-        Object[] consultationsArray = consultationList.toArray();
-        SetAndQueueInterface<String> doctorIds = new SetAndQueue<>();
-
-        int[] doctorCounts = new int[100];
-        String[] doctorIdArray = new String[100];
-        int doctorIndex = 0;
-        
+    private int countConsultationsForDoctor(String doctorId, Object[] consultationsArray) {
+        int count = 0;
         for (Object obj : consultationsArray) {
             Consultation consultation = (Consultation) obj;
-            String doctorId = consultation.getDoctorId();
-            doctorIds.add(doctorId);
-
-            boolean found = false;
-            for (int i = 0; i < doctorIndex; i++) {
-                if (doctorIdArray[i].equals(doctorId)) {
-                    doctorCounts[i]++;
-                    found = true;
-                    break;
-                }
-            }
-            if (!found) {
-                doctorIdArray[doctorIndex] = doctorId;
-                doctorCounts[doctorIndex] = 1;
-                doctorIndex++;
+            if (consultation.getDoctorId().equals(doctorId)) {
+                count++;
             }
         }
-        
-        System.out.println("📊 Doctor Performance (Consultations per Doctor):");
-        for (int i = 0; i < doctorIndex; i++) {
-            System.out.println("• Doctor ID " + doctorIdArray[i] + ": " + doctorCounts[i] + " consultations");
-        }
-        
-        System.out.println("\n📈 Performance Chart:");
-        if (doctorIndex > 0) {
-            //find the maximum consultations for scaling
-            int maxConsultations = 0;
-            for (int i = 0; i < doctorIndex; i++) {
-                if (doctorCounts[i] > maxConsultations) maxConsultations = doctorCounts[i];
-            }
-            
-            for (int i = 0; i < doctorIndex; i++) {
-                int bars = maxConsultations > 0 ? (int) Math.round((double) doctorCounts[i] / maxConsultations * 25) : 0;
-                System.out.printf("%-12s [%s] %d consultations\n", 
-                    "Doctor " + doctorIdArray[i] + ":", 
-                    createColoredBar(BLUE_BG, bars, 25),
-                    doctorCounts[i]);
-                System.out.println("");
-            }
-        }
-        
-        System.out.println("\nPress Enter to continue...");
-        scanner.nextLine();
+        return count;
     }
     
     public int getTotalConsultationCount() {
@@ -420,13 +326,6 @@ public class ConsultationManagement {
         return input;
     }
 
-    private static final String RESET = "\u001B[0m";
-    private static final String BLUE_BG = "\u001B[44m";
-    
-    private String createColoredBar(String color, int barCount, int totalWidth) {
-        return color + StringUtility.repeatString(" ", barCount) + RESET + StringUtility.repeatString(" ", totalWidth - barCount);
-    }
-
     private String getDoctorName(String doctorId) {
         if (doctorManagement != null) {
             Doctor doctor = doctorManagement.findDoctorById(doctorId);
@@ -435,5 +334,20 @@ public class ConsultationManagement {
             }
         }
         return "Unknown Doctor";
+    }
+    
+    private String getPatientName(String patientId) {
+        if (patientManagement != null) {
+            try {
+                int patientIdInt = Integer.parseInt(patientId);
+                Patient patient = patientManagement.findPatientById(patientIdInt);
+                if (patient != null) {
+                    return patient.getName();
+                }
+            } catch (NumberFormatException e) {
+                System.out.println("Error: Invalid patient ID format");
+            }
+        }
+        return "Unknown Patient";
     }
 } 

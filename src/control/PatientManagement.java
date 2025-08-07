@@ -9,6 +9,7 @@ import java.time.LocalDateTime;
 import java.time.format.DateTimeFormatter;
 import java.util.Scanner;
 import entity.Consultation;
+import utility.StringUtility;
 
 public class PatientManagement {
     private SetAndQueueInterface<Patient> patientList = new SetAndQueue<>();
@@ -29,6 +30,7 @@ public class PatientManagement {
     private void loadSampleData() {
         Patient[] samplePatients = DataInitializer.initializeSamplePatients();
         for (Patient patient : samplePatients) {
+            patient.setStatus("Active");
             patientList.add(patient);
         }
     }
@@ -58,12 +60,11 @@ public class PatientManagement {
         
         String registrationDate = LocalDateTime.now().format(DateTimeFormatter.ofPattern("yyyy-MM-dd HH:mm"));
         
-        Patient newPatient = new Patient(patientIdCounter++, name, age, gender, allergies, contactNumber, address, registrationDate, medicalHistory, false, "Registered");
+        Patient newPatient = new Patient(patientIdCounter++, name, age, gender, allergies, contactNumber, address, registrationDate, medicalHistory, "Waiting");
         
         patientList.add(newPatient);
         waitingPatientList.enqueue(newPatient);
-        newPatient.setIsInWaiting(true);
-        newPatient.setCurrentStatus("Waiting");
+        newPatient.setStatus("Waiting");
         
         System.out.println("\n✅ Patient registered successfully!");
         System.out.println("Patient ID: " + newPatient.getId());
@@ -79,18 +80,27 @@ public class PatientManagement {
         }
         
         System.out.println("Available patients:");
-        System.out.println(repeatString("-", 70));
+        System.out.println(StringUtility.repeatString("-", 70));
         System.out.printf("%-8s %-30s %-8s %-8s %-15s\n", "ID", "Name", "Age", "Gender", "Contact");
-        System.out.println(repeatString("-", 70));
+        System.out.println(StringUtility.repeatString("-", 70));
         
         Object[] patientsArray = patientList.toArray();
-        for (Object obj : patientsArray) {
-            Patient patient = (Patient) obj;
-            System.out.printf("%-8s %-30s %-8s %-8s %-15s\n", 
-                patient.getId(), patient.getName(), patient.getAge(), 
-                patient.getGender(), patient.getContactNumber());
+        String[] headers = {"ID", "Name", "Age", "Gender", "Contact"};
+        Object[][] rows = new Object[patientsArray.length][headers.length];
+        for (int i = 0; i < patientsArray.length; i++) {
+            Patient patient = (Patient) patientsArray[i];
+            rows[i][0] = patient.getId();
+            rows[i][1] = patient.getName();
+            rows[i][2] = patient.getAge();
+            rows[i][3] = patient.getGender();
+            rows[i][4] = patient.getContactNumber();
         }
-        System.out.println(repeatString("-", 70));
+        System.out.print(StringUtility.formatTableNoDividers(
+            "AVAILABLE PATIENTS",
+            headers,
+            rows
+        ));
+        System.out.println(StringUtility.repeatString("-", 70));
 
         int patientId = InputValidator.getValidInt(scanner, 1, 9999, "Enter patient ID to add to queue: ");
         
@@ -109,8 +119,7 @@ public class PatientManagement {
             
             if (!alreadyInQueue) {
                 waitingPatientList.enqueue(selectedPatient);
-                selectedPatient.setIsInWaiting(true);
-                selectedPatient.setCurrentStatus("waiting");
+                selectedPatient.setStatus("Waiting");
                 System.out.println("Patient " + selectedPatient.getName() + " added to waiting queue.");
             } else {
                 System.out.println("Patient is already in the waiting queue!");
@@ -121,49 +130,59 @@ public class PatientManagement {
     }
     
     public void displayWaitingQueue() {
-        System.out.println("\n" + repeatString("-", 70));
-        System.out.println("CURRENT WAITING QUEUE");
-        System.out.println(repeatString("-", 70));
-        
-        if (waitingPatientList.isQueueEmpty()) {
-            System.out.println("No patients in waiting queue.");
-        } else {
-            System.out.printf("%-8s %-30s %-8s %-8s %-15s\n", "ID", "Name", "Age", "Gender", "Contact");
-            System.out.println(repeatString("-", 70));
-            
-            Object[] queueArray = waitingPatientList.toQueueArray();
-            for (Object obj : queueArray) {
-                Patient patient = (Patient) obj;
-                System.out.printf("%-8s %-30s %-8s %-8s %-15s\n", 
-                    patient.getId(), patient.getName(), patient.getAge(), 
-                    patient.getGender(), patient.getContactNumber());
-            }
+        Object[] queueArray = waitingPatientList.toQueueArray();
+        String[] headers = {"ID", "Name", "Age", "Gender", "Contact"};
+        Object[][] rows = new Object[queueArray.length][headers.length];
+        for (int i = 0; i < queueArray.length; i++) {
+            Patient patient = (Patient) queueArray[i];
+            rows[i][0] = patient.getId();
+            rows[i][1] = patient.getName();
+            rows[i][2] = patient.getAge();
+            rows[i][3] = patient.getGender();
+            rows[i][4] = patient.getContactNumber();
         }
-        System.out.println(repeatString("-", 70));
+        if (queueArray.length == 0) {
+            System.out.println("\n" + StringUtility.repeatString("-", 70));
+            System.out.println("CURRENT WAITING QUEUE");
+            System.out.println(StringUtility.repeatString("-", 70));
+            System.out.println("No patients in waiting queue.");
+            System.out.println(StringUtility.repeatString("-", 70));
+        } else {
+            System.out.print(StringUtility.formatTableNoDividers(
+                "CURRENT WAITING QUEUE",
+                headers,
+                rows
+            ));
+        }
         System.out.println("Press Enter to continue...");
         scanner.nextLine();
     }
     
     public void removePatientFromQueue() {
-        if (waitingPatientList.isQueueEmpty()) {
-            System.out.println("No patients in waiting queue.");
-            return;
-        }
-
-        System.out.println("\n" + repeatString("-", 70));
-        System.out.println("CURRENT WAITING QUEUE");
-        System.out.println(repeatString("-", 70));
-        System.out.printf("%-8s %-30s %-8s %-8s %-15s\n", "ID", "Name", "Age", "Gender", "Contact");
-        System.out.println(repeatString("-", 70));
-        
         Object[] displayQueueArray = waitingPatientList.toQueueArray();
-        for (Object obj : displayQueueArray) {
-            Patient patient = (Patient) obj;
-            System.out.printf("%-8s %-30s %-8s %-8s %-15s\n", 
-                patient.getId(), patient.getName(), patient.getAge(), 
-                patient.getGender(), patient.getContactNumber());
+        String[] headers = {"ID", "Name", "Age", "Gender", "Contact"};
+        Object[][] rows = new Object[displayQueueArray.length][headers.length];
+        for (int i = 0; i < displayQueueArray.length; i++) {
+            Patient patient = (Patient) displayQueueArray[i];
+            rows[i][0] = patient.getId();
+            rows[i][1] = patient.getName();
+            rows[i][2] = patient.getAge();
+            rows[i][3] = patient.getGender();
+            rows[i][4] = patient.getContactNumber();
         }
-        System.out.println(repeatString("-", 70));
+        if (displayQueueArray.length == 0) {
+            System.out.println("\n" + StringUtility.repeatString("-", 70));
+            System.out.println("CURRENT WAITING QUEUE");
+            System.out.println(StringUtility.repeatString("-", 70));
+            System.out.println("No patients in waiting queue.");
+            System.out.println(StringUtility.repeatString("-", 70));
+        } else {
+            System.out.print(StringUtility.formatTableNoDividers(
+                "CURRENT WAITING QUEUE",
+                headers,
+                rows
+            ));
+        }
 
         int patientId = InputValidator.getValidInt(scanner, 1, 9999, "Enter patient ID to remove from queue: ");
         
@@ -177,8 +196,7 @@ public class PatientManagement {
                 Patient queuePatient = (Patient) obj;
                 if (queuePatient.getId() == patient.getId()) {
                     foundInQueue = true;
-                    patient.setIsInWaiting(false);
-                    patient.setCurrentStatus("Removed");
+                    patient.setStatus("Active");
                     System.out.println("Patient " + patient.getName() + " removed from waiting queue.");
                 } else {
                     newQueue.enqueue(queuePatient);
@@ -208,9 +226,8 @@ public class PatientManagement {
         Object[] allPatients = patientList.toArray();
         for (Object obj : allPatients) {
             Patient patient = (Patient) obj;
-            if (patient.isIsInWaiting()) {
-                patient.setIsInWaiting(false);
-                patient.setCurrentStatus("Cleared from queue");
+            if (isPatientInQueue(patient)) {
+                patient.setStatus("Active");
             }
         }
         
@@ -225,28 +242,22 @@ public class PatientManagement {
         
         Patient nextPatient = waitingPatientList.getFront();
         if (nextPatient != null) {
-            System.out.println("\n" + repeatString("-", 60));
+            System.out.println("\n" + StringUtility.repeatString("-", 60));
             System.out.println("NEXT PATIENT IN QUEUE");
-            System.out.println(repeatString("-", 60));
+            System.out.println(StringUtility.repeatString("-", 60));
             System.out.println("ID: " + nextPatient.getId());
             System.out.println("Name: " + nextPatient.getName());
             System.out.println("Age: " + nextPatient.getAge());
             System.out.println("Gender: " + nextPatient.getGender());
             System.out.println("Contact: " + nextPatient.getContactNumber());
-            System.out.println("Status: " + nextPatient.getCurrentStatus());
-            System.out.println(repeatString("-", 60));
+            System.out.println("Status: " + nextPatient.getStatus());
+            System.out.println(StringUtility.repeatString("-", 60));
         } else {
             System.out.println("Error retrieving next patient from queue.");
         }
     }
     
     public void displayAllPatientsSorted() {
-        System.out.println("\n" + repeatString("-", 90));
-        System.out.println("ALL PATIENTS (SORTED BY ID)");
-        System.out.println(repeatString("-", 90));
-        System.out.printf("%-8s %-30s %-8s %-8s %-15s %-15s\n", "ID", "Name", "Age", "Gender", "Contact", "Status");
-        System.out.println(repeatString("-", 90));
-        
         Object[] patientsArray = patientList.toArray();
         Patient[] patientArray = new Patient[patientsArray.length];
         for (int i = 0; i < patientsArray.length; i++) {
@@ -255,12 +266,22 @@ public class PatientManagement {
         
         utility.BubbleSort.sort(patientArray);
         
-        for (Patient patient : patientArray) {
-            System.out.printf("%-8s %-30s %-8s %-8s %-15s %-15s\n", 
-                patient.getId(), patient.getName(), patient.getAge(), 
-                patient.getGender(), patient.getContactNumber(), patient.getCurrentStatus());
+        String[] headers = {"ID", "Name", "Age", "Gender", "Contact", "Status"};
+        Object[][] rows = new Object[patientArray.length][headers.length];
+        for (int i = 0; i < patientArray.length; i++) {
+            Patient patient = patientArray[i];
+            rows[i][0] = patient.getId();
+            rows[i][1] = patient.getName();
+            rows[i][2] = patient.getAge();
+            rows[i][3] = patient.getGender();
+            rows[i][4] = patient.getContactNumber();
+            rows[i][5] = patient.getStatus();
         }
-        System.out.println(repeatString("-", 90));
+        System.out.print(StringUtility.formatTableNoDividers(
+            "ALL PATIENTS (SORTED BY ID)",
+            headers,
+            rows
+        ));
         System.out.println("Press Enter to continue...");
         scanner.nextLine();
     }
@@ -298,9 +319,9 @@ public class PatientManagement {
     }
     
     public void displayPatientDetails(Patient patient) {
-        System.out.println("\n" + repeatString("-", 60));
+        System.out.println("\n" + StringUtility.repeatString("-", 60));
         System.out.println("PATIENT DETAILS");
-        System.out.println(repeatString("-", 60));
+        System.out.println(StringUtility.repeatString("-", 60));
         System.out.println("ID: " + patient.getId());
         System.out.println("Name: " + patient.getName());
         System.out.println("Age: " + patient.getAge());
@@ -310,8 +331,8 @@ public class PatientManagement {
         System.out.println("Allergies: " + (patient.getAllegy().isEmpty() ? "None" : patient.getAllegy()));
         System.out.println("Medical History: " + (patient.getMedicalHistory().isEmpty() ? "None" : patient.getMedicalHistory()));
         System.out.println("Registration Date: " + patient.getRegistrationDate());
-        System.out.println("Current Status: " + patient.getCurrentStatus());
-        System.out.println(repeatString("-", 60));
+        System.out.println("Current Status: " + patient.getStatus());
+        System.out.println(StringUtility.repeatString("-", 60));
         System.out.println("Press Enter to continue...");
         scanner.nextLine();
     }
@@ -350,10 +371,12 @@ public class PatientManagement {
     }
     
     public void generatePatientStatisticsReport() {
-        System.out.println("\n" + repeatString("=", 70));
+        System.out.println("\n" + StringUtility.repeatString("=", 70));
         System.out.println("        PATIENT STATISTICS REPORT");
-        System.out.println(repeatString("=", 70));
-        
+        System.out.println(StringUtility.repeatString("=", 70));
+        System.out.println("Generated at: " + StringUtility.getCurrentDateTime());
+        System.out.println(StringUtility.repeatString("-", 70));
+
         Object[] patientsArray = patientList.toArray();
         int totalPatients = patientsArray.length;
         int maleCount = 0, femaleCount = 0;
@@ -376,12 +399,23 @@ public class PatientManagement {
         }
         femaleCount = totalPatients - maleCount;
 
-        // Get patients with consultations
+        SetAndQueueInterface<String> patientIdsWithConsultations = new SetAndQueue<>();
+        int maxConsultations = 0;
+        
         if (consultationManagement != null) {
             Object[] consultationsArray = consultationManagement.getAllConsultations();
             for (Object obj : consultationsArray) {
                 Consultation consultation = (Consultation) obj;
-                Patient patient = findPatientById(Integer.parseInt(consultation.getPatientId()));
+                String patientId = consultation.getPatientId();
+                patientIdsWithConsultations.add(patientId);
+                
+                //count consultations for this patient
+                int consultationCount = countConsultationsForPatient(patientId, consultationsArray);
+                if (consultationCount > maxConsultations) {
+                    maxConsultations = consultationCount;
+                }
+                
+                Patient patient = findPatientById(Integer.parseInt(patientId));
                 if (patient != null) {
                     patientsWithConsultations.add(patient);
                 }
@@ -396,125 +430,50 @@ public class PatientManagement {
         }
 
         //perform set operations
-        SetAndQueueInterface<Patient> patientsWithConsultationsOnly = patientsWithConsultations.difference(patientsInQueue);
-        SetAndQueueInterface<Patient> patientsInQueueOnly = patientsInQueue.difference(patientsWithConsultations);
         SetAndQueueInterface<Patient> patientsWithBoth = patientsWithConsultations.intersection(patientsInQueue);
         SetAndQueueInterface<Patient> allActivePatients = patientsWithConsultations.union(patientsInQueue);
-        
-        System.out.println("📊 Patient Statistics:");
+
+        String[] headers = {"ID", "Name", "Age", "Gender", "Contact", "Status"};
+        Object[][] rows = new Object[patientsArray.length][headers.length];
+        for (int i = 0; i < patientsArray.length; i++) {
+            Patient p = (Patient) patientsArray[i];
+            rows[i][0] = p.getId();
+            rows[i][1] = p.getName();
+            rows[i][2] = p.getAge();
+            rows[i][3] = p.getGender();
+            rows[i][4] = p.getContactNumber();
+            rows[i][5] = p.getStatus();
+        }
+        System.out.println("\nPATIENT LIST:");
+        System.out.print(StringUtility.formatTableWithDividers(headers, rows));
+
+        int barWidth = 30;
+        int maxGender = Math.max(maleCount, femaleCount);
+        System.out.println("\nGENDER DISTRIBUTION:");
+        System.out.printf("%-25s [%s] %d\n","Male : ", StringUtility.greenBarChart(maleCount, maxGender, barWidth), maleCount);
+        System.out.printf("%-25s [%s] %d\n","Female : ", StringUtility.greenBarChart(femaleCount, maxGender, barWidth), femaleCount);
+
+        System.out.println("\nCONSULTATIONS PER PATIENT:");
+        for (Object obj : patientsArray) {
+            Patient p = (Patient) obj;
+            int count = countConsultationsForPatient(String.valueOf(p.getId()), consultationManagement.getAllConsultations());
+            System.out.printf("%-25s [%s] %d\n", p.getName(), StringUtility.greenBarChart(count, maxConsultations, barWidth), count);
+        }
+
+        System.out.println("\nSUMMARY:");
         System.out.println("• Total Patients: " + totalPatients);
         System.out.println("• Male Patients: " + maleCount);
         System.out.println("• Female Patients: " + femaleCount);
-        
-        System.out.println("\n📈 Gender Distribution:");
-        if (totalPatients > 0) {
-            int maleBars = (int) Math.round((double) maleCount / totalPatients * 20);
-            int femaleBars = (int) Math.round((double) femaleCount / totalPatients * 20);
-            
-            System.out.printf("%-10s [%s] %2d (%.1f%%)\n", "Male:", createColoredBar(BLUE_BG, maleBars, 20), maleCount, (double)maleCount/totalPatients*100);
-            System.out.println("");
-            System.out.printf("%-10s [%s] %2d (%.1f%%)\n", "Female:", createColoredBar(BLUE_BG, femaleBars, 20), femaleCount, (double)femaleCount/totalPatients*100);
-        }
-        
-        System.out.println("\n📊 Patient Activity Analysis:");
-        System.out.println("• Patients with Consultations Only: " + patientsWithConsultationsOnly.size());
-        System.out.println("• Patients in Queue Only: " + patientsInQueueOnly.size());
-        System.out.println("• Patients with Both (Consultations & Queue): " + patientsWithBoth.size());
-        System.out.println("• Total Active Patients: " + allActivePatients.size());
-        System.out.println("• Inactive Patients: " + (totalPatients - allActivePatients.size()));
-        
-        System.out.println("\n📈 Age Range Distribution:");
-        if (totalPatients > 0) {
-            //calculate age distribution
-            int[] ageGroups = new int[6]; // 0-10, 11-20, 21-30, 31-40, 41-50, 50+
-            String[] ageLabels = {"0-10", "11-20", "21-30", "31-40", "41-50", "50+"};
-            
-            for (Object obj : patientsArray) {
-                Patient patient = (Patient) obj;
-                int age = patient.getAge();
-                if (age <= 10) ageGroups[0]++;
-                else if (age <= 20) ageGroups[1]++;
-                else if (age <= 30) ageGroups[2]++;
-                else if (age <= 40) ageGroups[3]++;
-                else if (age <= 50) ageGroups[4]++;
-                else ageGroups[5]++;
-            }
-            
-            //find the maximum count for scaling
-            int maxCount = 0;
-            for (int count : ageGroups) {
-                if (count > maxCount) maxCount = count;
-            }
-            
-            //display age range distribution with bar charts
-            for (int i = 0; i < ageGroups.length; i++) {
-                int bars = maxCount > 0 ? (int) Math.round((double) ageGroups[i] / maxCount * 25) : 0;
-                String percentage = totalPatients > 0 ? String.format("%.1f", (double)ageGroups[i]/totalPatients*100) : "0.0";
-                System.out.printf("%-8s [%s] %d patients (%s%%)\n", 
-                    ageLabels[i] + ":", 
-                    createColoredBar(BLUE_BG, bars, 25),
-                    ageGroups[i], 
-                    percentage);
-                System.out.println("");
-            }
-        }
-        
-        System.out.println("\nPress Enter to continue...");
+        System.out.println("• Patients with Consultations: " + patientsWithConsultations.size());
+        System.out.println("• Patients in Queue: " + patientsInQueue.size());
+        System.out.println("• Active Patients: " + allActivePatients.size());
+        System.out.println("• Patients with Both (Consultation & Queue): " + patientsWithBoth.size());
+
+        System.out.println(StringUtility.repeatString("=", 70));
+        System.out.println("Press Enter to continue...");
         scanner.nextLine();
     }
-    
-    public void generatePatientAgeDistributionReport() {
-        System.out.println("\n" + repeatString("=", 70));
-        System.out.println("        PATIENT AGE DISTRIBUTION REPORT");
-        System.out.println(repeatString("=", 70));
-        
-        Object[] patientsArray = patientList.toArray();
-        int[] ageGroups = new int[6]; // 0-10, 11-20, 21-30, 31-40, 41-50, 50+
-        String[] ageLabels = {"0-10", "11-20", "21-30", "31-40", "41-50", "50+"};
-        
-        for (Object obj : patientsArray) {
-            Patient patient = (Patient) obj;
-            int age = patient.getAge();
-            if (age <= 10) ageGroups[0]++;
-            else if (age <= 20) ageGroups[1]++;
-            else if (age <= 30) ageGroups[2]++;
-            else if (age <= 40) ageGroups[3]++;
-            else if (age <= 50) ageGroups[4]++;
-            else ageGroups[5]++;
-        }
-        
-        int totalPatients = patientsArray.length;
-        System.out.println("📊 Age Distribution:");
-        
-        //find the maximum count for scaling
-        int maxCount = 0;
-        for (int count : ageGroups) {
-            if (count > maxCount) maxCount = count;
-        }
-        
-        //display bar chart with single color
-        for (int i = 0; i < ageGroups.length; i++) {
-            int bars = maxCount > 0 ? (int) Math.round((double) ageGroups[i] / maxCount * 30) : 0;
-            String percentage = totalPatients > 0 ? String.format("%.1f", (double)ageGroups[i]/totalPatients*100) : "0.0";
-            System.out.printf("%-8s [%s] %d patients (%s%%)\n", 
-                ageLabels[i] + ":", 
-                createColoredBar(BLUE_BG, bars, 30),
-                ageGroups[i], 
-                percentage);
-            System.out.println("");
-        }
-        
-        //summary statistics
-        System.out.println("\n📈 Summary:");
-        System.out.println("• Total Patients: " + totalPatients);
-        System.out.println("• Average Age: " + String.format("%.1f", calculateAverageAge(patientsArray)));
-        System.out.println("• Youngest Age Group: " + getYoungestAgeGroup(ageGroups, ageLabels));
-        System.out.println("• Oldest Age Group: " + getOldestAgeGroup(ageGroups, ageLabels));
-        
-        System.out.println("\nPress Enter to continue...");
-        scanner.nextLine();
-    }
-    
+
     public Patient findPatientById(int patientId) {
         Object[] patientsArray = patientList.toArray();
         for (Object obj : patientsArray) {
@@ -562,47 +521,25 @@ public class PatientManagement {
         return waitingPatientList.isQueueEmpty();
     }
 
-    private static final String RESET = "\u001B[0m";
-    private static final String BLUE_BG = "\u001B[44m";
-    
-    private String repeatString(String str, int count) {
-        StringBuilder sb = new StringBuilder();
-        for (int i = 0; i < count; i++) {
-            sb.append(str);
-        }
-        return sb.toString();
-    }
-    
-    private String createColoredBar(String color, int barCount, int totalWidth) {
-        return color + repeatString(" ", barCount) + RESET + repeatString(" ", totalWidth - barCount);
-    }
-    
-    private double calculateAverageAge(Object[] patientsArray) {
-        if (patientsArray.length == 0) return 0.0;
-        
-        int totalAge = 0;
-        for (Object obj : patientsArray) {
-            Patient patient = (Patient) obj;
-            totalAge += patient.getAge();
-        }
-        return (double) totalAge / patientsArray.length;
-    }
-    
-    private String getYoungestAgeGroup(int[] ageGroups, String[] ageLabels) {
-        for (int i = 0; i < ageGroups.length; i++) {
-            if (ageGroups[i] > 0) {
-                return ageLabels[i] + " (" + ageGroups[i] + " patients)";
+    private int countConsultationsForPatient(String patientId, Object[] consultationsArray) {
+        int count = 0;
+        for (Object obj : consultationsArray) {
+            Consultation consultation = (Consultation) obj;
+            if (consultation.getPatientId().equals(patientId)) {
+                count++;
             }
         }
-        return "None";
+        return count;
     }
-    
-    private String getOldestAgeGroup(int[] ageGroups, String[] ageLabels) {
-        for (int i = ageGroups.length - 1; i >= 0; i--) {
-            if (ageGroups[i] > 0) {
-                return ageLabels[i] + " (" + ageGroups[i] + " patients)";
+
+    private boolean isPatientInQueue(Patient patient) {
+        Object[] queueArray = waitingPatientList.toQueueArray();
+        for (Object obj : queueArray) {
+            Patient queuePatient = (Patient) obj;
+            if (queuePatient.getId() == patient.getId()) {
+                return true;
             }
         }
-        return "None";
+        return false;
     }
 }

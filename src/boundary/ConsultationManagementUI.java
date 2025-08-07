@@ -5,6 +5,7 @@ import control.PatientManagement;
 import control.DoctorManagement;
 import control.TreatmentManagement;
 import java.util.Scanner;
+import utility.StringUtility;
 
 public class ConsultationManagementUI {
     private ConsultationManagement consultationManagement;
@@ -35,15 +36,15 @@ public class ConsultationManagementUI {
     public void manageConsultationHistory() {
         boolean back = false;
         while (!back) {
-            System.out.println("\n" + repeatString("=", 50));
+            System.out.println("\n" + StringUtility.repeatString("=", 50));
             System.out.println("        CONSULTATION HISTORY MANAGEMENT");
-            System.out.println(repeatString("=", 50));
+            System.out.println(StringUtility.repeatString("=", 50));
             System.out.println("1 . View All Consultations (Sorted by Date)");
             System.out.println("2 . Search Consultation by ID");
             System.out.println("3 . Search Consultations by Doctor");
             System.out.println("4 . Search Consultations by Patient");
             System.out.println("0 . Back to Main Menu");
-            System.out.println(repeatString("-", 50));
+            System.out.println(StringUtility.repeatString("-", 50));
             System.out.print("Enter your choice: ");
             
             int choice = getUserInputInt(0, 4);
@@ -84,13 +85,5 @@ public class ConsultationManagementUI {
         } while (input < min || input > max);
         
         return input;
-    }
-
-    private String repeatString(String str, int count) {
-        StringBuilder sb = new StringBuilder();
-        for (int i = 0; i < count; i++) {
-            sb.append(str);
-        }
-        return sb.toString();
     }
 } 

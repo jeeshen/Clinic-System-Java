@@ -73,12 +73,11 @@ public class PharmacyManagementUI {
             System.out.println("2 . Medicine Category Report");
             System.out.println("3 . Dispensing Statistics Report");
             System.out.println("4 . Inventory Value Report");
-            System.out.println("5 . Comprehensive Pharmacy Report");
             System.out.println("0 . Back to Main Menu");
             System.out.println(StringUtility.repeatString("-", 50));
             System.out.print("Enter your choice: ");
             
-            int choice = getUserInputInt(0, 5);
+            int choice = getUserInputInt(0, 4);
             
             switch (choice) {
                 case 1:
@@ -92,9 +91,6 @@ public class PharmacyManagementUI {
                     break;
                 case 4:
                     pharmacyManagement.generateInventoryValueReport();
-                    break;
-                case 5:
-                    pharmacyManagement.generateComprehensivePharmacyReport();
                     break;
                 case 0:
                     back = true;

@@ -127,19 +127,20 @@ public class Doctor implements Comparable<Doctor> {
 
     @Override
     public boolean equals(Object obj) {
-        if (this == obj) return true;
-        if (obj == null || getClass() != obj.getClass()) return false;
-        Doctor doctor = (Doctor) obj;
-        return isAvailable == doctor.isAvailable &&
-                onLeave == doctor.onLeave &&
-                java.util.Objects.equals(doctorId, doctor.doctorId) &&
-                java.util.Objects.equals(name, doctor.name) &&
-                java.util.Objects.equals(specialization, doctor.specialization) &&
-                java.util.Objects.equals(contactNumber, doctor.contactNumber) &&
-                java.util.Objects.equals(email, doctor.email) &&
-                java.util.Objects.equals(dutySchedule, doctor.dutySchedule) &&
-                java.util.Objects.equals(leaveDateStart, doctor.leaveDateStart) &&
-                java.util.Objects.equals(leaveDateEnd, doctor.leaveDateEnd);
+        if (this == obj) {
+            return true;
+        }
+        if (obj == null) {
+            return false;
+        }
+        if (getClass() != obj.getClass()) {
+            return false;
+        }
+        final Doctor other = (Doctor) obj;
+        if (!java.util.Objects.equals(this.doctorId, other.doctorId)) {
+            return false;
+        }
+        return true;
     }
     
     @Override
