@@ -31,7 +31,7 @@ public class PatientManagement {
         Patient[] samplePatients = DataInitializer.initializeSamplePatients();
         for (Patient patient : samplePatients) {
             patient.setStatus("Active");
-            patientList.add(patient);
+            patientList.add(patient); //adt method
         }
     }
     
@@ -53,7 +53,7 @@ public class PatientManagement {
         String medicalHistory = InputValidator.getValidStringAllowEmpty(scanner, "Enter medical history (if any, or press Enter): ");
 
         if (isPatientExists(contactNumber)) {
-            System.out.println("❌ Error: A patient with this phone number already exists!");
+            System.out.println("[ERROR] A patient with this phone number already exists!");
             System.out.println("Please use a different phone number or check existing patient records.");
             return;
         }
@@ -61,30 +61,27 @@ public class PatientManagement {
         String registrationDate = LocalDateTime.now().format(DateTimeFormatter.ofPattern("yyyy-MM-dd HH:mm"));
         
         Patient newPatient = new Patient(patientIdCounter++, name, age, gender, allergies, contactNumber, address, registrationDate, medicalHistory, "Waiting");
-        
-        patientList.add(newPatient);
-        waitingPatientList.enqueue(newPatient);
+
+        patientList.add(newPatient); //adt method
+        waitingPatientList.enqueue(newPatient); //adt method
         newPatient.setStatus("Waiting");
         
-        System.out.println("\n✅ Patient registered successfully!");
+        System.out.println("\n[OK] Patient registered successfully!");
         System.out.println("Patient ID: " + newPatient.getId());
         System.out.println("Patient added to waiting queue.");
     }
     
     public void selectExistingPatient() {
         System.out.println("\n=== SELECT EXISTING PATIENT ===");
-        
-        if (patientList.size() == 0) {
+
+        if (patientList.size() == 0) { //adt method
             System.out.println("No patients registered in the system.");
             return;
         }
-        
+
         System.out.println("Available patients:");
-        System.out.println(StringUtility.repeatString("-", 70));
-        System.out.printf("%-8s %-30s %-8s %-8s %-15s\n", "ID", "Name", "Age", "Gender", "Contact");
-        System.out.println(StringUtility.repeatString("-", 70));
-        
-        Object[] patientsArray = patientList.toArray();
+
+        Object[] patientsArray = patientList.toArray(); //adt method
         String[] headers = {"ID", "Name", "Age", "Gender", "Contact"};
         Object[][] rows = new Object[patientsArray.length][headers.length];
         for (int i = 0; i < patientsArray.length; i++) {
@@ -100,7 +97,6 @@ public class PatientManagement {
             headers,
             rows
         ));
-        System.out.println(StringUtility.repeatString("-", 70));
 
         int patientId = InputValidator.getValidInt(scanner, 1, 9999, "Enter patient ID to add to queue: ");
         
@@ -118,7 +114,7 @@ public class PatientManagement {
             }
             
             if (!alreadyInQueue) {
-                waitingPatientList.enqueue(selectedPatient);
+                waitingPatientList.enqueue(selectedPatient); //adt method
                 selectedPatient.setStatus("Waiting");
                 System.out.println("Patient " + selectedPatient.getName() + " added to waiting queue.");
             } else {
@@ -199,7 +195,7 @@ public class PatientManagement {
                     patient.setStatus("Active");
                     System.out.println("Patient " + patient.getName() + " removed from waiting queue.");
                 } else {
-                    newQueue.enqueue(queuePatient);
+                    newQueue.enqueue(queuePatient); //adt method
                 }
             }
             
@@ -219,11 +215,11 @@ public class PatientManagement {
             return;
         }
         
-        int queueSize = waitingPatientList.toQueueArray().length;
-        waitingPatientList.clearQueue();
-        
+        int queueSize = waitingPatientList.toQueueArray().length; //adt method
+        waitingPatientList.clearQueue(); //adt method
+
         //update patient status for all patients in the queue
-        Object[] allPatients = patientList.toArray();
+        Object[] allPatients = patientList.toArray(); //adt method
         for (Object obj : allPatients) {
             Patient patient = (Patient) obj;
             if (isPatientInQueue(patient)) {
@@ -231,7 +227,7 @@ public class PatientManagement {
             }
         }
         
-        System.out.println("✅ Patient queue cleared successfully! " + queueSize + " patients removed from queue.");
+        System.out.println("[OK] Patient queue cleared successfully! " + queueSize + " patients removed from queue.");
     }
     
     public void viewNextPatientInQueue() {
@@ -258,15 +254,15 @@ public class PatientManagement {
     }
     
     public void displayAllPatientsSorted() {
-        Object[] patientsArray = patientList.toArray();
+        Object[] patientsArray = patientList.toArray(); //adt method
 
         SetAndQueueInterface<Patient> tempList = new SetAndQueue<>();
         for (Object obj : patientsArray) {
-            tempList.add((Patient) obj);
+            tempList.add((Patient) obj); //adt method
         }
-        tempList.sort();
-        
-        Object[] sortedPatientsArray = tempList.toArray();
+        tempList.sort(); //adt method
+
+        Object[] sortedPatientsArray = tempList.toArray(); //adt method
         Patient[] patientArray = new Patient[sortedPatientsArray.length];
         for (int i = 0; i < sortedPatientsArray.length; i++) {
             patientArray[i] = (Patient) sortedPatientsArray[i];
@@ -306,9 +302,9 @@ public class PatientManagement {
     public void searchPatientByName() {
         String patientName = InputValidator.getValidString(scanner, "Enter patient name to search: ");
         
-        Object[] patientsArray = patientList.toArray();
+        Object[] patientsArray = patientList.toArray(); //adt method
         Patient foundPatient = null;
-        
+
         for (Object obj : patientsArray) {
             Patient patient = (Patient) obj;
             if (patient.getName().toLowerCase().contains(patientName.toLowerCase())) {
@@ -353,7 +349,7 @@ public class PatientManagement {
         System.out.printf("%-8s %-20s %-8s %-10s %-15s %-10s\n", "ID", "Name", "Age", "Gender", "Contact", "Status");
         System.out.println(StringUtility.repeatString("-", 60));
         
-        Object[] patientsArray = patientList.toArray();
+        Object[] patientsArray = patientList.toArray(); //adt method
         for (Object obj : patientsArray) {
             Patient patient = (Patient) obj;
             System.out.printf("%-8s %-20s %-8s %-10s %-15s %-10s\n", 
@@ -394,9 +390,9 @@ public class PatientManagement {
             String allergies = InputValidator.getValidStringAllowEmpty(scanner, "Allergies [" + patient.getAllegy() + "]: ");
             if (!allergies.isEmpty()) patient.setAllegy(allergies);
             
-            System.out.println("✅ Patient information updated successfully!");
+            System.out.println("[OK] Patient information updated successfully!");
         } else {
-            System.out.println("❌ Patient not found!");
+            System.out.println("[ERROR] Patient not found!");
         }
     }
     
@@ -410,7 +406,7 @@ public class PatientManagement {
         System.out.printf("%-8s %-20s %-8s %-10s %-15s %-10s\n", "ID", "Name", "Age", "Gender", "Contact", "Status");
         System.out.println(StringUtility.repeatString("-", 60));
         
-        Object[] patientsArray = patientList.toArray();
+        Object[] patientsArray = patientList.toArray(); //adt method
         for (Object obj : patientsArray) {
             Patient patient = (Patient) obj;
             System.out.printf("%-8s %-20s %-8s %-10s %-15s %-10s\n", 
@@ -434,7 +430,7 @@ public class PatientManagement {
             
             String confirm = InputValidator.getValidString(scanner, "Are you sure you want to remove this patient? (yes/no): ");
             if (confirm.toLowerCase().equals("yes")) {
-                boolean removedFromList = patientList.remove(patient);
+                boolean removedFromList = patientList.remove(patient); //adt method
                 
                 boolean removedFromQueue = false;
                 SetAndQueueInterface<Patient> newQueue = new SetAndQueue<>();
@@ -443,7 +439,7 @@ public class PatientManagement {
                 for (Object obj : queueArray) {
                     Patient queuePatient = (Patient) obj;
                     if (queuePatient.getId() != patient.getId()) {
-                        newQueue.enqueue(queuePatient);
+                        newQueue.enqueue(queuePatient); //adt method
                     } else {
                         removedFromQueue = true;
                     }
@@ -454,15 +450,15 @@ public class PatientManagement {
                 }
                 
                 if (removedFromList) {
-                    System.out.println("✅ Patient removed successfully!");
+                    System.out.println("[OK] Patient removed successfully!");
                 } else {
-                    System.out.println("❌ Failed to remove patient from system!");
+                    System.out.println("[ERROR] Failed to remove patient from system!");
                 }
             } else {
-                System.out.println("❌ Patient removal cancelled.");
+                System.out.println("[ERROR] Patient removal cancelled.");
             }
         } else {
-            System.out.println("❌ Patient not found!");
+            System.out.println("[ERROR] Patient not found!");
         }
     }
     
@@ -473,7 +469,7 @@ public class PatientManagement {
         System.out.println("Generated at: " + StringUtility.getCurrentDateTime());
         System.out.println(StringUtility.repeatString("-", 70));
 
-        Object[] patientsArray = patientList.toArray();
+        Object[] patientsArray = patientList.toArray(); //adt method
         int totalPatients = patientsArray.length;
         int maleCount = 0, femaleCount = 0;
 
@@ -488,9 +484,9 @@ public class PatientManagement {
             Patient patient = (Patient) obj;
             if (patient.getGender().equalsIgnoreCase("Male")) {
                 maleCount++;
-                malePatients.add(patient);
+                malePatients.add(patient); //adt method
             } else {
-                femalePatients.add(patient);
+                femalePatients.add(patient); //adt method
             }
         }
         femaleCount = totalPatients - maleCount;
@@ -503,30 +499,30 @@ public class PatientManagement {
             for (Object obj : consultationsArray) {
                 Consultation consultation = (Consultation) obj;
                 String patientId = consultation.getPatientId();
-                patientIdsWithConsultations.add(patientId);
-                
+                patientIdsWithConsultations.add(patientId); //adt method
+
                 //count consultations for this patient
                 int consultationCount = countConsultationsForPatient(patientId, consultationsArray);
                 if (consultationCount > maxConsultations) {
                     maxConsultations = consultationCount;
                 }
-                
+
                 Patient patient = findPatientById(Integer.parseInt(patientId));
                 if (patient != null) {
-                    patientsWithConsultations.add(patient);
+                    patientsWithConsultations.add(patient); //adt method
                 }
             }
         }
 
         //get patients in queue
-        Object[] queueArray = waitingPatientList.toQueueArray();
+        Object[] queueArray = waitingPatientList.toQueueArray(); //adt method
         for (Object obj : queueArray) {
             Patient patient = (Patient) obj;
-            patientsInQueue.add(patient);
+            patientsInQueue.add(patient); //adt method
         }
 
         //perform set operations
-        SetAndQueueInterface<Patient> patientsWithBoth = patientsWithConsultations.intersection(patientsInQueue);
+        SetAndQueueInterface<Patient> patientsWithBoth = patientsWithConsultations.intersection(patientsInQueue); //adt method
         SetAndQueueInterface<Patient> allActivePatients = patientsWithConsultations.union(patientsInQueue);
 
         String[] headers = {"ID", "Name", "Age", "Gender", "Contact", "Status"};
@@ -560,10 +556,10 @@ public class PatientManagement {
         System.out.println("• Total Patients: " + totalPatients);
         System.out.println("• Male Patients: " + maleCount);
         System.out.println("• Female Patients: " + femaleCount);
-        System.out.println("• Patients with Consultations: " + patientsWithConsultations.size());
-        System.out.println("• Patients in Queue: " + patientsInQueue.size());
-        System.out.println("• Active Patients: " + allActivePatients.size());
-        System.out.println("• Patients with Both (Consultation & Queue): " + patientsWithBoth.size());
+        System.out.println("• Patients with Consultations: " + patientsWithConsultations.size()); //adt method
+        System.out.println("• Patients in Queue: " + patientsInQueue.size()); //adt method
+        System.out.println("• Active Patients: " + allActivePatients.size()); //adt method
+        System.out.println("• Patients with Both (Consultation & Queue): " + patientsWithBoth.size()); //adt method
 
         System.out.println(StringUtility.repeatString("=", 70));
         System.out.println("Press Enter to continue...");
@@ -573,11 +569,11 @@ public class PatientManagement {
     public Patient findPatientById(int patientId) {
         Patient dummy = new Patient();
         dummy.setId(patientId);
-        return patientList.search(dummy);
+        return patientList.search(dummy); //adt method
     }
-    
+
     private boolean isPatientExists(String phoneNumber) {
-        Object[] patientsArray = patientList.toArray();
+        Object[] patientsArray = patientList.toArray(); //adt method
         for (Object obj : patientsArray) {
             Patient patient = (Patient) obj;
             if (patient.getContactNumber().equals(phoneNumber)) {
@@ -588,20 +584,20 @@ public class PatientManagement {
     }
     
     public Patient getNextPatientFromQueue() {
-        return waitingPatientList.dequeue();
+        return waitingPatientList.dequeue(); //adt method
     }
-    
+
     public void clearSet() {
-        patientList.clearSet();
-        System.out.println("✅ All patient records cleared successfully!");
+        patientList.clearSet(); //adt method
+        System.out.println("[OK] All patient records cleared successfully!");
     }
-    
+
     public int getTotalPatientCount() {
-        return patientList.size();
+        return patientList.size(); //adt method
     }
-    
+
     public Object[] getAllPatients() {
-        return patientList.toArray();
+        return patientList.toArray(); //adt method
     }
     
     public int getQueueSize() {

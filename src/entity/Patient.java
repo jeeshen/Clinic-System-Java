@@ -10,7 +10,7 @@ public class Patient implements Comparable<Patient> {
     private String address;
     private String registrationDate;
     private String medicalHistory;
-    private String status; // was currentStatus
+    private String status;
 
     public Patient() {
         this(0, "", 0, "", "", "", "", "", "", "");

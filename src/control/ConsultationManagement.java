@@ -35,7 +35,7 @@ public class ConsultationManagement {
     private void loadSampleData() {
         Consultation[] sampleConsultations = DataInitializer.initializeSampleConsultations();
         for (Consultation consultation : sampleConsultations) {
-            consultationList.add(consultation);
+            consultationList.add(consultation); //adt method
         }
     }
     
@@ -85,7 +85,7 @@ public class ConsultationManagement {
         
         Consultation consultation = new Consultation(consultationId, String.valueOf(currentPatient.getId()), selectedDoctor.getDoctorId(), consultationDate, "Completed", diagnosis);
         
-        consultationList.add(consultation);
+        consultationList.add(consultation); //adt method
         
         //create prescription through treatment management
         treatmentManagement.createPrescription(consultationId, currentPatient, selectedDoctor, diagnosis, consultationDate);
@@ -97,15 +97,15 @@ public class ConsultationManagement {
     }
     
     public void displayAllConsultationsSorted() {
-        Object[] consultationsArray = consultationList.toArray();
+        Object[] consultationsArray = consultationList.toArray(); //adt method
 
         SetAndQueueInterface<Consultation> tempList = new SetAndQueue<>();
         for (Object obj : consultationsArray) {
-            tempList.add((Consultation) obj);
+            tempList.add((Consultation) obj); //adt method
         }
-        tempList.sort();
-        
-        Object[] sortedConsultationsArray = tempList.toArray();
+        tempList.sort(); //adt method
+
+        Object[] sortedConsultationsArray = tempList.toArray(); //adt method
         Consultation[] consultationArray = new Consultation[sortedConsultationsArray.length];
         for (int i = 0; i < sortedConsultationsArray.length; i++) {
             consultationArray[i] = (Consultation) sortedConsultationsArray[i];
@@ -134,7 +134,7 @@ public class ConsultationManagement {
         System.out.print("Enter consultation ID to search: ");
         String consultationId = scanner.nextLine();
         
-        Object[] consultationsArray = consultationList.toArray();
+        Object[] consultationsArray = consultationList.toArray(); //adt method
         Consultation foundConsultation = null;
         
         for (Object obj : consultationsArray) {
@@ -156,17 +156,17 @@ public class ConsultationManagement {
         System.out.print("Enter doctor ID to search consultations: ");
         String doctorId = scanner.nextLine();
         
-        Object[] consultationsArray = consultationList.toArray();
+        Object[] consultationsArray = consultationList.toArray(); //adt method
         String[] headers = {"Consultation ID", "Patient Name", "Date", "Status"};
         SetAndQueueInterface<Object[]> rowList = new SetAndQueue<>();
         for (Object obj : consultationsArray) {
             Consultation consultation = (Consultation) obj;
             if (consultation.getDoctorId().equals(doctorId)) {
-                rowList.add(new Object[]{consultation.getConsultationId(), getPatientName(consultation.getPatientId()), consultation.getConsultationDate(), consultation.getStatus()});
+                rowList.add(new Object[]{consultation.getConsultationId(), getPatientName(consultation.getPatientId()), consultation.getConsultationDate(), consultation.getStatus()}); //adt method
             }
         }
-        Object[][] rows = new Object[rowList.size()][headers.length];
-        Object[] rowArray = rowList.toArray();
+        Object[][] rows = new Object[rowList.size()][headers.length]; //adt method
+        Object[] rowArray = rowList.toArray(); //adt method
         for (int i = 0; i < rowArray.length; i++) {
             rows[i] = (Object[]) rowArray[i];
         }
@@ -175,7 +175,7 @@ public class ConsultationManagement {
             headers,
             rows
         ));
-        if (rowList.isEmpty()) {
+        if (rowList.isEmpty()) { //adt method
             System.out.println("No consultations found for this doctor.");
         }
         System.out.println("Press Enter to continue...");
@@ -186,17 +186,17 @@ public class ConsultationManagement {
         System.out.print("Enter patient ID to search consultations: ");
         String patientId = scanner.nextLine();
         
-        Object[] consultationsArray = consultationList.toArray();
+        Object[] consultationsArray = consultationList.toArray(); //adt method
         String[] headers = {"Consultation ID", "Doctor Name", "Date", "Status"};
         SetAndQueueInterface<Object[]> rowList = new SetAndQueue<>();
         for (Object obj : consultationsArray) {
             Consultation consultation = (Consultation) obj;
             if (consultation.getPatientId().equals(patientId)) {
-                rowList.add(new Object[]{consultation.getConsultationId(), getDoctorName(consultation.getDoctorId()), consultation.getConsultationDate(), consultation.getStatus()});
+                rowList.add(new Object[]{consultation.getConsultationId(), getDoctorName(consultation.getDoctorId()), consultation.getConsultationDate(), consultation.getStatus()}); //adt method
             }
         }
-        Object[][] rows = new Object[rowList.size()][headers.length];
-        Object[] rowArray = rowList.toArray();
+        Object[][] rows = new Object[rowList.size()][headers.length]; //adt method
+        Object[] rowArray = rowList.toArray(); //adt method
         for (int i = 0; i < rowArray.length; i++) {
             rows[i] = (Object[]) rowArray[i];
         }
@@ -205,7 +205,7 @@ public class ConsultationManagement {
             headers,
             rows
         ));
-        if (rowList.isEmpty()) {
+        if (rowList.isEmpty()) { //adt method
             System.out.println("No consultations found for this patient.");
         }
         System.out.println("Press Enter to continue...");
@@ -217,12 +217,12 @@ public class ConsultationManagement {
         System.out.println("        REMOVE CONSULTATION");
         System.out.println(StringUtility.repeatString("=", 90));
         
-        System.out.println("📋 CURRENT CONSULTATION LIST:");
+        System.out.println("CURRENT CONSULTATION LIST:");
         System.out.println(StringUtility.repeatString("-", 90));
         System.out.printf("%-15s %-30s %-40s %-15s %-15s\n", "Consultation ID", "Patient Name", "Doctor Name", "Date", "Status");
         System.out.println(StringUtility.repeatString("-", 90));
         
-        Object[] consultationsArray = consultationList.toArray();
+        Object[] consultationsArray = consultationList.toArray(); //adt method
         for (Object obj : consultationsArray) {
             Consultation consultation = (Consultation) obj;
             System.out.printf("%-15s %-30s %-40s %-15s %-15s\n", 
@@ -246,22 +246,22 @@ public class ConsultationManagement {
             
             String confirm = InputValidator.getValidString(scanner, "Are you sure you want to remove this consultation? (yes/no): ");
             if (confirm.toLowerCase().equals("yes")) {
-                boolean removed = consultationList.remove(consultation);
+                boolean removed = consultationList.remove(consultation); //adt method
                 if (removed) {
-                    System.out.println("✅ Consultation removed successfully!");
+                    System.out.println("[OK] Consultation removed successfully!");
                 } else {
-                    System.out.println("❌ Failed to remove consultation from system!");
+                    System.out.println("[ERROR] Failed to remove consultation from system!");
                 }
             } else {
-                System.out.println("❌ Consultation removal cancelled.");
+                System.out.println("[ERROR] Consultation removal cancelled.");
             }
         } else {
-            System.out.println("❌ Consultation not found!");
+            System.out.println("[ERROR] Consultation not found!");
         }
     }
     
     private Consultation findConsultationById(String consultationId) {
-        Object[] consultationsArray = consultationList.toArray();
+        Object[] consultationsArray = consultationList.toArray(); //adt method
         for (Object obj : consultationsArray) {
             Consultation consultation = (Consultation) obj;
             if (consultation.getConsultationId().equals(consultationId)) {
@@ -280,7 +280,7 @@ public class ConsultationManagement {
         System.out.println("Doctor: " + getDoctorName(consultation.getDoctorId()) + " (ID: " + consultation.getDoctorId() + ")");
         System.out.println("Date: " + consultation.getConsultationDate());
         System.out.println("Status: " + consultation.getStatus());
-        System.out.println("Notes: " + (consultation.getNotes().isEmpty() ? "None" : consultation.getNotes()));
+        System.out.println("Notes: " + (consultation.getNotes().isEmpty() ? "None" : consultation.getNotes())); //adt method
 
         System.out.println(StringUtility.repeatString("-", 60));
         System.out.println("Press Enter to continue...");
@@ -294,16 +294,16 @@ public class ConsultationManagement {
         System.out.println("Generated at: " + utility.StringUtility.getCurrentDateTime());
         System.out.println(utility.StringUtility.repeatString("-", 80));
 
-        Object[] consultationsArray = consultationList.toArray();
+        Object[] consultationsArray = consultationList.toArray(); //adt method
         int totalConsultations = consultationsArray.length;
 
         SetAndQueueInterface<String> uniqueDoctors = new SetAndQueue<>();
         int maxConsultations = 0;
-        
+
         for (Object obj : consultationsArray) {
             Consultation consultation = (Consultation) obj;
             String doctorId = consultation.getDoctorId();
-            uniqueDoctors.add(doctorId);
+            uniqueDoctors.add(doctorId); //adt method
 
             int consultationCount = countConsultationsForDoctor(doctorId, consultationsArray);
             if (consultationCount > maxConsultations) {
@@ -311,7 +311,7 @@ public class ConsultationManagement {
             }
         }
 
-        Object[] doctorsArray = uniqueDoctors.toArray();
+        Object[] doctorsArray = uniqueDoctors.toArray(); //adt method
         int[] consultationCounts = new int[doctorsArray.length];
         
         for (int i = 0; i < doctorsArray.length; i++) {
@@ -361,11 +361,11 @@ public class ConsultationManagement {
     }
     
     public int getTotalConsultationCount() {
-        return consultationList.size();
+        return consultationList.size(); //adt method
     }
-    
+
     public Object[] getAllConsultations() {
-        return consultationList.toArray();
+        return consultationList.toArray(); //adt method
     }
     
     private int getUserInputInt(int min, int max) {

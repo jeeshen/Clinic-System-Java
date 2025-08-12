@@ -13,8 +13,8 @@ import adt.SetAndQueueInterface;
 
 public class DataInitializer {
     public static Medicine[] initializeSampleMedicines() {
-        Medicine[] medicines = new Medicine[20];
-        
+        Medicine[] medicines = new Medicine[40];
+
         medicines[0] = new Medicine("MED001", "Paracetamol", "Panadol", 50, "31-12-2025", 8.50, "Pain Relief", "Paracetamol", "Analgesic");
         medicines[1] = new Medicine("MED002", "Amoxicillin", "Amoxil", 30, "30-09-2025", 15.80, "Antibiotic", "Amoxicillin", "Antibiotic");
         medicines[2] = new Medicine("MED003", "Ibuprofen", "Advil", 25, "15-10-2025", 12.90, "Pain Relief", "Ibuprofen", "NSAID");
@@ -35,15 +35,35 @@ public class DataInitializer {
         medicines[17] = new Medicine("MED018", "Pantoprazole", "Protonix", 20, "10-01-2027", 31.20, "Acid Reflux", "Pantoprazole", "Proton Pump Inhibitor");
         medicines[18] = new Medicine("MED019", "Duloxetine", "Cymbalta", 10, "05-02-2027", 67.80, "Depression Treatment", "Duloxetine", "SNRI");
         medicines[19] = new Medicine("MED020", "Losartan", "Cozaar", 28, "20-03-2027", 29.60, "Hypertension", "Losartan", "Angiotensin Receptor Blocker");
-        
+        medicines[20] = new Medicine("MED021", "Paracetamol", "Panadol Active", 5, "31-12-2025", 8.50, "Pain Relief", "Paracetamol", "Analgesic");
+        medicines[21] = new Medicine("MED022", "Cephalexin", "Keflex", 35, "15-04-2026", 18.90, "Antibiotic", "Cephalexin", "Antibiotic");
+        medicines[22] = new Medicine("MED023", "Diclofenac", "Voltaren", 42, "20-05-2026", 14.70, "Pain Relief", "Diclofenac", "NSAID");
+        medicines[23] = new Medicine("MED024", "Ranitidine", "Zantac", 38, "25-06-2026", 19.80, "Acid Reflux", "Ranitidine", "H2 Receptor Antagonist");
+        medicines[24] = new Medicine("MED025", "Fexofenadine", "Allegra", 28, "30-07-2026", 21.50, "Allergy Relief", "Fexofenadine", "Antihistamine");
+        medicines[25] = new Medicine("MED026", "Glipizide", "Glucotrol", 33, "10-08-2026", 26.80, "Diabetes Management", "Glipizide", "Sulfonylurea");
+        medicines[26] = new Medicine("MED027", "Nifedipine", "Adalat", 29, "15-09-2026", 35.40, "Hypertension", "Nifedipine", "Calcium Channel Blocker");
+        medicines[27] = new Medicine("MED028", "Budesonide", "Pulmicort", 24, "20-10-2026", 52.30, "Asthma Prevention", "Budesonide", "Corticosteroid");
+        medicines[28] = new Medicine("MED029", "Escitalopram", "Lexapro", 18, "25-11-2026", 48.90, "Depression Treatment", "Escitalopram", "SSRI");
+        medicines[29] = new Medicine("MED030", "Rosuvastatin", "Crestor", 31, "30-12-2026", 62.70, "Cholesterol Management", "Rosuvastatin", "Statin");
+        medicines[30] = new Medicine("MED031", "Naproxen", "Aleve", 26, "15-01-2027", 11.40, "Pain Relief", "Naproxen", "NSAID");
+        medicines[31] = new Medicine("MED032", "Metoprolol", "Lopressor", 37, "20-02-2027", 24.60, "Hypertension", "Metoprolol", "Beta Blocker");
+        medicines[32] = new Medicine("MED033", "Prednisone", "Deltasone", 22, "25-03-2027", 15.80, "Anti-inflammatory", "Prednisone", "Corticosteroid");
+        medicines[33] = new Medicine("MED034", "Tramadol", "Ultram", 19, "30-04-2027", 28.70, "Pain Relief", "Tramadol", "Opioid Analgesic");
+        medicines[34] = new Medicine("MED035", "Warfarin", "Coumadin", 16, "15-05-2027", 12.30, "Blood Thinner", "Warfarin", "Anticoagulant");
+        medicines[35] = new Medicine("MED036", "Levothyroxine", "Synthroid", 41, "20-06-2027", 18.90, "Thyroid Hormone", "Levothyroxine", "Hormone");
+        medicines[36] = new Medicine("MED037", "Hydrochlorothiazide", "Microzide", 34, "25-07-2027", 16.50, "Diuretic", "Hydrochlorothiazide", "Thiazide Diuretic");
+        medicines[37] = new Medicine("MED038", "Alprazolam", "Xanax", 13, "30-08-2027", 22.80, "Anxiety Treatment", "Alprazolam", "Benzodiazepine");
+        medicines[38] = new Medicine("MED039", "Gabapentin", "Neurontin", 27, "15-09-2027", 31.40, "Nerve Pain", "Gabapentin", "Anticonvulsant");
+        medicines[39] = new Medicine("MED040", "Clonazepam", "Klonopin", 15, "20-10-2027", 19.60, "Seizure Control", "Clonazepam", "Benzodiazepine");
+
         return medicines;
     }
     
     public static Patient[] initializeSamplePatients() {
-        Patient[] patients = new Patient[25];
-        
+        Patient[] patients = new Patient[40];
+
         patients[0] = new Patient(1, "Ahmad bin Abdullah", 35, "Male", "Penicillin", "012-3456789", "123 Jalan Tunku Abdul Rahman, Kuala Lumpur", "01-07-2025", "Hypertension", "Active");
-        patients[1] = new Patient(2, "Siti binti Mohamed", 28, "Female", "None", "012-3456790", "456 Jalan Sultan Ismail, Petaling Jaya", "02-07-2025", "Diabetes", "Active");
+        patients[1] = new Patient(2, "Siti binti Mohamed", 28, "Female", "Paracetamol", "012-3456790", "456 Jalan Sultan Ismail, Petaling Jaya", "02-07-2025", "Diabetes", "Active");
         patients[2] = new Patient(3, "Raj a/l Kumar", 45, "Male", "Sulfa", "012-3456791", "789 Jalan Bukit Bintang, Kuala Lumpur", "03-07-2025", "Asthma", "Active");
         patients[3] = new Patient(4, "Lim Siew Mei", 32, "Female", "None", "012-3456792", "321 Jalan Ampang, Kuala Lumpur", "04-07-2025", "None", "Active");
         patients[4] = new Patient(5, "Tan Ah Kow", 50, "Male", "Codeine", "012-3456793", "654 Jalan Pudu, Kuala Lumpur", "05-07-2025", "Heart Disease", "Active");
@@ -67,13 +87,28 @@ public class DataInitializer {
         patients[22] = new Patient(23, "Muthu a/l Velu", 37, "Male", "None", "012-3456811", "159 Jalan Dang Wangi, Kuala Lumpur", "23-07-2025", "Anxiety", "Active");
         patients[23] = new Patient(24, "Lau Siew Mei", 29, "Female", "Shellfish", "012-3456812", "753 Jalan Tun Razak, Kuala Lumpur", "24-07-2025", "None", "Active");
         patients[24] = new Patient(25, "Hassan bin Ali", 46, "Male", "None", "012-3456813", "951 Jalan Ampang, Kuala Lumpur", "25-07-2025", "High Cholesterol", "Active");
-        
+        patients[25] = new Patient(26, "Aminah binti Rashid", 33, "Female", "Aspirin", "012-3456814", "123 Jalan Sentul, Kuala Lumpur", "26-07-2025", "Arthritis", "Active");
+        patients[26] = new Patient(27, "Ravi a/l Shankar", 41, "Male", "None", "012-3456815", "456 Jalan Kepong, Kuala Lumpur", "27-07-2025", "Hypertension", "Active");
+        patients[27] = new Patient(28, "Lily Tan Mei Hua", 24, "Female", "Shellfish", "012-3456816", "789 Jalan Setapak, Kuala Lumpur", "28-07-2025", "Allergic Rhinitis", "Active");
+        patients[28] = new Patient(29, "Azman bin Yusof", 55, "Male", "Penicillin", "012-3456817", "321 Jalan Wangsa Maju, Kuala Lumpur", "29-07-2025", "Diabetes", "Active");
+        patients[29] = new Patient(30, "Grace Lim Soo Cheng", 38, "Female", "None", "012-3456818", "654 Jalan Segambut, Kuala Lumpur", "30-07-2025", "Migraine", "Active");
+        patients[30] = new Patient(31, "Suresh a/l Krishnan", 43, "Male", "Iodine", "012-3456819", "987 Jalan Batu Caves, Selangor", "31-07-2025", "Thyroid Disorder", "Active");
+        patients[31] = new Patient(32, "Farah binti Kamal", 27, "Female", "Latex", "012-3456820", "147 Jalan Rawang, Selangor", "01-08-2025", "Asthma", "Active");
+        patients[32] = new Patient(33, "Danny Ng Wei Ming", 49, "Male", "None", "012-3456821", "258 Jalan Kajang, Selangor", "02-08-2025", "Sleep Apnea", "Active");
+        patients[33] = new Patient(34, "Khadijah binti Hassan", 31, "Female", "Sulfa", "012-3456822", "369 Jalan Selayang, Selangor", "03-08-2025", "Depression", "Active");
+        patients[34] = new Patient(35, "Vincent Loh Chee Keong", 36, "Male", "None", "012-3456823", "741 Jalan Subang, Selangor", "04-08-2025", "High Cholesterol", "Active");
+        patients[35] = new Patient(36, "Rohani binti Ibrahim", 42, "Female", "Peanuts", "012-3456824", "852 Jalan Shah Alam, Selangor", "05-08-2025", "Heart Disease", "Active");
+        patients[36] = new Patient(37, "Prakash a/l Devi", 28, "Male", "None", "012-3456825", "963 Jalan Klang, Selangor", "06-08-2025", "Anxiety", "Active");
+        patients[37] = new Patient(38, "Michelle Wong Ai Ling", 35, "Female", "Codeine", "012-3456826", "159 Jalan Puchong, Selangor", "07-08-2025", "Chronic Pain", "Active");
+        patients[38] = new Patient(39, "Hafiz bin Rahman", 40, "Male", "None", "012-3456827", "357 Jalan Cyberjaya, Selangor", "08-08-2025", "Diabetes", "Active");
+        patients[39] = new Patient(40, "Stephanie Tan Li Ying", 26, "Female", "Shellfish", "012-3456828", "753 Jalan Putrajaya, Putrajaya", "09-08-2025", "Allergic Dermatitis", "Active");
+
         return patients;
     }
 
     public static Doctor[] initializeSampleDoctors() {
-        Doctor[] doctors = new Doctor[12];
-        
+        Doctor[] doctors = new Doctor[20];
+
         doctors[0] = new Doctor("DOC001", "Dr. Sarah Chen Mei Ling", "Cardiology", "012-3456780", "sarah.chen@chubbyclinic.com.my", true, "Mon-Wed 9AM-5PM", false, "", "");
         doctors[1] = new Doctor("DOC002", "Dr. Robert Kim Ah Kow", "Pediatrics", "012-3456781", "robert.kim@chubbyclinic.com.my", true, "Tue-Thu 8AM-4PM", false, "", "");
         doctors[2] = new Doctor("DOC003", "Dr. Lisa Wong Siew Mei", "Neurology", "012-3456782", "lisa.wong@chubbyclinic.com.my", true, "Wed-Fri 10AM-6PM", false, "", "");
@@ -86,13 +121,21 @@ public class DataInitializer {
         doctors[9] = new Doctor("DOC010", "Dr. Christopher Tan Ah Beng", "Radiology", "012-3456789", "christopher.tan@chubbyclinic.com.my", true, "Mon-Fri 8AM-4PM", false, "", "");
         doctors[10] = new Doctor("DOC011", "Dr. Emily Wong Mei Ling", "Obstetrics & Gynecology", "012-3456790", "emily.wong@chubbyclinic.com.my", true, "Tue-Sat 9AM-5PM", false, "", "");
         doctors[11] = new Doctor("DOC012", "Dr. Benjamin Raj a/l Kumar", "Urology", "012-3456791", "benjamin.raj@chubbyclinic.com.my", true, "Mon-Thu 10AM-6PM", false, "", "");
-        
+        doctors[12] = new Doctor("DOC013", "Dr. Rachel Lim Hui Ying", "Internal Medicine", "012-3456792", "rachel.lim@chubbyclinic.com.my", true, "Mon-Fri 9AM-5PM", false, "", "");
+        doctors[13] = new Doctor("DOC014", "Dr. Kevin Tan Wei Jie", "Gastroenterology", "012-3456793", "kevin.tan@chubbyclinic.com.my", true, "Tue-Sat 8AM-4PM", false, "", "");
+        doctors[14] = new Doctor("DOC015", "Dr. Priya Sharma a/p Ravi", "Rheumatology", "012-3456794", "priya.sharma@chubbyclinic.com.my", true, "Wed-Fri 10AM-6PM", false, "", "");
+        doctors[15] = new Doctor("DOC016", "Dr. Ahmad Farid bin Hassan", "Pulmonology", "012-3456795", "ahmad.farid@chubbyclinic.com.my", false, "Mon-Thu 9AM-5PM", true, "10-08-2025", "15-08-2025");
+        doctors[16] = new Doctor("DOC017", "Dr. Catherine Ng Siew Lan", "Nephrology", "012-3456796", "catherine.ng@chubbyclinic.com.my", true, "Mon-Fri 8AM-4PM", false, "", "");
+        doctors[17] = new Doctor("DOC018", "Dr. Rajesh Kumar a/l Devi", "Hematology", "012-3456797", "rajesh.kumar@chubbyclinic.com.my", true, "Tue-Thu 9AM-5PM", false, "", "");
+        doctors[18] = new Doctor("DOC019", "Dr. Melissa Chan Ai Ling", "Infectious Disease", "012-3456798", "melissa.chan@chubbyclinic.com.my", true, "Wed-Sat 10AM-6PM", false, "", "");
+        doctors[19] = new Doctor("DOC020", "Dr. Hafiz Ismail bin Omar", "Anesthesiology", "012-3456799", "hafiz.ismail@chubbyclinic.com.my", true, "24/7 On-Call", false, "", "");
+
         return doctors;
     }
 
     public static Consultation[] initializeSampleConsultations() {
-        Consultation[] consultations = new Consultation[20];
-        
+        Consultation[] consultations = new Consultation[35];
+
         consultations[0] = new Consultation("CON001", "1", "DOC001", "10-07-2025", "Completed", "Patient shows signs of hypertension");
         consultations[1] = new Consultation("CON002", "2", "DOC002", "12-07-2025", "Completed", "Regular checkup");
         consultations[2] = new Consultation("CON003", "3", "DOC003", "15-07-2025", "Completed", "Neurological examination completed");
@@ -113,13 +156,28 @@ public class DataInitializer {
         consultations[17] = new Consultation("CON018", "18", "DOC012", "30-07-2025", "Completed", "Urological consultation");
         consultations[18] = new Consultation("CON019", "19", "DOC001", "31-07-2025", "Completed", "Cardiac examination");
         consultations[19] = new Consultation("CON020", "20", "DOC006", "01-08-2025", "Completed", "Psychiatric evaluation");
-        
+        consultations[20] = new Consultation("CON021", "21", "DOC013", "02-08-2025", "Completed", "Internal medicine consultation");
+        consultations[21] = new Consultation("CON022", "22", "DOC014", "03-08-2025", "Completed", "Gastroenterology examination");
+        consultations[22] = new Consultation("CON023", "23", "DOC015", "04-08-2025", "Completed", "Rheumatology assessment");
+        consultations[23] = new Consultation("CON024", "24", "DOC017", "05-08-2025", "Completed", "Nephrology consultation");
+        consultations[24] = new Consultation("CON025", "25", "DOC018", "06-08-2025", "Completed", "Hematology examination");
+        consultations[25] = new Consultation("CON026", "26", "DOC019", "07-08-2025", "Completed", "Infectious disease consultation");
+        consultations[26] = new Consultation("CON027", "27", "DOC001", "08-08-2025", "Completed", "Follow-up cardiac assessment");
+        consultations[27] = new Consultation("CON028", "28", "DOC007", "09-08-2025", "Completed", "Dermatology follow-up");
+        consultations[28] = new Consultation("CON029", "29", "DOC005", "10-08-2025", "Completed", "Endocrinology consultation");
+        consultations[29] = new Consultation("CON030", "30", "DOC013", "11-08-2025", "Completed", "General health checkup");
+        consultations[30] = new Consultation("CON031", "31", "DOC006", "12-08-2025", "Completed", "Mental health follow-up");
+        consultations[31] = new Consultation("CON032", "32", "DOC002", "13-08-2025", "Completed", "Pediatric vaccination");
+        consultations[32] = new Consultation("CON033", "33", "DOC008", "14-08-2025", "Completed", "Emergency treatment");
+        consultations[33] = new Consultation("CON034", "34", "DOC014", "15-08-2025", "Completed", "Digestive system examination");
+        consultations[34] = new Consultation("CON035", "35", "DOC015", "16-08-2025", "Completed", "Joint pain assessment");
+
         return consultations;
     }
 
     public static Treatment[] initializeSampleTreatments() {
-        Treatment[] treatments = new Treatment[15];
-        
+        Treatment[] treatments = new Treatment[30];
+
         treatments[0] = new Treatment("TRE001", "1", "DOC001", "Hypertension", "MED007", "10-07-2025");
         treatments[1] = new Treatment("TRE002", "3", "DOC003", "Migraine", "MED003", "15-07-2025");
         treatments[2] = new Treatment("TRE003", "2", "DOC005", "Diabetes Type 2", "MED006", "16-07-2025");
@@ -135,13 +193,28 @@ public class DataInitializer {
         treatments[12] = new Treatment("TRE013", "16", "DOC011", "Pregnancy Care", "MED004", "28-07-2025");
         treatments[13] = new Treatment("TRE014", "17", "DOC012", "Urinary Tract Infection", "MED002", "29-07-2025");
         treatments[14] = new Treatment("TRE015", "18", "DOC001", "Heart Disease Management", "MED007", "30-07-2025");
-        
+        treatments[15] = new Treatment("TRE016", "19", "DOC013", "Gastritis", "MED018", "02-08-2025");
+        treatments[16] = new Treatment("TRE017", "20", "DOC014", "Inflammatory Bowel Disease", "MED033", "03-08-2025");
+        treatments[17] = new Treatment("TRE018", "21", "DOC015", "Rheumatoid Arthritis", "MED031", "04-08-2025");
+        treatments[18] = new Treatment("TRE019", "22", "DOC017", "Chronic Kidney Disease", "MED014", "05-08-2025");
+        treatments[19] = new Treatment("TRE020", "23", "DOC018", "Anemia", "MED012", "06-08-2025");
+        treatments[20] = new Treatment("TRE021", "24", "DOC019", "Pneumonia", "MED022", "07-08-2025");
+        treatments[21] = new Treatment("TRE022", "25", "DOC001", "Atrial Fibrillation", "MED032", "08-08-2025");
+        treatments[22] = new Treatment("TRE023", "26", "DOC007", "Psoriasis", "MED028", "09-08-2025");
+        treatments[23] = new Treatment("TRE024", "27", "DOC005", "Hyperthyroidism", "MED036", "10-08-2025");
+        treatments[24] = new Treatment("TRE025", "28", "DOC013", "Peptic Ulcer", "MED024", "11-08-2025");
+        treatments[25] = new Treatment("TRE026", "29", "DOC006", "Bipolar Disorder", "MED029", "12-08-2025");
+        treatments[26] = new Treatment("TRE027", "30", "DOC002", "Allergic Asthma", "MED025", "13-08-2025");
+        treatments[27] = new Treatment("TRE028", "31", "DOC008", "Acute Myocardial Infarction", "MED035", "14-08-2025");
+        treatments[28] = new Treatment("TRE029", "32", "DOC014", "Crohn's Disease", "MED033", "15-08-2025");
+        treatments[29] = new Treatment("TRE030", "33", "DOC015", "Osteoarthritis", "MED034", "16-08-2025");
+
         return treatments;
     }
 
     public static PharmacyTransaction[] initializeSampleTransactions() {
-        PharmacyTransaction[] transactions = new PharmacyTransaction[25];
-        
+        PharmacyTransaction[] transactions = new PharmacyTransaction[40];
+
         transactions[0] = new PharmacyTransaction("TXN001", "1", "MED007", 2, "10-07-2025");
         transactions[1] = new PharmacyTransaction("TXN002", "3", "MED003", 1, "15-07-2025");
         transactions[2] = new PharmacyTransaction("TXN003", "2", "MED006", 3, "16-07-2025");
@@ -167,12 +240,27 @@ public class DataInitializer {
         transactions[22] = new PharmacyTransaction("TXN023", "23", "MED020", 1, "07-08-2025");
         transactions[23] = new PharmacyTransaction("TXN024", "24", "MED011", 2, "08-08-2025");
         transactions[24] = new PharmacyTransaction("TXN025", "25", "MED012", 1, "09-08-2025");
-        
+        transactions[25] = new PharmacyTransaction("TXN026", "26", "MED022", 1, "10-08-2025");
+        transactions[26] = new PharmacyTransaction("TXN027", "27", "MED023", 2, "11-08-2025");
+        transactions[27] = new PharmacyTransaction("TXN028", "28", "MED024", 1, "12-08-2025");
+        transactions[28] = new PharmacyTransaction("TXN029", "29", "MED025", 1, "13-08-2025");
+        transactions[29] = new PharmacyTransaction("TXN030", "30", "MED026", 2, "14-08-2025");
+        transactions[30] = new PharmacyTransaction("TXN031", "31", "MED027", 1, "15-08-2025");
+        transactions[31] = new PharmacyTransaction("TXN032", "32", "MED028", 1, "16-08-2025");
+        transactions[32] = new PharmacyTransaction("TXN033", "33", "MED029", 2, "17-08-2025");
+        transactions[33] = new PharmacyTransaction("TXN034", "34", "MED030", 1, "18-08-2025");
+        transactions[34] = new PharmacyTransaction("TXN035", "35", "MED031", 1, "19-08-2025");
+        transactions[35] = new PharmacyTransaction("TXN036", "36", "MED032", 2, "20-08-2025");
+        transactions[36] = new PharmacyTransaction("TXN037", "37", "MED033", 1, "21-08-2025");
+        transactions[37] = new PharmacyTransaction("TXN038", "38", "MED034", 1, "22-08-2025");
+        transactions[38] = new PharmacyTransaction("TXN039", "39", "MED035", 2, "23-08-2025");
+        transactions[39] = new PharmacyTransaction("TXN040", "40", "MED036", 1, "24-08-2025");
+
         return transactions;
     }
 
     public static Prescription[] initializeSamplePrescriptions() {
-        Prescription[] prescriptions = new Prescription[20];
+        Prescription[] prescriptions = new Prescription[35];
 
         SetAndQueueInterface<PrescribedMedicine> pm1 = new SetAndQueue<>();
         pm1.add(new PrescribedMedicine("PM001", "PRE001", "MED007", "Amlodipine", 30, "1 tablet daily", "Take in the morning", 32.80, 984.00, true));
@@ -233,6 +321,51 @@ public class DataInitializer {
         
         SetAndQueueInterface<PrescribedMedicine> pm20 = new SetAndQueue<>();
         pm20.add(new PrescribedMedicine("PM020", "PRE020", "MED011", "Aspirin", 30, "1 tablet daily", "Take with food", 6.50, 195.00, false));
+
+        SetAndQueueInterface<PrescribedMedicine> pm21 = new SetAndQueue<>();
+        pm21.add(new PrescribedMedicine("PM021", "PRE021", "MED022", "Cephalexin", 14, "1 capsule four times daily", "Take with food", 18.90, 264.60, true));
+
+        SetAndQueueInterface<PrescribedMedicine> pm22 = new SetAndQueue<>();
+        pm22.add(new PrescribedMedicine("PM022", "PRE022", "MED023", "Diclofenac", 30, "1 tablet twice daily", "Take with food", 14.70, 441.00, false));
+
+        SetAndQueueInterface<PrescribedMedicine> pm23 = new SetAndQueue<>();
+        pm23.add(new PrescribedMedicine("PM023", "PRE023", "MED024", "Ranitidine", 30, "1 tablet twice daily", "Take before meals", 19.80, 594.00, true));
+
+        SetAndQueueInterface<PrescribedMedicine> pm24 = new SetAndQueue<>();
+        pm24.add(new PrescribedMedicine("PM024", "PRE024", "MED025", "Fexofenadine", 30, "1 tablet daily", "Take in the morning", 21.50, 645.00, true));
+
+        SetAndQueueInterface<PrescribedMedicine> pm25 = new SetAndQueue<>();
+        pm25.add(new PrescribedMedicine("PM025", "PRE025", "MED026", "Glipizide", 30, "1 tablet twice daily", "Take with meals", 26.80, 804.00, false));
+
+        SetAndQueueInterface<PrescribedMedicine> pm26 = new SetAndQueue<>();
+        pm26.add(new PrescribedMedicine("PM026", "PRE026", "MED027", "Nifedipine", 30, "1 tablet daily", "Take in the morning", 35.40, 1062.00, true));
+
+        SetAndQueueInterface<PrescribedMedicine> pm27 = new SetAndQueue<>();
+        pm27.add(new PrescribedMedicine("PM027", "PRE027", "MED028", "Budesonide", 1, "2 puffs twice daily", "Rinse mouth after use", 52.30, 52.30, true));
+
+        SetAndQueueInterface<PrescribedMedicine> pm28 = new SetAndQueue<>();
+        pm28.add(new PrescribedMedicine("PM028", "PRE028", "MED029", "Escitalopram", 30, "1 tablet daily", "Take in the morning", 48.90, 1467.00, false));
+
+        SetAndQueueInterface<PrescribedMedicine> pm29 = new SetAndQueue<>();
+        pm29.add(new PrescribedMedicine("PM029", "PRE029", "MED030", "Rosuvastatin", 30, "1 tablet daily", "Take in the evening", 62.70, 1881.00, true));
+
+        SetAndQueueInterface<PrescribedMedicine> pm30 = new SetAndQueue<>();
+        pm30.add(new PrescribedMedicine("PM030", "PRE030", "MED031", "Naproxen", 20, "1 tablet twice daily", "Take with food", 11.40, 228.00, true));
+
+        SetAndQueueInterface<PrescribedMedicine> pm31 = new SetAndQueue<>();
+        pm31.add(new PrescribedMedicine("PM031", "PRE031", "MED032", "Metoprolol", 30, "1 tablet twice daily", "Take with food", 24.60, 738.00, false));
+
+        SetAndQueueInterface<PrescribedMedicine> pm32 = new SetAndQueue<>();
+        pm32.add(new PrescribedMedicine("PM032", "PRE032", "MED033", "Prednisone", 10, "1 tablet daily", "Take with food", 15.80, 158.00, true));
+
+        SetAndQueueInterface<PrescribedMedicine> pm33 = new SetAndQueue<>();
+        pm33.add(new PrescribedMedicine("PM033", "PRE033", "MED034", "Tramadol", 20, "1 tablet every 6 hours", "Take as needed for pain", 28.70, 574.00, true));
+
+        SetAndQueueInterface<PrescribedMedicine> pm34 = new SetAndQueue<>();
+        pm34.add(new PrescribedMedicine("PM034", "PRE034", "MED035", "Warfarin", 30, "1 tablet daily", "Monitor INR regularly", 12.30, 369.00, false));
+
+        SetAndQueueInterface<PrescribedMedicine> pm35 = new SetAndQueue<>();
+        pm35.add(new PrescribedMedicine("PM035", "PRE035", "MED036", "Levothyroxine", 30, "1 tablet daily", "Take on empty stomach", 18.90, 567.00, true));
         
         prescriptions[0] = new Prescription("PRE001", "CON001", "1", "DOC001", "Hypertension", pm1, "10-07-2025", "active", 984.00, true);
         prescriptions[1] = new Prescription("PRE002", "CON003", "3", "DOC003", "Migraine", pm2, "15-07-2025", "active", 258.00, true);
@@ -254,7 +387,22 @@ public class DataInitializer {
         prescriptions[17] = new Prescription("PRE018", "CON002", "2", "DOC002", "Bacterial Infection", pm18, "12-07-2025", "completed", 331.80, true);
         prescriptions[18] = new Prescription("PRE019", "CON005", "5", "DOC001", "Allergic Reaction", pm19, "17-07-2025", "completed", 546.00, true);
         prescriptions[19] = new Prescription("PRE020", "CON007", "7", "DOC007", "Cardiovascular Prevention", pm20, "19-07-2025", "completed", 195.00, true);
-        
+        prescriptions[20] = new Prescription("PRE021", "CON021", "26", "DOC013", "Bacterial Infection", pm21, "02-08-2025", "active", 264.60, true);
+        prescriptions[21] = new Prescription("PRE022", "CON022", "27", "DOC014", "Arthritis", pm22, "03-08-2025", "active", 441.00, false);
+        prescriptions[22] = new Prescription("PRE023", "CON023", "28", "DOC015", "Gastritis", pm23, "04-08-2025", "active", 594.00, true);
+        prescriptions[23] = new Prescription("PRE024", "CON024", "29", "DOC017", "Allergic Rhinitis", pm24, "05-08-2025", "active", 645.00, true);
+        prescriptions[24] = new Prescription("PRE025", "CON025", "30", "DOC018", "Diabetes Type 2", pm25, "06-08-2025", "active", 804.00, false);
+        prescriptions[25] = new Prescription("PRE026", "CON026", "31", "DOC019", "Hypertension", pm26, "07-08-2025", "active", 1062.00, true);
+        prescriptions[26] = new Prescription("PRE027", "CON027", "32", "DOC001", "Asthma", pm27, "08-08-2025", "active", 52.30, true);
+        prescriptions[27] = new Prescription("PRE028", "CON028", "33", "DOC007", "Depression", pm28, "09-08-2025", "active", 1467.00, false);
+        prescriptions[28] = new Prescription("PRE029", "CON029", "34", "DOC005", "High Cholesterol", pm29, "10-08-2025", "active", 1881.00, true);
+        prescriptions[29] = new Prescription("PRE030", "CON030", "35", "DOC013", "Joint Pain", pm30, "11-08-2025", "active", 228.00, true);
+        prescriptions[30] = new Prescription("PRE031", "CON031", "36", "DOC006", "Hypertension", pm31, "12-08-2025", "active", 738.00, false);
+        prescriptions[31] = new Prescription("PRE032", "CON032", "37", "DOC002", "Inflammatory Condition", pm32, "13-08-2025", "active", 158.00, true);
+        prescriptions[32] = new Prescription("PRE033", "CON033", "38", "DOC008", "Chronic Pain", pm33, "14-08-2025", "active", 574.00, true);
+        prescriptions[33] = new Prescription("PRE034", "CON034", "39", "DOC014", "Atrial Fibrillation", pm34, "15-08-2025", "active", 369.00, false);
+        prescriptions[34] = new Prescription("PRE035", "CON035", "40", "DOC015", "Hypothyroidism", pm35, "16-08-2025", "active", 567.00, true);
+
         return prescriptions;
     }
 } 

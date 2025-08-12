@@ -3,6 +3,8 @@ package control;
 import adt.SetAndQueueInterface;
 import adt.SetAndQueue;
 import entity.Medicine;
+import entity.Prescription;
+import entity.PrescribedMedicine;
 import dao.DataInitializer;
 import utility.StringUtility;
 import java.util.Scanner;
@@ -11,28 +13,34 @@ import utility.InputValidator;
 public class PharmacyManagement {
     private SetAndQueueInterface<Medicine> medicineList = new SetAndQueue<>();
     private Scanner scanner;
+    private TreatmentManagement treatmentManagement;
+    private static final int LOW_STOCK_THRESHOLD = 10;
     
     public PharmacyManagement() {
         scanner = new Scanner(System.in);
         loadSampleData();
     }
+
+    public void setTreatmentManagement(TreatmentManagement treatmentManagement) {
+        this.treatmentManagement = treatmentManagement;
+    }
     
     private void loadSampleData() {
         Medicine[] sampleMedicines = DataInitializer.initializeSampleMedicines();
         for (Medicine medicine : sampleMedicines) {
-            medicineList.add(medicine);
+            medicineList.add(medicine); //adt method
         }
     }
     
     public void displayAllMedicinesSorted() {
-        Object[] medicinesArray = medicineList.toArray();
+        Object[] medicinesArray = medicineList.toArray(); //adt method
         SetAndQueueInterface<Medicine> tempList = new SetAndQueue<>();
         for (Object obj : medicinesArray) {
-            tempList.add((Medicine) obj);
+            tempList.add((Medicine) obj); //adt method
         }
-        tempList.sort();
-        
-        Object[] sortedMedicinesArray = tempList.toArray();
+        tempList.sort(); //adt method
+
+        Object[] sortedMedicinesArray = tempList.toArray(); //adt method
         Medicine[] medicineArray = new Medicine[sortedMedicinesArray.length];
         for (int i = 0; i < sortedMedicinesArray.length; i++) {
             medicineArray[i] = (Medicine) sortedMedicinesArray[i];
@@ -74,17 +82,17 @@ public class PharmacyManagement {
         System.out.print("Enter medicine name to search: ");
         String name = scanner.nextLine();
         
-        Object[] medicinesArray = medicineList.toArray();
+        Object[] medicinesArray = medicineList.toArray(); //adt method
         String[] headers = {"ID", "Name", "Brand", "Stock", "Price"};
         SetAndQueueInterface<Object[]> rowList = new SetAndQueue<>();
         for (Object obj : medicinesArray) {
             Medicine medicine = (Medicine) obj;
             if (medicine.getName().toLowerCase().contains(name.toLowerCase())) {
-                rowList.add(new Object[]{medicine.getMedicineId(), medicine.getName(), medicine.getBrand(), medicine.getStockQuantity(), "RM " + medicine.getPrice()});
+                rowList.add(new Object[]{medicine.getMedicineId(), medicine.getName(), medicine.getBrand(), medicine.getStockQuantity(), "RM " + medicine.getPrice()}); //adt method
             }
         }
-        Object[][] rows = new Object[rowList.size()][headers.length];
-        Object[] rowArray = rowList.toArray();
+        Object[][] rows = new Object[rowList.size()][headers.length]; //adt method
+        Object[] rowArray = rowList.toArray(); //adt method
         for (int i = 0; i < rowArray.length; i++) {
             rows[i] = (Object[]) rowArray[i];
         }
@@ -93,7 +101,7 @@ public class PharmacyManagement {
             headers,
             rows
         ));
-        if (rowList.isEmpty()) {
+        if (rowList.isEmpty()) { //adt method
             System.out.println("No medicines found with this name.");
         }
         System.out.println("Press Enter to continue...");
@@ -105,12 +113,9 @@ public class PharmacyManagement {
         System.out.println("        REMOVE MEDICINE");
         System.out.println(StringUtility.repeatString("=", 60));
         
-        System.out.println("📋 CURRENT MEDICINE LIST:");
-        System.out.println(StringUtility.repeatString("-", 60));
-        System.out.printf("%-8s %-20s %-15s %-8s %-10s %-10s\n", "ID", "Name", "Brand", "Stock", "Price", "Category");
-        System.out.println(StringUtility.repeatString("-", 60));
+        System.out.println("CURRENT MEDICINE LIST:");
         
-        Object[] medicinesArray = medicineList.toArray();
+        Object[] medicinesArray = medicineList.toArray(); //adt method
         for (Object obj : medicinesArray) {
             Medicine medicine = (Medicine) obj;
             System.out.printf("%-8s %-20s %-15s %-8s %-10s %-10s\n", 
@@ -135,17 +140,17 @@ public class PharmacyManagement {
             
             String confirm = InputValidator.getValidString(scanner, "Are you sure you want to remove this medicine? (yes/no): ");
             if (confirm.toLowerCase().equals("yes")) {
-                boolean removed = medicineList.remove(medicine);
+                boolean removed = medicineList.remove(medicine); //adt method
                 if (removed) {
-                    System.out.println("✅ Medicine removed successfully!");
+                    System.out.println("[OK] Medicine removed successfully!");
                 } else {
-                    System.out.println("❌ Failed to remove medicine from system!");
+                    System.out.println("[ERROR] Failed to remove medicine from system!");
                 }
             } else {
-                System.out.println("❌ Medicine removal cancelled.");
+                System.out.println("[ERROR] Medicine removal cancelled.");
             }
         } else {
-            System.out.println("❌ Medicine not found!");
+            System.out.println("[ERROR] Medicine not found!");
         }
     }
     
@@ -172,7 +177,7 @@ public class PharmacyManagement {
         System.out.println("                    UPDATE MEDICINE INFORMATION");
         System.out.println(StringUtility.repeatString("=", 80));
 
-        System.out.println("📋 CURRENT MEDICINE LIST:");
+        System.out.println("CURRENT MEDICINE LIST:");
         System.out.println(StringUtility.repeatString("-", 80));
         System.out.printf("%-12s %-25s %-15s %-10s %-10s %-10s\n", "ID", "Name", "Brand", "Stock", "Price", "Status");
         System.out.println(StringUtility.repeatString("-", 80));
@@ -220,38 +225,31 @@ public class PharmacyManagement {
             System.out.println("\n" + StringUtility.repeatString("-", 60));
             System.out.println("Enter new information (press Enter to keep current value):");
             System.out.println(StringUtility.repeatString("-", 60));
-            
-            // Update name
+
             System.out.print("Name [" + medicine.getName() + "]: ");
             String name = scanner.nextLine();
             if (!name.isEmpty()) medicine.setName(name);
-            
-            // Update brand
+
             System.out.print("Brand [" + medicine.getBrand() + "]: ");
             String brand = scanner.nextLine();
             if (!brand.isEmpty()) medicine.setBrand(brand);
-            
-            // Update purpose
+
             System.out.print("Purpose [" + medicine.getPurpose() + "]: ");
             String purpose = scanner.nextLine();
             if (!purpose.isEmpty()) medicine.setPurpose(purpose);
-            
-            // Update active ingredient
+
             System.out.print("Active Ingredient [" + medicine.getActiveIngredient() + "]: ");
             String activeIngredient = scanner.nextLine();
             if (!activeIngredient.isEmpty()) medicine.setActiveIngredient(activeIngredient);
-            
-            // Update category
+
             System.out.print("Category [" + medicine.getCategory() + "]: ");
             String category = scanner.nextLine();
             if (!category.isEmpty()) medicine.setCategory(category);
-            
-            // Update expiry date
+
             System.out.print("Expiry Date [" + medicine.getExpiryDate() + "] (YYYY-MM-DD): ");
             String expiryDate = scanner.nextLine();
             if (!expiryDate.isEmpty()) medicine.setExpiryDate(expiryDate);
-            
-            // Update price
+
             System.out.print("Price [" + String.format("%.2f", medicine.getPrice()) + "] (Enter new price or press Enter): ");
             String priceInput = scanner.nextLine();
             if (!priceInput.isEmpty()) {
@@ -267,13 +265,13 @@ public class PharmacyManagement {
                 }
             }
             
-            System.out.println("\n✅ Medicine information updated successfully!");
+            System.out.println("\n[OK] Medicine information updated successfully!");
             System.out.println("Updated " + medicine.getName() + " information.");
             
             System.out.println("\nUpdated medicine information:");
             displayMedicineDetails(medicine);
         } else {
-            System.out.println("❌ Medicine not found!");
+            System.out.println("[ERROR] Medicine not found!");
         }
     }
     
@@ -282,7 +280,7 @@ public class PharmacyManagement {
         System.out.println("                    UPDATE MEDICINE STOCK");
         System.out.println(StringUtility.repeatString("=", 80));
 
-        System.out.println("📋 CURRENT MEDICINE LIST:");
+        System.out.println("CURRENT MEDICINE LIST:");
         System.out.println(StringUtility.repeatString("-", 80));
         System.out.printf("%-12s %-25s %-15s %-10s %-10s %-10s\n", "ID", "Name", "Brand", "Stock", "Price", "Status");
         System.out.println(StringUtility.repeatString("-", 80));
@@ -339,7 +337,14 @@ public class PharmacyManagement {
                     int newStock = Integer.parseInt(stockInput);
                     if (newStock >= 0) {
                         medicine.setStockQuantity(newStock);
-                        System.out.println("\n✅ Medicine stock updated successfully!");
+                        //sync with treatment management inventory
+                        if (treatmentManagement != null) {
+                            Medicine tmMedicine = treatmentManagement.findMedicineById(medicine.getMedicineId());
+                            if (tmMedicine != null) {
+                                tmMedicine.setStockQuantity(newStock);
+                            }
+                        }
+                        System.out.println("\n[OK] Medicine stock updated successfully!");
                         System.out.println("Updated " + medicine.getName() + " stock to: " + newStock + " units");
                         
                         //show updated status
@@ -364,7 +369,7 @@ public class PharmacyManagement {
                 System.out.println("No changes made to stock quantity.");
             }
         } else {
-            System.out.println("❌ Medicine not found!");
+            System.out.println("[ERROR] Medicine not found!");
         }
     }
     
@@ -474,6 +479,510 @@ public class PharmacyManagement {
         System.out.println(StringUtility.repeatString("=", 60));
         System.out.println("Press Enter to continue...");
         scanner.nextLine();
+    }
+
+    public void dispenseMedicines() {
+        if (treatmentManagement == null) {
+            System.out.println("Treatment management not available!");
+            return;
+        }
+
+        System.out.println("\n" + StringUtility.repeatString("=", 60));
+        System.out.println("        MEDICINE DISPENSING");
+        System.out.println(StringUtility.repeatString("=", 60));
+
+        System.out.println("Prescriptions with Undispensed Medicines:");
+        System.out.println(StringUtility.repeatString("-", 80));
+        System.out.printf("%-15s %-10s %-20s %-15s %-10s\n", "Prescription ID", "Patient ID", "Diagnosis", "Total Cost", "Status");
+        System.out.println(StringUtility.repeatString("-", 80));
+
+        Object[] prescriptionsArray = treatmentManagement.getAllPrescriptions();
+        boolean hasUndispensed = false;
+        for (Object obj : prescriptionsArray) {
+            Prescription prescription = (Prescription) obj;
+            if (prescription.getStatus().equals("active") && hasUndispensedMedicines(prescription)) {
+                System.out.printf("%-15s %-10s %-20s %-15s %-10s\n",
+                    prescription.getPrescriptionId(), prescription.getPatientId(),
+                    prescription.getDiagnosis(), "RM " + String.format("%.2f", prescription.getTotalCost()),
+                    prescription.getStatus());
+                hasUndispensed = true;
+            }
+        }
+
+        if (!hasUndispensed) {
+            System.out.println("No prescriptions with undispensed medicines found.");
+            System.out.println(StringUtility.repeatString("-", 80));
+            System.out.println("Press Enter to continue...");
+            scanner.nextLine();
+            return;
+        }
+
+        System.out.println(StringUtility.repeatString("-", 80));
+
+        System.out.print("Enter prescription ID to dispense medicines: ");
+        String prescriptionId = scanner.nextLine();
+
+        Prescription prescription = treatmentManagement.findPrescriptionById(prescriptionId);
+        if (prescription == null) {
+            System.out.println("Prescription not found!");
+            System.out.println("Press Enter to continue...");
+            scanner.nextLine();
+            return;
+        }
+
+        if (!prescription.getStatus().equals("active")) {
+            System.out.println("Cannot dispense medicines for non-active prescription!");
+            System.out.println("Press Enter to continue...");
+            scanner.nextLine();
+            return;
+        }
+
+        if (!prescription.isPaid()) {
+            System.out.println("Cannot dispense medicines for unpaid prescription!");
+            System.out.println("Please process payment first.");
+            System.out.println("Press Enter to continue...");
+            scanner.nextLine();
+            return;
+        }
+
+        System.out.println("\nPrescription Details:");
+        System.out.println("Prescription ID: " + prescription.getPrescriptionId());
+        System.out.println("Patient ID: " + prescription.getPatientId());
+        System.out.println("Diagnosis: " + prescription.getDiagnosis());
+        System.out.println("Date: " + prescription.getPrescriptionDate());
+
+        System.out.println("\nPrescribed Medicines:");
+        System.out.println(StringUtility.repeatString("-", 100));
+        System.out.printf("%-20s %-10s %-20s %-10s %-10s %-10s\n", "Medicine", "Quantity", "Dosage", "Instructions", "Price", "Dispensed");
+        System.out.println(StringUtility.repeatString("-", 100));
+
+        Object[] prescribedMedicinesArray = prescription.getPrescribedMedicines().toArray();
+        boolean allDispensed = true;
+        for (Object obj : prescribedMedicinesArray) {
+            PrescribedMedicine pm = (PrescribedMedicine) obj;
+            String dosage = (pm.getDosage() == null || pm.getDosage().trim().isEmpty()) ? "-" : pm.getDosage();
+            String instructions = (pm.getInstructions() == null || pm.getInstructions().trim().isEmpty()) ? "-" : pm.getInstructions();
+            System.out.printf("%-20s %-10s %-20s %-20s %-10s %-10s\n",
+                pm.getMedicineName(), pm.getQuantity(), dosage,
+                instructions, "RM " + String.format("%.2f", pm.getUnitPrice()),
+                pm.isDispensed() ? "Yes" : "No");
+            if (!pm.isDispensed()) allDispensed = false;
+        }
+        if (allDispensed) {
+            System.out.println("\nAll medicines in this prescription have been dispensed!");
+            System.out.println("Press Enter to continue...");
+            scanner.nextLine();
+            return;
+        }
+
+        System.out.println(StringUtility.repeatString("-", 100));
+        System.out.println("\nDispensing Options:");
+        System.out.println("1. Dispense all undispensed medicines");
+        System.out.println("2. Dispense specific medicine");
+        System.out.print("Select option (1-2): ");
+        int option = getUserInputInt(1, 2);
+
+        if (option == 1) {
+            boolean success = true;
+            for (Object obj : prescribedMedicinesArray) {
+                PrescribedMedicine pm = (PrescribedMedicine) obj;
+                if (!pm.isDispensed()) {
+                    Medicine tmMed = treatmentManagement.findMedicineById(pm.getMedicineId());
+                    if (tmMed != null) {
+                        boolean dispensed = false;
+                        if (tmMed.getStockQuantity() >= pm.getQuantity() && tmMed.getStockQuantity() <= LOW_STOCK_THRESHOLD) {
+                            dispensed = handleAlternativeSuggestionAndMaybeDispense(prescription, pm, tmMed);
+                        }
+                        if (!dispensed) {
+                            if (tmMed.getStockQuantity() >= pm.getQuantity()) {
+                                //deduct from both inventories
+                                tmMed.setStockQuantity(tmMed.getStockQuantity() - pm.getQuantity());
+                                Medicine phMed = findMedicineById(pm.getMedicineId());
+                                if (phMed != null) phMed.setStockQuantity(phMed.getStockQuantity() - pm.getQuantity());
+                                pm.setDispensed(true);
+                            } else {
+                                boolean substituted = handleAlternativeSelectionWhenInsufficient(prescription, pm, tmMed);
+                                if (!substituted) {
+                                    System.out.println("Insufficient stock for " + pm.getMedicineName() +
+                                            " (Required: " + pm.getQuantity() + ", Available: " + tmMed.getStockQuantity() + ")");
+                                    success = false;
+                                }
+                            }
+                        }
+                    } else {
+                        System.out.println("Medicine " + pm.getMedicineName() + " not found in inventory!");
+                        success = false;
+                    }
+                }
+            }
+            if (success) {
+                System.out.println("\n[OK] All medicines dispensed successfully!");
+                System.out.println("Stock levels have been updated.");
+            } else {
+                System.out.println("\n[ERROR] Some medicines could not be dispensed due to insufficient stock.");
+            }
+        } else {
+            System.out.print("Enter medicine name to dispense: ");
+            String medicineName = scanner.nextLine();
+            boolean found = false;
+            for (Object obj : prescribedMedicinesArray) {
+                PrescribedMedicine pm = (PrescribedMedicine) obj;
+                if (pm.getMedicineName().equalsIgnoreCase(medicineName) && !pm.isDispensed()) {
+                    found = true;
+                    Medicine tmMed = treatmentManagement.findMedicineById(pm.getMedicineId());
+                    if (tmMed != null) {
+                        boolean dispensed = false;
+                        if (tmMed.getStockQuantity() >= pm.getQuantity() && tmMed.getStockQuantity() <= LOW_STOCK_THRESHOLD) {
+                            dispensed = handleAlternativeSuggestionAndMaybeDispense(prescription, pm, tmMed);
+                        }
+                        if (!dispensed) {
+                            if (tmMed.getStockQuantity() >= pm.getQuantity()) {
+                                tmMed.setStockQuantity(tmMed.getStockQuantity() - pm.getQuantity());
+                                Medicine phMed = findMedicineById(pm.getMedicineId());
+                                if (phMed != null) phMed.setStockQuantity(phMed.getStockQuantity() - pm.getQuantity());
+                                pm.setDispensed(true);
+                                System.out.println("\n[OK] " + pm.getMedicineName() + " dispensed successfully!");
+                                System.out.println("Quantity dispensed: " + pm.getQuantity());
+                                System.out.println("Remaining stock: " + tmMed.getStockQuantity());
+                            } else {
+                                boolean substituted = handleAlternativeSelectionWhenInsufficient(prescription, pm, tmMed);
+                                if (!substituted) {
+                                    System.out.println("[ERROR] Insufficient stock for " + pm.getMedicineName() +
+                                            " (Required: " + pm.getQuantity() + ", Available: " + tmMed.getStockQuantity() + ")");
+                                }
+                            }
+                        }
+                    } else {
+                        System.out.println("[ERROR] Medicine " + pm.getMedicineName() + " not found in inventory!");
+                    }
+                    break;
+                }
+            }
+            if (!found) {
+                System.out.println("[ERROR] Medicine not found or already dispensed!");
+            }
+        }
+
+        System.out.println("\nPress Enter to continue...");
+        scanner.nextLine();
+    }
+
+    public void processPayment() {
+        if (treatmentManagement == null) {
+            System.out.println("Treatment management not available!");
+            return;
+        }
+
+        System.out.println("\n" + StringUtility.repeatString("=", 60));
+        System.out.println("        PAYMENT PROCESSING");
+        System.out.println(StringUtility.repeatString("=", 60));
+
+        System.out.println("Unpaid Active Prescriptions:");
+        System.out.println(StringUtility.repeatString("-", 80));
+        System.out.printf("%-15s %-10s %-20s %-15s %-10s\n", "Prescription ID", "Patient ID", "Diagnosis", "Total Cost", "Status");
+        System.out.println(StringUtility.repeatString("-", 80));
+
+        Object[] prescriptionsArray = treatmentManagement.getAllPrescriptions();
+        boolean hasUnpaid = false;
+        for (Object obj : prescriptionsArray) {
+            Prescription prescription = (Prescription) obj;
+            if (prescription.getStatus().equals("active") && !prescription.isPaid()) {
+                System.out.printf("%-15s %-10s %-20s %-15s %-10s\n",
+                        prescription.getPrescriptionId(), prescription.getPatientId(),
+                        prescription.getDiagnosis(), "RM " + String.format("%.2f", prescription.getTotalCost()),
+                        prescription.getStatus());
+                hasUnpaid = true;
+            }
+        }
+
+        if (!hasUnpaid) {
+            System.out.println("No unpaid active prescriptions found.");
+            System.out.println("Press Enter to continue...");
+            scanner.nextLine();
+            return;
+        }
+
+        System.out.println(StringUtility.repeatString("-", 80));
+        System.out.print("Enter prescription ID to process payment: ");
+        String prescriptionId = scanner.nextLine();
+        Prescription prescription = treatmentManagement.findPrescriptionById(prescriptionId);
+        if (prescription == null) {
+            System.out.println("Prescription not found!");
+            System.out.println("Press Enter to continue...");
+            scanner.nextLine();
+            return;
+        }
+        if (!prescription.getStatus().equals("active")) {
+            System.out.println("Cannot process payment for non-active prescription!");
+            System.out.println("Press Enter to continue...");
+            scanner.nextLine();
+            return;
+        }
+
+        System.out.println("\nPrescription Details:");
+        System.out.println("Prescription ID: " + prescription.getPrescriptionId());
+        System.out.println("Patient ID: " + prescription.getPatientId());
+        System.out.println("Diagnosis: " + prescription.getDiagnosis());
+        System.out.println("Total Cost: RM " + String.format("%.2f", prescription.getTotalCost()));
+
+        System.out.println("\nPayment Methods:");
+        System.out.println("1. Cash");
+        System.out.println("2. Credit Card");
+        System.out.println("3. Debit Card");
+        System.out.println("4. Online Banking");
+        System.out.print("Select payment method (1-4): ");
+        int paymentMethod = getUserInputInt(1, 4);
+        String paymentMethodStr = "";
+        switch (paymentMethod) {
+            case 1: paymentMethodStr = "Cash"; break;
+            case 2: paymentMethodStr = "Credit Card"; break;
+            case 3: paymentMethodStr = "Debit Card"; break;
+            case 4: paymentMethodStr = "Online Banking"; break;
+        }
+
+        System.out.print("Enter amount received: RM ");
+        double amountReceived = getUserInputDouble(prescription.getTotalCost(), prescription.getTotalCost() * 2);
+        double change = amountReceived - prescription.getTotalCost();
+        prescription.setPaid(true);
+
+        System.out.println("\n" + StringUtility.repeatString("=", 50));
+        System.out.println("        PAYMENT RECEIPT");
+        System.out.println(StringUtility.repeatString("=", 50));
+        System.out.println("Prescription ID: " + prescription.getPrescriptionId());
+        System.out.println("Patient ID: " + prescription.getPatientId());
+        System.out.println("Diagnosis: " + prescription.getDiagnosis());
+        System.out.println("Total Cost: RM " + String.format("%.2f", prescription.getTotalCost()));
+        System.out.println("Amount Received: RM " + String.format("%.2f", amountReceived));
+        System.out.println("Change: RM " + String.format("%.2f", change));
+        System.out.println("Payment Method: " + paymentMethodStr);
+        System.out.println("Payment Status: PAID");
+        System.out.println("Date: " + java.time.LocalDate.now());
+        System.out.println("Time: " + java.time.LocalTime.now().toString().substring(0, 8));
+        System.out.println(StringUtility.repeatString("=", 50));
+        System.out.println("Thank you for your payment!");
+
+        System.out.println("\nPress Enter to continue...");
+        scanner.nextLine();
+    }
+
+    public void generateDispensingStatisticsReport() {
+        if (treatmentManagement == null) {
+            System.out.println("Treatment management not available!");
+            return;
+        }
+
+        System.out.println("\n" + StringUtility.repeatString("=", 60));
+        System.out.println("        DISPENSING STATISTICS REPORT");
+        System.out.println(StringUtility.repeatString("=", 60));
+
+        Object[] prescriptionsArray = treatmentManagement.getAllPrescriptions();
+        int totalPrescriptions = prescriptionsArray.length;
+        int totalMedicines = 0;
+        int dispensedMedicines = 0;
+        double totalRevenue = 0.0;
+
+        for (Object obj : prescriptionsArray) {
+            Prescription prescription = (Prescription) obj;
+            Object[] pmArray = prescription.getPrescribedMedicines().toArray();
+            for (Object pmObj : pmArray) {
+                PrescribedMedicine pm = (PrescribedMedicine) pmObj;
+                totalMedicines++;
+                if (pm.isDispensed()) {
+                    dispensedMedicines++;
+                    if (prescription.isPaid()) {
+                        totalRevenue += pm.getTotalPrice();
+                    }
+                }
+            }
+        }
+
+        System.out.println("Dispensing Statistics:");
+        System.out.println("• Total Prescriptions: " + totalPrescriptions);
+        System.out.println("• Total Medicines Prescribed: " + totalMedicines);
+        System.out.println("• Prescriptions Dispensed: " + dispensedMedicines);
+        System.out.println("• Dispensing Rate: " + String.format("%.1f", (double)dispensedMedicines/totalMedicines*100) + "%");
+        System.out.println("• Total Revenue from Dispensed Medicines: RM " + String.format("%.2f", totalRevenue));
+
+        if (totalMedicines > 0) {
+            System.out.println("• Average Medicines per Prescription: " + String.format("%.1f", (double)totalMedicines/totalPrescriptions));
+        }
+
+        System.out.println("\nPress Enter to continue...");
+        scanner.nextLine();
+    }
+
+    private int getUserInputInt(int min, int max) {
+        int input;
+        do {
+            while (!scanner.hasNextInt()) {
+                System.out.print("Invalid input! Please enter a number between " + min + " and " + max + ": ");
+                scanner.next();
+            }
+            input = scanner.nextInt();
+            scanner.nextLine();
+            if (input < min || input > max) {
+                System.out.print("Please enter a number between " + min + " and " + max + ": ");
+            }
+        } while (input < min || input > max);
+        return input;
+    }
+
+    private double getUserInputDouble(double min, double max) {
+        double input;
+        do {
+            while (!scanner.hasNextDouble()) {
+                System.out.print("Invalid input! Please enter an amount between " + String.format("%.2f", min) + " and " + String.format("%.2f", max) + ": ");
+                scanner.next();
+            }
+            input = scanner.nextDouble();
+            scanner.nextLine();
+            if (input < min || input > max) {
+                System.out.print("Please enter a number between " + String.format("%.2f", min) + " and " + String.format("%.2f", max) + ": ");
+            }
+        } while (input < min || input > max);
+        return input;
+    }
+
+    private boolean hasUndispensedMedicines(Prescription prescription) {
+        Object[] arr = prescription.getPrescribedMedicines().toArray();
+        for (Object obj : arr) {
+            PrescribedMedicine pm = (PrescribedMedicine) obj;
+            if (!pm.isDispensed()) return true;
+        }
+        return false;
+    }
+
+    private boolean handleAlternativeSuggestionAndMaybeDispense(Prescription prescription, PrescribedMedicine pm, Medicine originalMedicine) {
+        //find medicines with same active ingredient using intersection
+        SetAndQueueInterface<Medicine> sameActiveIngredient = findMedicinesByActiveIngredient(originalMedicine.getActiveIngredient());
+        SetAndQueueInterface<Medicine> sufficientStock = findMedicinesWithSufficientStock(pm.getQuantity());
+        SetAndQueueInterface<Medicine> alternatives = sameActiveIngredient.intersection(sufficientStock); //adt method
+
+        //remove the original medicine from alternatives
+        SetAndQueueInterface<Medicine> finalAlternatives = new SetAndQueue<>();
+        Object[] altArray = alternatives.toArray(); //adt method
+        for (Object obj : altArray) {
+            Medicine alt = (Medicine) obj;
+            if (!alt.getMedicineId().equals(originalMedicine.getMedicineId())) {
+                finalAlternatives.add(alt); //adt method
+            }
+        }
+
+        if (finalAlternatives.isEmpty()) return false; //adt method
+
+        System.out.println("\nWARNING: Low stock for " + originalMedicine.getName() + " (Available: " + originalMedicine.getStockQuantity() + ")");
+        System.out.println("Similar medicines with the same active ingredient available:");
+        displayMedicineOptions(finalAlternatives);
+
+        System.out.print("Use an alternative medicine? (y/n): ");
+        String choice = scanner.nextLine();
+        if (!choice.equalsIgnoreCase("y")) return false;
+
+        System.out.print("Enter alternative medicine ID to dispense: ");
+        String altId = scanner.nextLine();
+        Medicine selectedAlt = findMedicineById(altId);
+        if (selectedAlt == null || selectedAlt.getStockQuantity() < pm.getQuantity()) {
+            System.out.println("[ERROR] Invalid selection or insufficient stock for selected alternative.");
+            return false;
+        }
+
+        //deduct from both inventories
+        selectedAlt.setStockQuantity(selectedAlt.getStockQuantity() - pm.getQuantity());
+        Medicine tmAlt = treatmentManagement.findMedicineById(selectedAlt.getMedicineId());
+        if (tmAlt != null) tmAlt.setStockQuantity(tmAlt.getStockQuantity() - pm.getQuantity());
+
+        pm.setMedicineId(selectedAlt.getMedicineId());
+        pm.setMedicineName(selectedAlt.getName());
+        pm.setDispensed(true);
+
+        System.out.println("\n[OK] Dispensed alternative: " + selectedAlt.getName() + " (Active Ingredient: " + selectedAlt.getActiveIngredient() + ")");
+        return true;
+    }
+
+    private boolean handleAlternativeSelectionWhenInsufficient(Prescription prescription, PrescribedMedicine pm, Medicine originalMedicine) {
+        //find medicines with same active ingredient using union
+        SetAndQueueInterface<Medicine> sameActiveIngredient = findMedicinesByActiveIngredient(originalMedicine.getActiveIngredient());
+        SetAndQueueInterface<Medicine> sufficientStock = findMedicinesWithSufficientStock(pm.getQuantity());
+        SetAndQueueInterface<Medicine> alternatives = sameActiveIngredient.intersection(sufficientStock); //adt method
+
+        //remove the original medicine from alternatives
+        SetAndQueueInterface<Medicine> finalAlternatives = new SetAndQueue<>();
+        Object[] altArray = alternatives.toArray(); //adt method
+        for (Object obj : altArray) {
+            Medicine alt = (Medicine) obj;
+            if (!alt.getMedicineId().equals(originalMedicine.getMedicineId())) {
+                finalAlternatives.add(alt); //adt method
+            }
+        }
+
+        if (finalAlternatives.isEmpty()) return false; //adt method
+
+        System.out.println("\nALERT: Insufficient stock for " + originalMedicine.getName() + ". Available alternatives with the same active ingredient:");
+        displayMedicineOptions(finalAlternatives);
+
+        System.out.print("Do you want to dispense one of these alternatives? (y/n): ");
+        String choice = scanner.nextLine();
+        if (!choice.equalsIgnoreCase("y")) return false;
+
+        System.out.print("Enter alternative medicine ID to dispense: ");
+        String altId = scanner.nextLine();
+        Medicine selectedAlt = findMedicineById(altId);
+        if (selectedAlt == null || selectedAlt.getStockQuantity() < pm.getQuantity()) {
+            System.out.println("[ERROR] Invalid selection or insufficient stock for selected alternative.");
+            return false;
+        }
+
+        //deduct from both inventories
+        selectedAlt.setStockQuantity(selectedAlt.getStockQuantity() - pm.getQuantity());
+        Medicine tmAlt = treatmentManagement.findMedicineById(selectedAlt.getMedicineId());
+        if (tmAlt != null) tmAlt.setStockQuantity(tmAlt.getStockQuantity() - pm.getQuantity());
+
+        pm.setMedicineId(selectedAlt.getMedicineId());
+        pm.setMedicineName(selectedAlt.getName());
+        pm.setDispensed(true);
+
+        System.out.println("\n[OK] Dispensed alternative: " + selectedAlt.getName() + " (Active Ingredient: " + selectedAlt.getActiveIngredient() + ")");
+        return true;
+    }
+
+    private void displayMedicineOptions(SetAndQueueInterface<Medicine> medicines) {
+        Object[] medicinesArray = medicines.toArray();
+        String[] headers = {"ID", "Name", "Brand", "Stock", "Price", "Active Ingredient"};
+        Object[][] rows = new Object[medicinesArray.length][headers.length];
+        for (int i = 0; i < medicinesArray.length; i++) {
+            Medicine m = (Medicine) medicinesArray[i];
+            rows[i][0] = m.getMedicineId();
+            rows[i][1] = m.getName();
+            rows[i][2] = m.getBrand();
+            rows[i][3] = m.getStockQuantity();
+            rows[i][4] = "RM " + String.format("%.2f", m.getPrice());
+            rows[i][5] = m.getActiveIngredient();
+        }
+        System.out.print(StringUtility.formatTableNoDividers("SIMILAR MEDICINES", headers, rows));
+    }
+
+    private SetAndQueueInterface<Medicine> findMedicinesByActiveIngredient(String activeIngredient) {
+        SetAndQueueInterface<Medicine> result = new SetAndQueue<>();
+        Object[] medicinesArray = medicineList.toArray(); //adt method
+        for (Object obj : medicinesArray) {
+            Medicine m = (Medicine) obj;
+            if (m.getActiveIngredient() != null && m.getActiveIngredient().equalsIgnoreCase(activeIngredient)) {
+                result.add(m); //adt method
+            }
+        }
+        return result;
+    }
+
+    private SetAndQueueInterface<Medicine> findMedicinesWithSufficientStock(int requiredQuantity) {
+        SetAndQueueInterface<Medicine> result = new SetAndQueue<>();
+        Object[] medicinesArray = medicineList.toArray(); //adt method
+        for (Object obj : medicinesArray) {
+            Medicine m = (Medicine) obj;
+            if (m.getStockQuantity() >= requiredQuantity) {
+                result.add(m); //adt method
+            }
+        }
+        return result;
     }
     
     public void generateMedicineCategoryReport() {
@@ -629,10 +1138,10 @@ public class PharmacyManagement {
     public Medicine findMedicineById(String medicineId) {
         Medicine dummy = new Medicine();
         dummy.setMedicineId(medicineId);
-        return medicineList.search(dummy);
+        return medicineList.search(dummy); //adt method
     }
-    
+
     public Object[] getAllMedicines() {
-        return medicineList.toArray();
+        return medicineList.toArray(); //adt method
     }
 }

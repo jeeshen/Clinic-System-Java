@@ -45,7 +45,7 @@ public class ClinicSystem {
         doctorManagement.setConsultationManagement(consultationManagement);
         reportUI.setDependencies(patientManagement, doctorManagement, consultationManagement, treatmentManagement);
         pharmacyUI.setDependencies(treatmentManagement);
-        treatmentManagement.setPharmacyManagement(pharmacyManagement);
+        pharmacyManagement.setTreatmentManagement(treatmentManagement);
     }
     
     public void run() {

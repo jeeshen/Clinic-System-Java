@@ -58,7 +58,7 @@ public class PharmacyManagementUI {
                     pharmacyManagement.removeMedicine();
                     break;
                 case 7:
-                    treatmentManagement.dispenseMedicines();
+                    pharmacyManagement.dispenseMedicines();
                     break;
                 case 0:
                     back = true;
@@ -91,7 +91,7 @@ public class PharmacyManagementUI {
                     pharmacyManagement.generateMedicineCategoryReport();
                     break;
                 case 3:
-                    treatmentManagement.generateDispensingStatisticsReport();
+                    pharmacyManagement.generateDispensingStatisticsReport();
                     break;
                 case 4:
                     pharmacyManagement.generateInventoryValueReport();

@@ -15,7 +15,6 @@ import utility.InputValidator;
 public class TreatmentManagement {
     private SetAndQueueInterface<Prescription> prescriptionList = new SetAndQueue<>();
     private SetAndQueueInterface<Medicine> medicineList = new SetAndQueue<>();
-    private PharmacyManagement pharmacyManagement;
     private Scanner scanner;
     private int prescriptionIdCounter = 3001;
     private int prescribedMedicineIdCounter = 4001;
@@ -24,20 +23,16 @@ public class TreatmentManagement {
         scanner = new Scanner(System.in);
         loadSampleData();
     }
-    
-    public void setPharmacyManagement(PharmacyManagement pharmacyManagement) {
-        this.pharmacyManagement = pharmacyManagement;
-    }
-    
+
     private void loadSampleData() {
         Medicine[] sampleMedicines = DataInitializer.initializeSampleMedicines();
         for (Medicine medicine : sampleMedicines) {
-            medicineList.add(medicine);
+            medicineList.add(medicine); //adt method
         }
 
         Prescription[] samplePrescriptions = DataInitializer.initializeSamplePrescriptions();
         for (Prescription prescription : samplePrescriptions) {
-            prescriptionList.add(prescription);
+            prescriptionList.add(prescription); //adt method
         }
     }
     
@@ -93,16 +88,16 @@ public class TreatmentManagement {
                     quantity, dosage, instructions, medicine.getPrice(), totalPrice, false
                 );
                 
-                prescription.getPrescribedMedicines().add(prescribedMedicine);
+                prescription.getPrescribedMedicines().add(prescribedMedicine); //adt method
                 prescription.setTotalCost(prescription.getTotalCost() + totalPrice);
-                
+
                 System.out.println("Medicine " + medicine.getName() + " prescribed successfully!");
             } else {
                 System.out.println("Medicine not found!");
             }
         }
-        
-        prescriptionList.add(prescription);
+
+        prescriptionList.add(prescription); //adt method
         System.out.println("Prescription ID: " + prescriptionId);
         System.out.println("Total cost: RM " + String.format("%.2f", prescription.getTotalCost()));
     }
@@ -114,14 +109,14 @@ public class TreatmentManagement {
         System.out.printf("%-15s %-10s %-10s %-20s %-12s %-10s\n", "Prescription ID", "Patient ID", "Doctor ID", "Diagnosis", "Total Cost", "Status");
         System.out.println(StringUtility.repeatString("-", 100));
         
-        Object[] prescriptionsArray = prescriptionList.toArray();
+        Object[] prescriptionsArray = prescriptionList.toArray(); //adt method
         SetAndQueueInterface<Prescription> tempList = new SetAndQueue<>();
         for (Object obj : prescriptionsArray) {
-            tempList.add((Prescription) obj);
+            tempList.add((Prescription) obj); //adt method
         }
-        tempList.sort();
-        
-        Object[] sortedPrescriptionsArray = tempList.toArray();
+        tempList.sort(); //adt method
+
+        Object[] sortedPrescriptionsArray = tempList.toArray(); //adt method
         Prescription[] prescriptionArray = new Prescription[sortedPrescriptionsArray.length];
         for (int i = 0; i < sortedPrescriptionsArray.length; i++) {
             prescriptionArray[i] = (Prescription) sortedPrescriptionsArray[i];
@@ -224,7 +219,7 @@ public class TreatmentManagement {
         System.out.println("        REMOVE PRESCRIPTION");
         System.out.println(StringUtility.repeatString("=", 60));
         
-        System.out.println("📋 CURRENT PRESCRIPTION LIST:");
+        System.out.println("CURRENT PRESCRIPTION LIST:");
         System.out.println(StringUtility.repeatString("-", 60));
         System.out.printf("%-15s %-10s %-10s %-20s %-12s %-10s\n", "Prescription ID", "Patient ID", "Doctor ID", "Diagnosis", "Total Cost", "Status");
         System.out.println(StringUtility.repeatString("-", 60));
@@ -256,15 +251,15 @@ public class TreatmentManagement {
             if (confirm.toLowerCase().equals("yes")) {
                 boolean removed = prescriptionList.remove(prescription);
                 if (removed) {
-                    System.out.println("✅ Prescription removed successfully!");
+                    System.out.println("[OK] Prescription removed successfully!");
                 } else {
-                    System.out.println("❌ Failed to remove prescription from system!");
+                    System.out.println("[ERROR] Failed to remove prescription from system!");
                 }
             } else {
-                System.out.println("❌ Prescription removal cancelled.");
+                System.out.println("[ERROR] Prescription removal cancelled.");
             }
         } else {
-            System.out.println("❌ Prescription not found!");
+            System.out.println("[ERROR] Prescription not found!");
         }
     }
     
@@ -460,7 +455,7 @@ public class TreatmentManagement {
     public Prescription findPrescriptionById(String prescriptionId) {
         Prescription dummy = new Prescription();
         dummy.setPrescriptionId(prescriptionId);
-        return prescriptionList.search(dummy);
+        return prescriptionList.search(dummy); //adt method
     }
     
     public Medicine findMedicineById(String medicineId) {
@@ -493,7 +488,7 @@ public class TreatmentManagement {
     }
 
     public int getTotalPrescriptionCount() {
-        return prescriptionList.size();
+        return prescriptionList.size(); //adt method
     }
     
     public double getTotalRevenue() {
@@ -645,263 +640,8 @@ public class TreatmentManagement {
         
         return input;
     }
-
-    public void dispenseMedicines() {
-        System.out.println("\n" + StringUtility.repeatString("=", 60));
-        System.out.println("        MEDICINE DISPENSING");
-        System.out.println(StringUtility.repeatString("=", 60));
-        
-        //display prescriptions with undispensed medicines
-        System.out.println("Prescriptions with Undispensed Medicines:");
-        System.out.println(StringUtility.repeatString("-", 80));
-        System.out.printf("%-15s %-10s %-20s %-15s %-10s\n", "Prescription ID", "Patient ID", "Diagnosis", "Total Cost", "Status");
-        System.out.println(StringUtility.repeatString("-", 80));
-        
-        Object[] prescriptionsArray = prescriptionList.toArray();
-        boolean hasUndispensed = false;
-        
-        for (Object obj : prescriptionsArray) {
-            Prescription prescription = (Prescription) obj;
-            if (prescription.getStatus().equals("active") && hasUndispensedMedicines(prescription)) {
-                System.out.printf("%-15s %-10s %-20s %-15s %-10s\n", 
-                    prescription.getPrescriptionId(), prescription.getPatientId(),
-                    prescription.getDiagnosis(), "RM " + String.format("%.2f", prescription.getTotalCost()),
-                    prescription.getStatus());
-                hasUndispensed = true;
-            }
-        }
-        
-        if (!hasUndispensed) {
-            System.out.println("No prescriptions with undispensed medicines found.");
-            System.out.println(StringUtility.repeatString("-", 80));
-            System.out.println("Press Enter to continue...");
-            scanner.nextLine();
-            return;
-        }
-        
-        System.out.println(StringUtility.repeatString("-", 80));
-        
-        //get prescription ID for dispensing
-        System.out.print("Enter prescription ID to dispense medicines: ");
-        String prescriptionId = scanner.nextLine();
-        
-        Prescription prescription = findPrescriptionById(prescriptionId);
-        if (prescription == null) {
-            System.out.println("Prescription not found!");
-            System.out.println("Press Enter to continue...");
-            scanner.nextLine();
-            return;
-        }
-        
-        if (!prescription.getStatus().equals("active")) {
-            System.out.println("Cannot dispense medicines for non-active prescription!");
-            System.out.println("Press Enter to continue...");
-            scanner.nextLine();
-            return;
-        }
-        
-        if (!prescription.isPaid()) {
-            System.out.println("Cannot dispense medicines for unpaid prescription!");
-            System.out.println("Please process payment first.");
-            System.out.println("Press Enter to continue...");
-            scanner.nextLine();
-            return;
-        }
-        
-        // Display prescription details and medicines
-        System.out.println("\nPrescription Details:");
-        System.out.println("Prescription ID: " + prescription.getPrescriptionId());
-        System.out.println("Patient ID: " + prescription.getPatientId());
-        System.out.println("Diagnosis: " + prescription.getDiagnosis());
-        System.out.println("Date: " + prescription.getPrescriptionDate());
-        
-        System.out.println("\nPrescribed Medicines:");
-        System.out.println(StringUtility.repeatString("-", 100));
-        System.out.printf("%-20s %-10s %-20s %-10s %-10s %-10s\n", "Medicine", "Quantity", "Dosage", "Instructions", "Price", "Dispensed");
-        System.out.println(StringUtility.repeatString("-", 100));
-        
-        Object[] prescribedMedicinesArray = prescription.getPrescribedMedicines().toArray();
-        boolean allDispensed = true;
-        
-        for (Object obj : prescribedMedicinesArray) {
-            PrescribedMedicine pm = (PrescribedMedicine) obj;
-            System.out.printf("%-20s %-10s %-20s %-10s %-10s %-10s\n", 
-                pm.getMedicineName(), pm.getQuantity(), pm.getDosage(),
-                pm.getInstructions(), "RM " + String.format("%.2f", pm.getUnitPrice()),
-                pm.isDispensed() ? "Yes" : "No");
-            
-            if (!pm.isDispensed()) {
-                allDispensed = false;
-            }
-        }
-        
-        if (allDispensed) {
-            System.out.println("\nAll medicines in this prescription have been dispensed!");
-            System.out.println("Press Enter to continue...");
-            scanner.nextLine();
-            return;
-        }
-        
-        System.out.println(StringUtility.repeatString("-", 100));
-        
-        //dispense medicines
-        System.out.println("\nDispensing Options:");
-        System.out.println("1. Dispense all undispensed medicines");
-        System.out.println("2. Dispense specific medicine");
-        System.out.print("Select option (1-2): ");
-        
-        int option = getUserInputInt(1, 2);
-        
-        if (option == 1) {
-            //dispense all undispensed medicines
-            boolean success = true;
-            for (Object obj : prescribedMedicinesArray) {
-                PrescribedMedicine pm = (PrescribedMedicine) obj;
-                if (!pm.isDispensed()) {
-                    Medicine medicine = findMedicineById(pm.getMedicineId());
-                    if (medicine != null) {
-                        if (medicine.getStockQuantity() >= pm.getQuantity()) {
-                            // Update stock in TreatmentManagement
-                            medicine.setStockQuantity(medicine.getStockQuantity() - pm.getQuantity());
-                            
-                            //also update stock in PharmacyManagement if available
-                            if (pharmacyManagement != null) {
-                                Medicine pharmacyMedicine = pharmacyManagement.findMedicineById(pm.getMedicineId());
-                                if (pharmacyMedicine != null) {
-                                    pharmacyMedicine.setStockQuantity(pharmacyMedicine.getStockQuantity() - pm.getQuantity());
-                                }
-                            }
-                            
-                            //mark as dispensed
-                            pm.setDispensed(true);
-                        } else {
-                            System.out.println("Insufficient stock for " + pm.getMedicineName() + 
-                                             " (Required: " + pm.getQuantity() + ", Available: " + medicine.getStockQuantity() + ")");
-                            success = false;
-                        }
-                    } else {
-                        System.out.println("Medicine " + pm.getMedicineName() + " not found in inventory!");
-                        success = false;
-                    }
-                }
-            }
-            
-            if (success) {
-                System.out.println("\n✅ All medicines dispensed successfully!");
-                System.out.println("Stock levels have been updated.");
-            } else {
-                System.out.println("\n❌ Some medicines could not be dispensed due to insufficient stock.");
-            }
-        } else {
-            //dispense specific medicine
-            System.out.print("Enter medicine name to dispense: ");
-            String medicineName = scanner.nextLine();
-            
-            boolean found = false;
-            for (Object obj : prescribedMedicinesArray) {
-                PrescribedMedicine pm = (PrescribedMedicine) obj;
-                if (pm.getMedicineName().equalsIgnoreCase(medicineName) && !pm.isDispensed()) {
-                    found = true;
-                    Medicine medicine = findMedicineById(pm.getMedicineId());
-                    if (medicine != null) {
-                        if (medicine.getStockQuantity() >= pm.getQuantity()) {
-                            //update stock in TreatmentManagement
-                            medicine.setStockQuantity(medicine.getStockQuantity() - pm.getQuantity());
-                            
-                            //also update stock in PharmacyManagement if available
-                            if (pharmacyManagement != null) {
-                                Medicine pharmacyMedicine = pharmacyManagement.findMedicineById(pm.getMedicineId());
-                                if (pharmacyMedicine != null) {
-                                    pharmacyMedicine.setStockQuantity(pharmacyMedicine.getStockQuantity() - pm.getQuantity());
-                                }
-                            }
-                            
-                            //mark as dispensed
-                            pm.setDispensed(true);
-                            System.out.println("\n✅ " + pm.getMedicineName() + " dispensed successfully!");
-                            System.out.println("Quantity dispensed: " + pm.getQuantity());
-                            System.out.println("Remaining stock: " + medicine.getStockQuantity());
-                        } else {
-                            System.out.println("❌ Insufficient stock for " + pm.getMedicineName() + 
-                                             " (Required: " + pm.getQuantity() + ", Available: " + medicine.getStockQuantity() + ")");
-                        }
-                    } else {
-                        System.out.println("❌ Medicine " + pm.getMedicineName() + " not found in inventory!");
-                    }
-                    break;
-                }
-            }
-            
-            if (!found) {
-                System.out.println("❌ Medicine not found or already dispensed!");
-            }
-        }
-        
-        System.out.println("\nPress Enter to continue...");
-        scanner.nextLine();
-    }
-    
-    private boolean hasUndispensedMedicines(Prescription prescription) {
-        Object[] prescribedMedicinesArray = prescription.getPrescribedMedicines().toArray();
-        for (Object obj : prescribedMedicinesArray) {
-            PrescribedMedicine pm = (PrescribedMedicine) obj;
-            if (!pm.isDispensed()) {
-                return true;
-            }
-        }
-        return false;
-    }
     
     public Object[] getAllPrescriptions() {
-        return prescriptionList.toArray();
-    }
-    
-    public void generateDispensingStatisticsReport() {
-        System.out.println("\n" + StringUtility.repeatString("=", 60));
-        System.out.println("        DISPENSING STATISTICS REPORT");
-        System.out.println(StringUtility.repeatString("=", 60));
-        
-        Object[] prescriptionsArray = prescriptionList.toArray();
-        int totalPrescriptions = prescriptionsArray.length;
-        int totalMedicines = 0;
-        int dispensedMedicines = 0;
-        double totalRevenue = 0.0;
-        
-        for (Object obj : prescriptionsArray) {
-            Prescription prescription = (Prescription) obj;
-            Object[] prescribedMedicinesArray = prescription.getPrescribedMedicines().toArray();
-            
-            for (Object pmObj : prescribedMedicinesArray) {
-                PrescribedMedicine pm = (PrescribedMedicine) pmObj;
-                totalMedicines++;
-                if (pm.isDispensed()) {
-                    dispensedMedicines++;
-                    if (prescription.isPaid()) {
-                        totalRevenue += pm.getTotalPrice();
-                    }
-                }
-            }
-        }
-        
-        System.out.println("📊 Dispensing Statistics:");
-        System.out.println("• Total Prescriptions: " + totalPrescriptions);
-        System.out.println("• Total Medicines Prescribed: " + totalMedicines);
-        System.out.println("• Prescriptions Dispensed: " + dispensedMedicines);
-        System.out.println("• Dispensing Rate: " + String.format("%.1f", (double)dispensedMedicines/totalMedicines*100) + "%");
-        System.out.println("• Total Revenue from Dispensed Medicines: RM " + String.format("%.2f", totalRevenue));
-        
-        if (totalMedicines > 0) {
-            System.out.println("• Average Medicines per Prescription: " + String.format("%.1f", (double)totalMedicines/totalPrescriptions));
-        }
-        
-        System.out.println("\nPress Enter to continue...");
-        scanner.nextLine();
-    }
-
-    private static final String RESET = "\u001B[0m";
-    private static final String BLUE_BG = "\u001B[44m";
-    
-    private String createColoredBar(String color, int barCount, int totalWidth) {
-        return color + StringUtility.repeatString(" ", barCount) + RESET + StringUtility.repeatString(" ", totalWidth - barCount);
+        return prescriptionList.toArray(); //adt method
     }
 } 

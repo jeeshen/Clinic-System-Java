@@ -27,15 +27,15 @@ public class DoctorManagement {
     private void loadSampleData() {
         Doctor[] sampleDoctors = DataInitializer.initializeSampleDoctors();
         for (Doctor doctor : sampleDoctors) {
-            doctorList.add(doctor);
+            doctorList.add(doctor); //adt method
             if (doctor.isIsAvailable() && !doctor.isOnLeave()) {
-                onDutyDoctorList.add(doctor);
+                onDutyDoctorList.add(doctor); //adt method
             }
         }
     }
     
     public void displayAllDoctors() {
-        Object[] doctorsArray = doctorList.toArray();
+        Object[] doctorsArray = doctorList.toArray(); //adt method
         String[] headers = {"ID", "Name", "Specialization", "Contact", "Available"};
         Object[][] rows = new Object[doctorsArray.length][headers.length];
         for (int i = 0; i < doctorsArray.length; i++) {
@@ -56,7 +56,7 @@ public class DoctorManagement {
     }
     
     public void displayDoctorsOnDuty() {
-        Object[] doctorsArray = onDutyDoctorList.toArray();
+        Object[] doctorsArray = onDutyDoctorList.toArray(); //adt method
         String[] headers = {"ID", "Name", "Specialization", "Contact"};
         Object[][] rows = new Object[doctorsArray.length][headers.length];
         for (int i = 0; i < doctorsArray.length; i++) {
@@ -76,13 +76,13 @@ public class DoctorManagement {
     }
     
     public void addDoctorToDuty() {
-        Object[] doctorsArray = doctorList.toArray();
+        Object[] doctorsArray = doctorList.toArray(); //adt method
         String[] headers = {"ID", "Name", "Specialization", "Contact", "Available", "On Leave"};
         Object[][] rows = new Object[doctorsArray.length][headers.length];
         int rowIdx = 0;
         for (Object obj : doctorsArray) {
             Doctor doctor = (Doctor) obj;
-            if (!onDutyDoctorList.contains(doctor) && doctor.isIsAvailable() && !doctor.isOnLeave()) {
+            if (!onDutyDoctorList.contains(doctor) && doctor.isIsAvailable() && !doctor.isOnLeave()) { //adt method
                 rows[rowIdx][0] = doctor.getDoctorId();
                 rows[rowIdx][1] = doctor.getName();
                 rows[rowIdx][2] = doctor.getSpecialization();
@@ -111,8 +111,8 @@ public class DoctorManagement {
         Doctor doctor = findDoctorById(doctorId);
         if (doctor != null) {
             if (doctor.isIsAvailable() && !doctor.isOnLeave()) {
-                if (!onDutyDoctorList.contains(doctor)) {
-                    onDutyDoctorList.add(doctor);
+                if (!onDutyDoctorList.contains(doctor)) { //adt method
+                    onDutyDoctorList.add(doctor); //adt method
                     System.out.println("Doctor " + doctor.getName() + " added to duty successfully!");
                 } else {
                     System.out.println("Doctor is already on duty!");
@@ -128,10 +128,10 @@ public class DoctorManagement {
     public void removeDoctorFromDuty() {
         System.out.print("Enter Doctor ID to remove from duty: ");
         String doctorId = scanner.nextLine();
-        
+
         Doctor doctor = findDoctorById(doctorId);
-        if (doctor != null && onDutyDoctorList.contains(doctor)) {
-            onDutyDoctorList.remove(doctor);
+        if (doctor != null && onDutyDoctorList.contains(doctor)) { //adt method
+            onDutyDoctorList.remove(doctor); //adt method
             System.out.println("Doctor " + doctor.getName() + " removed from duty successfully!");
         } else {
             System.out.println("Doctor not found or not on duty!");
@@ -139,15 +139,15 @@ public class DoctorManagement {
     }
     
     public void displayAllDoctorsSorted() {
-        Object[] doctorsArray = doctorList.toArray();
+        Object[] doctorsArray = doctorList.toArray(); //adt method
 
         SetAndQueueInterface<Doctor> tempList = new SetAndQueue<>();
         for (Object obj : doctorsArray) {
-            tempList.add((Doctor) obj);
+            tempList.add((Doctor) obj); //adt method
         }
-        tempList.sort();
-        
-        Object[] sortedDoctorsArray = tempList.toArray();
+        tempList.sort(); //adt method
+
+        Object[] sortedDoctorsArray = tempList.toArray(); //adt method
         Doctor[] doctorArray = new Doctor[sortedDoctorsArray.length];
         for (int i = 0; i < sortedDoctorsArray.length; i++) {
             doctorArray[i] = (Doctor) sortedDoctorsArray[i];
@@ -187,18 +187,18 @@ public class DoctorManagement {
     public void searchDoctorBySpecialization() {
         System.out.print("Enter specialization to search: ");
         String specialization = scanner.nextLine();
-        
-        Object[] doctorsArray = doctorList.toArray();
+
+        Object[] doctorsArray = doctorList.toArray(); //adt method
         String[] headers = {"ID", "Name", "Contact", "Available"};
         SetAndQueueInterface<Object[]> rowList = new SetAndQueue<>();
         for (Object obj : doctorsArray) {
             Doctor doctor = (Doctor) obj;
             if (doctor.getSpecialization().toLowerCase().contains(specialization.toLowerCase())) {
-                rowList.add(new Object[]{doctor.getDoctorId(), doctor.getName(), doctor.getContactNumber(), doctor.isIsAvailable() ? "Yes" : "No"});
+                rowList.add(new Object[]{doctor.getDoctorId(), doctor.getName(), doctor.getContactNumber(), doctor.isIsAvailable() ? "Yes" : "No"}); //adt method
             }
         }
-        Object[][] rows = new Object[rowList.size()][headers.length];
-        Object[] rowArray = rowList.toArray();
+        Object[][] rows = new Object[rowList.size()][headers.length]; //adt method
+        Object[] rowArray = rowList.toArray(); //adt method
         for (int i = 0; i < rowArray.length; i++) {
             rows[i] = (Object[]) rowArray[i];
         }
@@ -207,8 +207,8 @@ public class DoctorManagement {
             headers,
             rows
         ));
-        
-        if (rowList.isEmpty()) {
+
+        if (rowList.isEmpty()) { //adt method
             System.out.println("No doctors found with this specialization.");
         }
         System.out.println(StringUtility.repeatString("-", 70));
@@ -241,15 +241,15 @@ public class DoctorManagement {
         System.out.println("        UPDATE DOCTOR DETAILS");
         System.out.println(StringUtility.repeatString("=", 60));
 
-        Object[] doctorsArray = doctorList.toArray();
+        Object[] doctorsArray = doctorList.toArray(); //adt method
 
         SetAndQueueInterface<Doctor> tempList = new SetAndQueue<>();
         for (Object obj : doctorsArray) {
-            tempList.add((Doctor) obj);
+            tempList.add((Doctor) obj); //adt method
         }
-        tempList.sort();
-        
-        Object[] sortedDoctorsArray = tempList.toArray();
+        tempList.sort(); //adt method
+
+        Object[] sortedDoctorsArray = tempList.toArray(); //adt method
         Doctor[] doctorArray = new Doctor[sortedDoctorsArray.length];
         for (int i = 0; i < sortedDoctorsArray.length; i++) {
             doctorArray[i] = (Doctor) sortedDoctorsArray[i];
@@ -300,11 +300,11 @@ public class DoctorManagement {
             String contact = scanner.nextLine();
             if (!contact.isEmpty()) doctor.setContactNumber(contact);
             
-            System.out.println("\n✅ Doctor details updated successfully!");
+            System.out.println("\n[OK] Doctor details updated successfully!");
             System.out.println("\nUpdated doctor information:");
             displayDoctorDetails(doctor);
         } else {
-            System.out.println("❌ Doctor not found!");
+            System.out.println("[ERROR] Doctor not found!");
         }
     }
     
@@ -313,15 +313,15 @@ public class DoctorManagement {
         System.out.println("        UPDATE DOCTOR SCHEDULE");
         System.out.println(StringUtility.repeatString("=", 60));
 
-        Object[] doctorsArray = doctorList.toArray();
-        
+        Object[] doctorsArray = doctorList.toArray(); //adt method
+
         SetAndQueueInterface<Doctor> tempList = new SetAndQueue<>();
         for (Object obj : doctorsArray) {
-            tempList.add((Doctor) obj);
+            tempList.add((Doctor) obj); //adt method
         }
-        tempList.sort();
-        
-        Object[] sortedDoctorsArray = tempList.toArray();
+        tempList.sort(); //adt method
+
+        Object[] sortedDoctorsArray = tempList.toArray(); //adt method
         Doctor[] doctorArray = new Doctor[sortedDoctorsArray.length];
         for (int i = 0; i < sortedDoctorsArray.length; i++) {
             doctorArray[i] = (Doctor) sortedDoctorsArray[i];
@@ -386,11 +386,11 @@ public class DoctorManagement {
                 if (!leaveEnd.isEmpty()) doctor.setLeaveDateEnd(leaveEnd);
             }
             
-            System.out.println("\n✅ Doctor schedule updated successfully!");
+            System.out.println("\n[OK] Doctor schedule updated successfully!");
             System.out.println("\nUpdated doctor information:");
             displayDoctorDetails(doctor);
         } else {
-            System.out.println("❌ Doctor not found!");
+            System.out.println("[ERROR] Doctor not found!");
         }
     }
     
@@ -399,12 +399,12 @@ public class DoctorManagement {
         System.out.println("        REMOVE DOCTOR");
         System.out.println(StringUtility.repeatString("=", 60));
         
-        System.out.println("📋 CURRENT DOCTOR LIST:");
+        System.out.println("CURRENT DOCTOR LIST:");
         System.out.println(StringUtility.repeatString("-", 60));
         System.out.printf("%-8s %-40s %-15s %-15s %-10s\n", "ID", "Name", "Specialization", "Contact", "Available");
         System.out.println(StringUtility.repeatString("-", 60));
-        
-        Object[] doctorsArray = doctorList.toArray();
+
+        Object[] doctorsArray = doctorList.toArray(); //adt method
         for (Object obj : doctorsArray) {
             Doctor doctor = (Doctor) obj;
             System.out.printf("%-8s %-40s %-15s %-15s %-10s\n", 
@@ -428,23 +428,23 @@ public class DoctorManagement {
             
             String confirm = InputValidator.getValidString(scanner, "Are you sure you want to remove this doctor? (yes/no): ");
             if (confirm.toLowerCase().equals("yes")) {
-                boolean removedFromList = doctorList.remove(doctor);
+                boolean removedFromList = doctorList.remove(doctor); //adt method
 
-                boolean removedFromDuty = onDutyDoctorList.remove(doctor);
+                boolean removedFromDuty = onDutyDoctorList.remove(doctor); //adt method
                 
                 if (removedFromList) {
-                    System.out.println("✅ Doctor removed successfully!");
+                    System.out.println("[OK] Doctor removed successfully!");
                     if (removedFromDuty) {
-                        System.out.println("✅ Doctor also removed from duty list.");
+                        System.out.println("[OK] Doctor also removed from duty list.");
                     }
                 } else {
-                    System.out.println("❌ Failed to remove doctor from system!");
+                    System.out.println("[ERROR] Failed to remove doctor from system!");
                 }
             } else {
-                System.out.println("❌ Doctor removal cancelled.");
+                System.out.println("[ERROR] Doctor removal cancelled.");
             }
         } else {
-            System.out.println("❌ Doctor not found!");
+            System.out.println("[ERROR] Doctor not found!");
         }
     }
     
@@ -455,7 +455,7 @@ public class DoctorManagement {
         System.out.println("Generated at: " + StringUtility.getCurrentDateTime());
         System.out.println(StringUtility.repeatString("-", 60));
 
-        Object[] doctorsArray = doctorList.toArray();
+        Object[] doctorsArray = doctorList.toArray(); //adt method
         int totalDoctors = doctorsArray.length;
         int availableCount = 0, onLeaveCount = 0, onDutyCount = 0;
 
@@ -465,7 +465,7 @@ public class DoctorManagement {
             Doctor d = (Doctor) doctorsArray[i];
             boolean available = d.isIsAvailable();
             boolean onLeave = d.isOnLeave();
-            boolean onDuty = onDutyDoctorList.contains(d);
+            boolean onDuty = onDutyDoctorList.contains(d); //adt method
             if (available) availableCount++;
             if (onLeave) onLeaveCount++;
             if (onDuty) onDutyCount++;
@@ -496,7 +496,7 @@ public class DoctorManagement {
         System.out.println("Generated at: " + StringUtility.getCurrentDateTime());
         System.out.println(StringUtility.repeatString("-", 60));
 
-        Object[] doctorsArray = doctorList.toArray();
+        Object[] doctorsArray = doctorList.toArray(); //adt method
         int totalDoctors = doctorsArray.length;
         SetAndQueueInterface<String> specializationSet = new SetAndQueue<>();
 
@@ -507,8 +507,8 @@ public class DoctorManagement {
         for (Object obj : doctorsArray) {
             Doctor doctor = (Doctor) obj;
             String specialization = doctor.getSpecialization();
-            specializationSet.add(specialization);
-            
+            specializationSet.add(specialization); //adt method
+
             //count specializations
             boolean found = false;
             for (int i = 0; i < specializationIndex; i++) {
@@ -569,28 +569,28 @@ public class DoctorManagement {
     public Doctor findDoctorById(String doctorId) {
         Doctor dummy = new Doctor();
         dummy.setDoctorId(doctorId);
-        return doctorList.search(dummy);
+        return doctorList.search(dummy); //adt method
     }
-    
+
     public Doctor[] getDoctorsOnDuty() {
-        Object[] doctorsArray = onDutyDoctorList.toArray();
+        Object[] doctorsArray = onDutyDoctorList.toArray(); //adt method
         Doctor[] doctorArray = new Doctor[doctorsArray.length];
         for (int i = 0; i < doctorsArray.length; i++) {
             doctorArray[i] = (Doctor) doctorsArray[i];
         }
         return doctorArray;
     }
-    
+
     public int getTotalDoctorCount() {
-        return doctorList.size();
+        return doctorList.size(); //adt method
     }
-    
+
     public int getDoctorsOnDutyCount() {
-        return onDutyDoctorList.size();
+        return onDutyDoctorList.size(); //adt method
     }
-    
+
     public Object[] getAllDoctors() {
-        return doctorList.toArray();
+        return doctorList.toArray(); //adt method
     }
 
     private int countConsultationsForDoctor(String doctorId, Object[] consultationsArray) {
@@ -624,14 +624,14 @@ public class DoctorManagement {
         for (Object obj : consultationsArray) {
             Consultation consultation = (Consultation) obj;
             String doctorId = consultation.getDoctorId();
-            uniqueDoctors.add(doctorId);
+            uniqueDoctors.add(doctorId); //adt method
             int consultationCount = countConsultationsForDoctor(doctorId, consultationsArray);
             if (consultationCount > maxConsultations) {
                 maxConsultations = consultationCount;
             }
         }
 
-        Object[] doctorsArray = uniqueDoctors.toArray();
+        Object[] doctorsArray = uniqueDoctors.toArray(); //adt method
         int[] consultationCounts = new int[doctorsArray.length];
         int[] daysWorkedCounts = new int[doctorsArray.length];
         for (int i = 0; i < doctorsArray.length; i++) {
@@ -676,14 +676,14 @@ public class DoctorManagement {
     }
 
     private int countUniqueConsultationDaysForDoctor(String doctorId, Object[] consultationsArray) {
-        java.util.HashSet<String> uniqueDates = new java.util.HashSet<>();
+        SetAndQueueInterface<String> uniqueDates = new SetAndQueue<>();
         for (Object obj : consultationsArray) {
             Consultation consultation = (Consultation) obj;
             if (consultation.getDoctorId().equals(doctorId)) {
-                uniqueDates.add(consultation.getConsultationDate());
+                uniqueDates.add(consultation.getConsultationDate()); //adt method
             }
         }
-        return uniqueDates.size();
+        return uniqueDates.size(); //adt method
     }
     
     private String getDoctorName(String doctorId) {

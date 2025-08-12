@@ -90,8 +90,8 @@ public class ReportManagement {
                 }
             }
             ageGroupCounts[ageGroupIndex]++;
-            allDiseases.add(diagnosis);
-            diseaseByAgeGroup[ageGroupIndex].add(diagnosis);
+            allDiseases.add(diagnosis); //adt method
+            diseaseByAgeGroup[ageGroupIndex].add(diagnosis); //adt method
         }
         int maxAgeCount = 0;
         for (int i = 0; i < ageGroupNames.length; i++) {
@@ -105,9 +105,9 @@ public class ReportManagement {
         }
         System.out.println("\nDISEASES BY AGE GROUP:");
         for (int i = 0; i < ageGroupNames.length; i++) {
-            if (!diseaseByAgeGroup[i].isEmpty()) {
+            if (!diseaseByAgeGroup[i].isEmpty()) { //adt method
                 System.out.println(ageGroupNames[i] + ":");;
-                Object[] diseasesArray = diseaseByAgeGroup[i].toArray();
+                Object[] diseasesArray = diseaseByAgeGroup[i].toArray(); //adt method
                 Object[][] diseaseRows = new Object[diseasesArray.length][2];
                 int maxCases = 0;
                 for (int j = 0; j < diseasesArray.length; j++) {
@@ -127,7 +127,7 @@ public class ReportManagement {
 
         System.out.println("\nSUMMARY:");
         System.out.println("• Total Patients: " + patientsArray.length);
-        System.out.println("• Total Diagnoses: " + allDiseases.size());
+        System.out.println("• Total Diagnoses: " + allDiseases.size()); //adt method
         System.out.println(StringUtility.repeatString("=", 80));
         System.out.println("Press Enter to continue...");
         scanner.nextLine();
@@ -174,13 +174,13 @@ public class ReportManagement {
             entity.Patient patient = patientManagement.findPatientById(Integer.parseInt(patientId));
             if (patient == null) continue;
             adt.SetAndQueueInterface<entity.PrescribedMedicine> meds = prescription.getPrescribedMedicines();
-            Object[] medsArray = meds.toArray();
+            Object[] medsArray = meds.toArray(); //adt method
             for (Object medObj : medsArray) {
                 entity.PrescribedMedicine med = (entity.PrescribedMedicine) medObj;
                 String medName = med.getMedicineName();
                 //find or create index for this medicine
                 int medIdx = -1;
-                Object[] existingMeds = medicineNames.toArray();
+                Object[] existingMeds = medicineNames.toArray(); //adt method
                 for (int i = 0; i < existingMeds.length; i++) {
                     if (existingMeds[i].equals(medName)) {
                         medIdx = i;
@@ -189,33 +189,33 @@ public class ReportManagement {
                 }
                 if (medIdx == -1) {
                     medIdx = medicineIndex++;
-                    medicineNames.add(medName);
+                    medicineNames.add(medName); //adt method
                     medicineToPatients[medIdx] = new SetAndQueue<>();
                     medicineToDiseases[medIdx] = new SetAndQueue<>();
                 }
                 //track unique patients and diseases
-                medicineToPatients[medIdx].add(patientId);
-                medicineToDiseases[medIdx].add(diagnosis);
+                medicineToPatients[medIdx].add(patientId); //adt method
+                medicineToDiseases[medIdx].add(diagnosis); //adt method
             }
         }
 
         String[] headers = {"Medicine", "Unique Patients", "Diseases"};
-        Object[] medNamesArray = medicineNames.toArray();
+        Object[] medNamesArray = medicineNames.toArray(); //adt method
         Object[][] rows = new Object[medNamesArray.length][headers.length];
         for (int i = 0; i < medNamesArray.length; i++) {
             String medName = (String) medNamesArray[i];
             rows[i][0] = medName;
-            rows[i][1] = medicineToPatients[i].size();
+            rows[i][1] = medicineToPatients[i].size(); //adt method
             //convert diseases set to comma-separated string
-            Object[] diseasesArray = medicineToDiseases[i].toArray();
+            Object[] diseasesArray = medicineToDiseases[i].toArray(); //adt method
             StringBuilder diseasesStr = new StringBuilder();
             for (int j = 0; j < diseasesArray.length; j++) {
                 if (j > 0) diseasesStr.append(", ");
                 diseasesStr.append(diseasesArray[j]);
             }
             rows[i][2] = diseasesStr.toString();
-            if (medicineToPatients[i].size() > maxPatients) {
-                maxPatients = medicineToPatients[i].size();
+            if (medicineToPatients[i].size() > maxPatients) { //adt method
+                maxPatients = medicineToPatients[i].size(); //adt method
             }
         }
         System.out.println("\nMEDICINE USAGE TABLE:");
@@ -225,7 +225,7 @@ public class ReportManagement {
         int barWidth = 30;
         for (int i = 0; i < medNamesArray.length; i++) {
             String medName = (String) medNamesArray[i];
-            int count = medicineToPatients[i].size();
+            int count = medicineToPatients[i].size(); //adt method
             System.out.printf("%-20s [%s] %d patients\n", medName, StringUtility.greenBarChart(count, maxPatients, barWidth), count);
         }
 
