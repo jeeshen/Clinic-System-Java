@@ -46,6 +46,12 @@ public class ClinicSystem {
         reportUI.setDependencies(patientManagement, doctorManagement, consultationManagement, treatmentManagement);
         pharmacyUI.setDependencies(treatmentManagement);
         pharmacyManagement.setTreatmentManagement(treatmentManagement);
+        treatmentManagement.setPatientManagement(patientManagement);
+        treatmentManagement.setDoctorManagement(doctorManagement);
+        
+        //initialize entity relationships for sample data
+        consultationManagement.initializeEntityRelationships();
+        treatmentManagement.initializeEntityRelationships();
     }
     
     public void run() {

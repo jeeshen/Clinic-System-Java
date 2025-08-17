@@ -58,14 +58,17 @@ public class DoctorManagementUI {
             System.out.println("1 . View All Doctors (Sorted by ID)");
             System.out.println("2 . Search Doctor by ID");
             System.out.println("3 . Search Doctor by Specialization");
-            System.out.println("4 . Update Doctor Details");
-            System.out.println("5 . Update Doctor Schedule");
-            System.out.println("6 . Remove Doctor");
+            System.out.println("4 . Search Doctor Consultations");
+            System.out.println("5 . Search Doctor Treatments");
+            System.out.println("6 . Search Doctor Prescriptions");
+            System.out.println("7 . Update Doctor Details");
+            System.out.println("8 . Update Doctor Schedule");
+            System.out.println("9 . Remove Doctor");
             System.out.println("0 . Back to Main Menu");
             System.out.println(StringUtility.repeatString("-", 50));
             System.out.print("Enter your choice: ");
             
-            int choice = getUserInputInt(0, 6);
+            int choice = getUserInputInt(0, 9);
             
             switch (choice) {
                 case 1:
@@ -78,12 +81,21 @@ public class DoctorManagementUI {
                     doctorManagement.searchDoctorBySpecialization();
                     break;
                 case 4:
-                    doctorManagement.updateDoctorDetails();
+                    doctorManagement.searchDoctorConsultations();
                     break;
                 case 5:
-                    doctorManagement.updateDoctorSchedule();
+                    doctorManagement.searchDoctorTreatments();
                     break;
                 case 6:
+                    doctorManagement.searchDoctorPrescriptions();
+                    break;
+                case 7:
+                    doctorManagement.updateDoctorDetails();
+                    break;
+                case 8:
+                    doctorManagement.updateDoctorSchedule();
+                    break;
+                case 9:
                     doctorManagement.removeDoctor();
                     break;
                 case 0:

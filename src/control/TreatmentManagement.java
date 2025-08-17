@@ -7,6 +7,8 @@ import entity.PrescribedMedicine;
 import entity.Patient;
 import entity.Doctor;
 import entity.Medicine;
+import entity.Treatment;
+import entity.PharmacyTransaction;
 import dao.DataInitializer;
 import java.util.Scanner;
 import utility.StringUtility;
@@ -18,10 +20,20 @@ public class TreatmentManagement {
     private Scanner scanner;
     private int prescriptionIdCounter = 3001;
     private int prescribedMedicineIdCounter = 4001;
+    private PatientManagement patientManagement;
+    private DoctorManagement doctorManagement;
     
     public TreatmentManagement() {
         scanner = new Scanner(System.in);
         loadSampleData();
+    }
+    
+    public void setPatientManagement(PatientManagement patientManagement) {
+        this.patientManagement = patientManagement;
+    }
+    
+    public void setDoctorManagement(DoctorManagement doctorManagement) {
+        this.doctorManagement = doctorManagement;
     }
 
     private void loadSampleData() {
@@ -33,6 +45,63 @@ public class TreatmentManagement {
         Prescription[] samplePrescriptions = DataInitializer.initializeSamplePrescriptions();
         for (Prescription prescription : samplePrescriptions) {
             prescriptionList.add(prescription); //adt method
+        }
+    }
+    
+    public void initializeEntityRelationships() {
+        if (patientManagement == null || doctorManagement == null) {
+            return;
+        }
+        
+        Object[] prescriptionsArray = prescriptionList.toArray();
+        for (Object obj : prescriptionsArray) {
+            Prescription prescription = (Prescription) obj;
+            
+            try {
+                int patientId = Integer.parseInt(prescription.getPatientId());
+                Patient patient = patientManagement.findPatientById(patientId);
+                if (patient != null) {
+                    patient.getPrescriptions().add(prescription);
+                }
+            } catch (NumberFormatException e) {
+                System.out.println("Error parsing patient ID: " + prescription.getPatientId());
+            }
+            
+            Doctor doctor = doctorManagement.findDoctorById(prescription.getDoctorId());
+            if (doctor != null) {
+                doctor.getPrescriptions().add(prescription);
+            }
+        }
+        
+        Treatment[] sampleTreatments = DataInitializer.initializeSampleTreatments();
+        for (Treatment treatment : sampleTreatments) {
+            try {
+                int patientId = Integer.parseInt(treatment.getPatientId());
+                Patient patient = patientManagement.findPatientById(patientId);
+                if (patient != null) {
+                    patient.getTreatments().add(treatment);
+                }
+            } catch (NumberFormatException e) {
+                System.out.println("Error parsing patient ID: " + treatment.getPatientId());
+            }
+            
+            Doctor doctor = doctorManagement.findDoctorById(treatment.getDoctorId());
+            if (doctor != null) {
+                doctor.getTreatments().add(treatment);
+            }
+        }
+        
+        PharmacyTransaction[] sampleTransactions = DataInitializer.initializeSampleTransactions();
+        for (PharmacyTransaction transaction : sampleTransactions) {
+            try {
+                int patientId = Integer.parseInt(transaction.getPatientId());
+                Patient patient = patientManagement.findPatientById(patientId);
+                if (patient != null) {
+                    patient.getPharmacyTransactions().add(transaction);
+                }
+            } catch (NumberFormatException e) {
+                System.out.println("Error parsing patient ID: " + transaction.getPatientId());
+            }
         }
     }
     
@@ -97,7 +166,28 @@ public class TreatmentManagement {
             }
         }
 
+        if (prescription.getPrescribedMedicines().isEmpty()) {
+            System.out.println("No medicines were prescribed for this consultation.");
+            System.out.println("No prescription created.");
+            return;
+        }
+
         prescriptionList.add(prescription); //adt method
+        
+        if (patientManagement != null) {
+            Patient patient = patientManagement.findPatientById(currentPatient.getId());
+            if (patient != null) {
+                patient.getPrescriptions().add(prescription);
+            }
+        }
+        
+        if (doctorManagement != null) {
+            Doctor doctor = doctorManagement.findDoctorById(selectedDoctor.getDoctorId());
+            if (doctor != null) {
+                doctor.getPrescriptions().add(prescription);
+            }
+        }
+        
         System.out.println("Prescription ID: " + prescriptionId);
         System.out.println("Total cost: RM " + String.format("%.2f", prescription.getTotalCost()));
     }

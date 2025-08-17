@@ -1,7 +1,7 @@
 package entity;
 
 //pharmarcy
-public class PharmacyTransaction {
+public class PharmacyTransaction implements Comparable<PharmacyTransaction> {
     private String transactionId;
     private String patientId;
     private String medicineId;
@@ -87,5 +87,10 @@ public class PharmacyTransaction {
             return false;
         }
         return true;
+    }
+    
+    @Override
+    public int compareTo(PharmacyTransaction other) {
+        return this.transactionId.compareTo(other.transactionId);
     }
 }

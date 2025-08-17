@@ -1,6 +1,6 @@
 package entity;
 
-public class Treatment {
+public class Treatment implements Comparable<Treatment> {
     private String treatmentId;
     private String patientId;
     private String doctorId;
@@ -99,5 +99,10 @@ public class Treatment {
             return false;
         }
         return true;
+    }
+    
+    @Override
+    public int compareTo(Treatment other) {
+        return this.treatmentId.compareTo(other.treatmentId);
     }
 }

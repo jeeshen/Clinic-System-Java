@@ -39,6 +39,32 @@ public class ConsultationManagement {
         }
     }
     
+    public void initializeEntityRelationships() {
+        if (patientManagement == null || doctorManagement == null) {
+            return;
+        }
+        
+        Object[] consultationsArray = consultationList.toArray();
+        for (Object obj : consultationsArray) {
+            Consultation consultation = (Consultation) obj;
+            
+            try {
+                int patientId = Integer.parseInt(consultation.getPatientId());
+                Patient patient = patientManagement.findPatientById(patientId);
+                if (patient != null) {
+                    patient.getConsultations().add(consultation);
+                }
+            } catch (NumberFormatException e) {
+                System.out.println("Error parsing patient ID: " + consultation.getPatientId());
+            }
+            
+            Doctor doctor = doctorManagement.findDoctorById(consultation.getDoctorId());
+            if (doctor != null) {
+                doctor.getConsultations().add(consultation);
+            }
+        }
+    }
+    
     public void conductConsultation(PatientManagement patientManagement, DoctorManagement doctorManagement, TreatmentManagement treatmentManagement) {
         if (doctorManagement.getDoctorsOnDutyCount() == 0) {
             System.out.println("No doctors on duty! Please add doctors to duty first.");
@@ -86,6 +112,16 @@ public class ConsultationManagement {
         Consultation consultation = new Consultation(consultationId, String.valueOf(currentPatient.getId()), selectedDoctor.getDoctorId(), consultationDate, "Completed", diagnosis);
         
         consultationList.add(consultation); //adt method
+        
+        Patient patient = patientManagement.findPatientById(currentPatient.getId());
+        if (patient != null) {
+            patient.getConsultations().add(consultation);
+        }
+        
+        Doctor doctor = doctorManagement.findDoctorById(selectedDoctor.getDoctorId());
+        if (doctor != null) {
+            doctor.getConsultations().add(consultation);
+        }
         
         //create prescription through treatment management
         treatmentManagement.createPrescription(consultationId, currentPatient, selectedDoctor, diagnosis, consultationDate);

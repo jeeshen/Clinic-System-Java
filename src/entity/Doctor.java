@@ -1,5 +1,8 @@
 package entity;
 
+import adt.SetAndQueueInterface;
+import adt.SetAndQueue;
+
 public class Doctor implements Comparable<Doctor> {
     private String doctorId;
     private String name;
@@ -11,6 +14,9 @@ public class Doctor implements Comparable<Doctor> {
     private boolean onLeave;
     private String leaveDateStart;
     private String leaveDateEnd;
+    private SetAndQueueInterface<Consultation> consultations = new SetAndQueue<>();
+    private SetAndQueueInterface<Treatment> treatments = new SetAndQueue<>();
+    private SetAndQueueInterface<Prescription> prescriptions = new SetAndQueue<>();
 
     public Doctor() {
         this("", "", "", "", "", false, "", false, "", "");
@@ -107,6 +113,18 @@ public class Doctor implements Comparable<Doctor> {
 
     public void setLeaveDateEnd(String leaveDateEnd) {
         this.leaveDateEnd = leaveDateEnd;
+    }
+
+    public SetAndQueueInterface<Consultation> getConsultations() {
+        return consultations;
+    }
+
+    public SetAndQueueInterface<Treatment> getTreatments() {
+        return treatments;
+    }
+
+    public SetAndQueueInterface<Prescription> getPrescriptions() {
+        return prescriptions;
     }
 
     @Override

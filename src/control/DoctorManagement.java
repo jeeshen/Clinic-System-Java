@@ -4,6 +4,8 @@ import adt.SetAndQueueInterface;
 import adt.SetAndQueue;
 import entity.Doctor;
 import entity.Consultation;
+import entity.Treatment;
+import entity.Prescription;
 import dao.DataInitializer;
 import java.util.Scanner;
 import utility.StringUtility;
@@ -692,5 +694,105 @@ public class DoctorManagement {
             return doctor.getName();
         }
         return "Unknown Doctor";
+    }
+    
+    public void searchDoctorConsultations() {
+        System.out.print("Enter doctor ID to search consultations: ");
+        String doctorId = scanner.nextLine();
+        
+        Doctor doctor = findDoctorById(doctorId);
+        if (doctor == null) {
+            System.out.println("Doctor not found!");
+            return;
+        }
+        
+        Object[] consultationsArray = doctor.getConsultations().toArray();
+        String[] headers = {"Consultation ID", "Patient ID", "Date", "Status", "Notes"};
+        Object[][] rows = new Object[consultationsArray.length][headers.length];
+        for (int i = 0; i < consultationsArray.length; i++) {
+            Consultation consultation = (Consultation) consultationsArray[i];
+            rows[i][0] = consultation.getConsultationId();
+            rows[i][1] = consultation.getPatientId();
+            rows[i][2] = consultation.getConsultationDate();
+            rows[i][3] = consultation.getStatus();
+            rows[i][4] = consultation.getNotes();
+        }
+        System.out.print(StringUtility.formatTableNoDividers(
+            "CONSULTATIONS FOR DOCTOR: " + doctor.getName(),
+            headers,
+            rows
+        ));
+        if (consultationsArray.length == 0) {
+            System.out.println("No consultations found for this doctor.");
+        }
+        System.out.println("Press Enter to continue...");
+        scanner.nextLine();
+    }
+    
+    public void searchDoctorTreatments() {
+        System.out.print("Enter doctor ID to search treatments: ");
+        String doctorId = scanner.nextLine();
+        
+        Doctor doctor = findDoctorById(doctorId);
+        if (doctor == null) {
+            System.out.println("Doctor not found!");
+            return;
+        }
+        
+        Object[] treatmentsArray = doctor.getTreatments().toArray();
+        String[] headers = {"Treatment ID", "Patient ID", "Diagnosis", "Medications", "Date"};
+        Object[][] rows = new Object[treatmentsArray.length][headers.length];
+        for (int i = 0; i < treatmentsArray.length; i++) {
+            Treatment treatment = (Treatment) treatmentsArray[i];
+            rows[i][0] = treatment.getTreatmentId();
+            rows[i][1] = treatment.getPatientId();
+            rows[i][2] = treatment.getDiagnosis();
+            rows[i][3] = treatment.getPrescribedMedications();
+            rows[i][4] = treatment.getTreatmentDate();
+        }
+        System.out.print(StringUtility.formatTableNoDividers(
+            "TREATMENTS BY DOCTOR: " + doctor.getName(),
+            headers,
+            rows
+        ));
+        if (treatmentsArray.length == 0) {
+            System.out.println("No treatments found for this doctor.");
+        }
+        System.out.println("Press Enter to continue...");
+        scanner.nextLine();
+    }
+    
+    public void searchDoctorPrescriptions() {
+        System.out.print("Enter doctor ID to search prescriptions: ");
+        String doctorId = scanner.nextLine();
+        
+        Doctor doctor = findDoctorById(doctorId);
+        if (doctor == null) {
+            System.out.println("Doctor not found!");
+            return;
+        }
+        
+        Object[] prescriptionsArray = doctor.getPrescriptions().toArray();
+        String[] headers = {"Prescription ID", "Patient ID", "Diagnosis", "Total Cost", "Status", "Paid"};
+        Object[][] rows = new Object[prescriptionsArray.length][headers.length];
+        for (int i = 0; i < prescriptionsArray.length; i++) {
+            Prescription prescription = (Prescription) prescriptionsArray[i];
+            rows[i][0] = prescription.getPrescriptionId();
+            rows[i][1] = prescription.getPatientId();
+            rows[i][2] = prescription.getDiagnosis();
+            rows[i][3] = "RM " + String.format("%.2f", prescription.getTotalCost());
+            rows[i][4] = prescription.getStatus();
+            rows[i][5] = prescription.isPaid() ? "Yes" : "No";
+        }
+        System.out.print(StringUtility.formatTableNoDividers(
+            "PRESCRIPTIONS BY DOCTOR: " + doctor.getName(),
+            headers,
+            rows
+        ));
+        if (prescriptionsArray.length == 0) {
+            System.out.println("No prescriptions found for this doctor.");
+        }
+        System.out.println("Press Enter to continue...");
+        scanner.nextLine();
     }
 } 
