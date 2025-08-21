@@ -1,6 +1,6 @@
 package entity;
 
-//pharmarcy
+//chan jee shen
 public class PharmacyTransaction implements Comparable<PharmacyTransaction> {
     private String transactionId;
     private String patientId;

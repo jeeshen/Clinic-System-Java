@@ -1,6 +1,6 @@
 package entity;
 
-//pharmarcy module
+//chan jee shen
 public class Medicine implements Comparable<Medicine> {
     private String medicineId;
     private String name;

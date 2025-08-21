@@ -1,7 +1,7 @@
 package control;
 
 import adt.SetAndQueueInterface;
-import adt.SetAndQueue;
+import adt.SetQueueArray;
 import entity.Medicine;
 import entity.Prescription;
 import entity.PrescribedMedicine;
@@ -11,7 +11,7 @@ import java.util.Scanner;
 import utility.InputValidator;
 
 public class PharmacyManagement {
-    private SetAndQueueInterface<Medicine> medicineList = new SetAndQueue<>();
+    private SetAndQueueInterface<Medicine> medicineList = new SetQueueArray<>();
     private Scanner scanner;
     private TreatmentManagement treatmentManagement;
     private static final int LOW_STOCK_THRESHOLD = 10;
@@ -34,7 +34,7 @@ public class PharmacyManagement {
     
     public void displayAllMedicinesSorted() {
         Object[] medicinesArray = medicineList.toArray(); //adt method
-        SetAndQueueInterface<Medicine> tempList = new SetAndQueue<>();
+        SetAndQueueInterface<Medicine> tempList = new SetQueueArray<>();
         for (Object obj : medicinesArray) {
             tempList.add((Medicine) obj); //adt method
         }
@@ -84,7 +84,7 @@ public class PharmacyManagement {
         
         Object[] medicinesArray = medicineList.toArray(); //adt method
         String[] headers = {"ID", "Name", "Brand", "Stock", "Price"};
-        SetAndQueueInterface<Object[]> rowList = new SetAndQueue<>();
+        SetAndQueueInterface<Object[]> rowList = new SetQueueArray<>();
         for (Object obj : medicinesArray) {
             Medicine medicine = (Medicine) obj;
             if (medicine.getName().toLowerCase().contains(name.toLowerCase())) {
@@ -386,8 +386,8 @@ public class PharmacyManagement {
         double totalInventoryValue = 0.0;
         
         //create separate lists for low stock and out of stock medicines
-        SetAndQueueInterface<Medicine> lowStockMedicines = new SetAndQueue<>();
-        SetAndQueueInterface<Medicine> outOfStockMedicines = new SetAndQueue<>();
+        SetAndQueueInterface<Medicine> lowStockMedicines = new SetQueueArray<>();
+        SetAndQueueInterface<Medicine> outOfStockMedicines = new SetQueueArray<>();
         
         for (Object obj : medicinesArray) {
             Medicine medicine = (Medicine) obj;
@@ -859,7 +859,7 @@ public class PharmacyManagement {
         SetAndQueueInterface<Medicine> alternatives = sameActiveIngredient.intersection(sufficientStock); //adt method
 
         //remove the original medicine from alternatives
-        SetAndQueueInterface<Medicine> finalAlternatives = new SetAndQueue<>();
+        SetAndQueueInterface<Medicine> finalAlternatives = new SetQueueArray<>();
         Object[] altArray = alternatives.toArray(); //adt method
         for (Object obj : altArray) {
             Medicine alt = (Medicine) obj;
@@ -906,7 +906,7 @@ public class PharmacyManagement {
         SetAndQueueInterface<Medicine> alternatives = sameActiveIngredient.intersection(sufficientStock); //adt method
 
         //remove the original medicine from alternatives
-        SetAndQueueInterface<Medicine> finalAlternatives = new SetAndQueue<>();
+        SetAndQueueInterface<Medicine> finalAlternatives = new SetQueueArray<>();
         Object[] altArray = alternatives.toArray(); //adt method
         for (Object obj : altArray) {
             Medicine alt = (Medicine) obj;
@@ -962,7 +962,7 @@ public class PharmacyManagement {
     }
 
     private SetAndQueueInterface<Medicine> findMedicinesByActiveIngredient(String activeIngredient) {
-        SetAndQueueInterface<Medicine> result = new SetAndQueue<>();
+        SetAndQueueInterface<Medicine> result = new SetQueueArray<>();
         Object[] medicinesArray = medicineList.toArray(); //adt method
         for (Object obj : medicinesArray) {
             Medicine m = (Medicine) obj;
@@ -974,7 +974,7 @@ public class PharmacyManagement {
     }
 
     private SetAndQueueInterface<Medicine> findMedicinesWithSufficientStock(int requiredQuantity) {
-        SetAndQueueInterface<Medicine> result = new SetAndQueue<>();
+        SetAndQueueInterface<Medicine> result = new SetQueueArray<>();
         Object[] medicinesArray = medicineList.toArray(); //adt method
         for (Object obj : medicinesArray) {
             Medicine m = (Medicine) obj;
@@ -993,7 +993,7 @@ public class PharmacyManagement {
         System.out.println(StringUtility.repeatString("-", 60));
         
         Object[] medicinesArray = medicineList.toArray();
-        SetAndQueueInterface<String> categorySet = new SetAndQueue<>();
+        SetAndQueueInterface<String> categorySet = new SetQueueArray<>();
 
         int[] categoryCounts = new int[100];
         String[] categoryArray = new String[100];

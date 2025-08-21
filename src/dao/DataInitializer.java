@@ -8,7 +8,7 @@ import entity.Treatment;
 import entity.PharmacyTransaction;
 import entity.Prescription;
 import entity.PrescribedMedicine;
-import adt.SetAndQueue;
+import adt.SetQueueArray;
 import adt.SetAndQueueInterface;
 
 public class DataInitializer {
@@ -262,109 +262,109 @@ public class DataInitializer {
     public static Prescription[] initializeSamplePrescriptions() {
         Prescription[] prescriptions = new Prescription[35];
 
-        SetAndQueueInterface<PrescribedMedicine> pm1 = new SetAndQueue<>();
+        SetAndQueueInterface<PrescribedMedicine> pm1 = new SetQueueArray<>();
         pm1.add(new PrescribedMedicine("PM001", "PRE001", "MED007", "Amlodipine", 30, "1 tablet daily", "Take in the morning", 32.80, 984.00, true));
         
-        SetAndQueueInterface<PrescribedMedicine> pm2 = new SetAndQueue<>();
+        SetAndQueueInterface<PrescribedMedicine> pm2 = new SetQueueArray<>();
         pm2.add(new PrescribedMedicine("PM002", "PRE002", "MED003", "Ibuprofen", 20, "1 tablet every 6 hours", "Take with food", 12.90, 258.00, true));
         
-        SetAndQueueInterface<PrescribedMedicine> pm3 = new SetAndQueue<>();
+        SetAndQueueInterface<PrescribedMedicine> pm3 = new SetQueueArray<>();
         pm3.add(new PrescribedMedicine("PM003", "PRE003", "MED006", "Metformin", 60, "1 tablet twice daily", "Take with meals", 22.40, 1344.00, true));
         
-        SetAndQueueInterface<PrescribedMedicine> pm4 = new SetAndQueue<>();
+        SetAndQueueInterface<PrescribedMedicine> pm4 = new SetQueueArray<>();
         pm4.add(new PrescribedMedicine("PM004", "PRE004", "MED009", "Sertraline", 30, "1 tablet daily", "Take in the morning", 45.60, 1368.00, true));
         
-        SetAndQueueInterface<PrescribedMedicine> pm5 = new SetAndQueue<>();
+        SetAndQueueInterface<PrescribedMedicine> pm5 = new SetQueueArray<>();
         pm5.add(new PrescribedMedicine("PM005", "PRE005", "MED004", "Omeprazole", 30, "1 tablet daily", "Take before breakfast", 25.60, 768.00, true));
         
-        SetAndQueueInterface<PrescribedMedicine> pm6 = new SetAndQueue<>();
+        SetAndQueueInterface<PrescribedMedicine> pm6 = new SetQueueArray<>();
         pm6.add(new PrescribedMedicine("PM006", "PRE006", "MED008", "Salbutamol", 1, "2 puffs as needed", "Use during asthma attacks", 28.90, 28.90, true));
         
-        SetAndQueueInterface<PrescribedMedicine> pm7 = new SetAndQueue<>();
+        SetAndQueueInterface<PrescribedMedicine> pm7 = new SetQueueArray<>();
         pm7.add(new PrescribedMedicine("PM007", "PRE007", "MED009", "Sertraline", 60, "1 tablet daily", "Take in the morning", 45.60, 2736.00, false));
         
-        SetAndQueueInterface<PrescribedMedicine> pm8 = new SetAndQueue<>();
+        SetAndQueueInterface<PrescribedMedicine> pm8 = new SetQueueArray<>();
         pm8.add(new PrescribedMedicine("PM008", "PRE008", "MED010", "Atorvastatin", 30, "1 tablet daily", "Take in the evening", 58.90, 1767.00, true));
         
-        SetAndQueueInterface<PrescribedMedicine> pm9 = new SetAndQueue<>();
+        SetAndQueueInterface<PrescribedMedicine> pm9 = new SetQueueArray<>();
         pm9.add(new PrescribedMedicine("PM009", "PRE009", "MED013", "Loratadine", 30, "1 tablet daily", "Take as needed for allergies", 16.80, 504.00, true));
         
-        SetAndQueueInterface<PrescribedMedicine> pm10 = new SetAndQueue<>();
+        SetAndQueueInterface<PrescribedMedicine> pm10 = new SetQueueArray<>();
         pm10.add(new PrescribedMedicine("PM010", "PRE010", "MED014", "Lisinopril", 30, "1 tablet daily", "Take in the morning", 28.40, 852.00, false));
         
-        SetAndQueueInterface<PrescribedMedicine> pm11 = new SetAndQueue<>();
+        SetAndQueueInterface<PrescribedMedicine> pm11 = new SetQueueArray<>();
         pm11.add(new PrescribedMedicine("PM011", "PRE011", "MED015", "Fluoxetine", 30, "1 tablet daily", "Take in the morning", 42.30, 1269.00, true));
         
-        SetAndQueueInterface<PrescribedMedicine> pm12 = new SetAndQueue<>();
+        SetAndQueueInterface<PrescribedMedicine> pm12 = new SetQueueArray<>();
         pm12.add(new PrescribedMedicine("PM012", "PRE012", "MED016", "Simvastatin", 30, "1 tablet daily", "Take in the evening", 35.70, 1071.00, true));
         
-        SetAndQueueInterface<PrescribedMedicine> pm13 = new SetAndQueue<>();
+        SetAndQueueInterface<PrescribedMedicine> pm13 = new SetQueueArray<>();
         pm13.add(new PrescribedMedicine("PM013", "PRE013", "MED017", "Montelukast", 30, "1 tablet daily", "Take in the evening", 38.90, 1167.00, false));
         
-        SetAndQueueInterface<PrescribedMedicine> pm14 = new SetAndQueue<>();
+        SetAndQueueInterface<PrescribedMedicine> pm14 = new SetQueueArray<>();
         pm14.add(new PrescribedMedicine("PM014", "PRE014", "MED018", "Pantoprazole", 30, "1 tablet daily", "Take before breakfast", 31.20, 936.00, true));
         
-        SetAndQueueInterface<PrescribedMedicine> pm15 = new SetAndQueue<>();
+        SetAndQueueInterface<PrescribedMedicine> pm15 = new SetQueueArray<>();
         pm15.add(new PrescribedMedicine("PM015", "PRE015", "MED019", "Duloxetine", 30, "1 tablet daily", "Take in the morning", 67.80, 2034.00, false));
         
-        SetAndQueueInterface<PrescribedMedicine> pm16 = new SetAndQueue<>();
+        SetAndQueueInterface<PrescribedMedicine> pm16 = new SetQueueArray<>();
         pm16.add(new PrescribedMedicine("PM016", "PRE016", "MED020", "Losartan", 30, "1 tablet daily", "Take in the morning", 29.60, 888.00, true));
         
-        SetAndQueueInterface<PrescribedMedicine> pm17 = new SetAndQueue<>();
+        SetAndQueueInterface<PrescribedMedicine> pm17 = new SetQueueArray<>();
         pm17.add(new PrescribedMedicine("PM017", "PRE017", "MED001", "Paracetamol", 20, "1-2 tablets every 4-6 hours", "Take as needed for pain", 8.50, 170.00, true));
         
-        SetAndQueueInterface<PrescribedMedicine> pm18 = new SetAndQueue<>();
+        SetAndQueueInterface<PrescribedMedicine> pm18 = new SetQueueArray<>();
         pm18.add(new PrescribedMedicine("PM018", "PRE018", "MED002", "Amoxicillin", 21, "1 capsule three times daily", "Take with food", 15.80, 331.80, true));
         
-        SetAndQueueInterface<PrescribedMedicine> pm19 = new SetAndQueue<>();
+        SetAndQueueInterface<PrescribedMedicine> pm19 = new SetQueueArray<>();
         pm19.add(new PrescribedMedicine("PM019", "PRE019", "MED005", "Cetirizine", 30, "1 tablet daily", "Take in the evening", 18.20, 546.00, true));
         
-        SetAndQueueInterface<PrescribedMedicine> pm20 = new SetAndQueue<>();
+        SetAndQueueInterface<PrescribedMedicine> pm20 = new SetQueueArray<>();
         pm20.add(new PrescribedMedicine("PM020", "PRE020", "MED011", "Aspirin", 30, "1 tablet daily", "Take with food", 6.50, 195.00, false));
 
-        SetAndQueueInterface<PrescribedMedicine> pm21 = new SetAndQueue<>();
+        SetAndQueueInterface<PrescribedMedicine> pm21 = new SetQueueArray<>();
         pm21.add(new PrescribedMedicine("PM021", "PRE021", "MED022", "Cephalexin", 14, "1 capsule four times daily", "Take with food", 18.90, 264.60, true));
 
-        SetAndQueueInterface<PrescribedMedicine> pm22 = new SetAndQueue<>();
+        SetAndQueueInterface<PrescribedMedicine> pm22 = new SetQueueArray<>();
         pm22.add(new PrescribedMedicine("PM022", "PRE022", "MED023", "Diclofenac", 30, "1 tablet twice daily", "Take with food", 14.70, 441.00, false));
 
-        SetAndQueueInterface<PrescribedMedicine> pm23 = new SetAndQueue<>();
+        SetAndQueueInterface<PrescribedMedicine> pm23 = new SetQueueArray<>();
         pm23.add(new PrescribedMedicine("PM023", "PRE023", "MED024", "Ranitidine", 30, "1 tablet twice daily", "Take before meals", 19.80, 594.00, true));
 
-        SetAndQueueInterface<PrescribedMedicine> pm24 = new SetAndQueue<>();
+        SetAndQueueInterface<PrescribedMedicine> pm24 = new SetQueueArray<>();
         pm24.add(new PrescribedMedicine("PM024", "PRE024", "MED025", "Fexofenadine", 30, "1 tablet daily", "Take in the morning", 21.50, 645.00, true));
 
-        SetAndQueueInterface<PrescribedMedicine> pm25 = new SetAndQueue<>();
+        SetAndQueueInterface<PrescribedMedicine> pm25 = new SetQueueArray<>();
         pm25.add(new PrescribedMedicine("PM025", "PRE025", "MED026", "Glipizide", 30, "1 tablet twice daily", "Take with meals", 26.80, 804.00, false));
 
-        SetAndQueueInterface<PrescribedMedicine> pm26 = new SetAndQueue<>();
+        SetAndQueueInterface<PrescribedMedicine> pm26 = new SetQueueArray<>();
         pm26.add(new PrescribedMedicine("PM026", "PRE026", "MED027", "Nifedipine", 30, "1 tablet daily", "Take in the morning", 35.40, 1062.00, true));
 
-        SetAndQueueInterface<PrescribedMedicine> pm27 = new SetAndQueue<>();
+        SetAndQueueInterface<PrescribedMedicine> pm27 = new SetQueueArray<>();
         pm27.add(new PrescribedMedicine("PM027", "PRE027", "MED028", "Budesonide", 1, "2 puffs twice daily", "Rinse mouth after use", 52.30, 52.30, true));
 
-        SetAndQueueInterface<PrescribedMedicine> pm28 = new SetAndQueue<>();
+        SetAndQueueInterface<PrescribedMedicine> pm28 = new SetQueueArray<>();
         pm28.add(new PrescribedMedicine("PM028", "PRE028", "MED029", "Escitalopram", 30, "1 tablet daily", "Take in the morning", 48.90, 1467.00, false));
 
-        SetAndQueueInterface<PrescribedMedicine> pm29 = new SetAndQueue<>();
+        SetAndQueueInterface<PrescribedMedicine> pm29 = new SetQueueArray<>();
         pm29.add(new PrescribedMedicine("PM029", "PRE029", "MED030", "Rosuvastatin", 30, "1 tablet daily", "Take in the evening", 62.70, 1881.00, true));
 
-        SetAndQueueInterface<PrescribedMedicine> pm30 = new SetAndQueue<>();
+        SetAndQueueInterface<PrescribedMedicine> pm30 = new SetQueueArray<>();
         pm30.add(new PrescribedMedicine("PM030", "PRE030", "MED031", "Naproxen", 20, "1 tablet twice daily", "Take with food", 11.40, 228.00, true));
 
-        SetAndQueueInterface<PrescribedMedicine> pm31 = new SetAndQueue<>();
+        SetAndQueueInterface<PrescribedMedicine> pm31 = new SetQueueArray<>();
         pm31.add(new PrescribedMedicine("PM031", "PRE031", "MED032", "Metoprolol", 30, "1 tablet twice daily", "Take with food", 24.60, 738.00, false));
 
-        SetAndQueueInterface<PrescribedMedicine> pm32 = new SetAndQueue<>();
+        SetAndQueueInterface<PrescribedMedicine> pm32 = new SetQueueArray<>();
         pm32.add(new PrescribedMedicine("PM032", "PRE032", "MED033", "Prednisone", 10, "1 tablet daily", "Take with food", 15.80, 158.00, true));
 
-        SetAndQueueInterface<PrescribedMedicine> pm33 = new SetAndQueue<>();
+        SetAndQueueInterface<PrescribedMedicine> pm33 = new SetQueueArray<>();
         pm33.add(new PrescribedMedicine("PM033", "PRE033", "MED034", "Tramadol", 20, "1 tablet every 6 hours", "Take as needed for pain", 28.70, 574.00, true));
 
-        SetAndQueueInterface<PrescribedMedicine> pm34 = new SetAndQueue<>();
+        SetAndQueueInterface<PrescribedMedicine> pm34 = new SetQueueArray<>();
         pm34.add(new PrescribedMedicine("PM034", "PRE034", "MED035", "Warfarin", 30, "1 tablet daily", "Monitor INR regularly", 12.30, 369.00, false));
 
-        SetAndQueueInterface<PrescribedMedicine> pm35 = new SetAndQueue<>();
+        SetAndQueueInterface<PrescribedMedicine> pm35 = new SetQueueArray<>();
         pm35.add(new PrescribedMedicine("PM035", "PRE035", "MED036", "Levothyroxine", 30, "1 tablet daily", "Take on empty stomach", 18.90, 567.00, true));
         
         prescriptions[0] = new Prescription("PRE001", "CON001", "1", "DOC001", "Hypertension", pm1, "10-07-2025", "active", 984.00, true);

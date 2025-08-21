@@ -1,7 +1,7 @@
 package control;
 
 import adt.SetAndQueueInterface;
-import adt.SetAndQueue;
+import adt.SetQueueArray;
 import entity.Doctor;
 import entity.Consultation;
 import entity.Treatment;
@@ -12,8 +12,8 @@ import utility.StringUtility;
 import utility.InputValidator;
 
 public class DoctorManagement {
-    private SetAndQueueInterface<Doctor> doctorList = new SetAndQueue<>();
-    private SetAndQueueInterface<Doctor> onDutyDoctorList = new SetAndQueue<>();
+    private SetAndQueueInterface<Doctor> doctorList = new SetQueueArray<>();
+    private SetAndQueueInterface<Doctor> onDutyDoctorList = new SetQueueArray<>();
     private Scanner scanner;
     private ConsultationManagement consultationManagement;
     
@@ -143,7 +143,7 @@ public class DoctorManagement {
     public void displayAllDoctorsSorted() {
         Object[] doctorsArray = doctorList.toArray(); //adt method
 
-        SetAndQueueInterface<Doctor> tempList = new SetAndQueue<>();
+        SetAndQueueInterface<Doctor> tempList = new SetQueueArray<>();
         for (Object obj : doctorsArray) {
             tempList.add((Doctor) obj); //adt method
         }
@@ -192,7 +192,7 @@ public class DoctorManagement {
 
         Object[] doctorsArray = doctorList.toArray(); //adt method
         String[] headers = {"ID", "Name", "Contact", "Available"};
-        SetAndQueueInterface<Object[]> rowList = new SetAndQueue<>();
+        SetAndQueueInterface<Object[]> rowList = new SetQueueArray<>();
         for (Object obj : doctorsArray) {
             Doctor doctor = (Doctor) obj;
             if (doctor.getSpecialization().toLowerCase().contains(specialization.toLowerCase())) {
@@ -245,7 +245,7 @@ public class DoctorManagement {
 
         Object[] doctorsArray = doctorList.toArray(); //adt method
 
-        SetAndQueueInterface<Doctor> tempList = new SetAndQueue<>();
+        SetAndQueueInterface<Doctor> tempList = new SetQueueArray<>();
         for (Object obj : doctorsArray) {
             tempList.add((Doctor) obj); //adt method
         }
@@ -317,7 +317,7 @@ public class DoctorManagement {
 
         Object[] doctorsArray = doctorList.toArray(); //adt method
 
-        SetAndQueueInterface<Doctor> tempList = new SetAndQueue<>();
+        SetAndQueueInterface<Doctor> tempList = new SetQueueArray<>();
         for (Object obj : doctorsArray) {
             tempList.add((Doctor) obj); //adt method
         }
@@ -500,7 +500,7 @@ public class DoctorManagement {
 
         Object[] doctorsArray = doctorList.toArray(); //adt method
         int totalDoctors = doctorsArray.length;
-        SetAndQueueInterface<String> specializationSet = new SetAndQueue<>();
+        SetAndQueueInterface<String> specializationSet = new SetQueueArray<>();
 
         int[] specializationCounts = new int[100];
         String[] specializationArray = new String[100];
@@ -620,7 +620,7 @@ public class DoctorManagement {
 
         Object[] consultationsArray = consultationManagement.getAllConsultations();
 
-        SetAndQueueInterface<String> uniqueDoctors = new SetAndQueue<>();
+        SetAndQueueInterface<String> uniqueDoctors = new SetQueueArray<>();
         int maxConsultations = 0;
         
         for (Object obj : consultationsArray) {
@@ -678,7 +678,7 @@ public class DoctorManagement {
     }
 
     private int countUniqueConsultationDaysForDoctor(String doctorId, Object[] consultationsArray) {
-        SetAndQueueInterface<String> uniqueDates = new SetAndQueue<>();
+        SetAndQueueInterface<String> uniqueDates = new SetQueueArray<>();
         for (Object obj : consultationsArray) {
             Consultation consultation = (Consultation) obj;
             if (consultation.getDoctorId().equals(doctorId)) {

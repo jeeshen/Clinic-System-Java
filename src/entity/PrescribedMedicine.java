@@ -1,5 +1,6 @@
 package entity;
 
+//chan jee shen
 public class PrescribedMedicine implements Comparable<PrescribedMedicine> {
     private String prescribedMedicineId;
     private String prescriptionId;

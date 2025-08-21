@@ -1,8 +1,9 @@
 package entity;
 
 import adt.SetAndQueueInterface;
-import adt.SetAndQueue;
+import adt.SetQueueArray;
 
+//tew jun xiang
 public class Consultation implements Comparable<Consultation> {
     private String consultationId;
     private String patientId;
@@ -10,7 +11,7 @@ public class Consultation implements Comparable<Consultation> {
     private String consultationDate;
     private String status; //completed
     private String notes;
-    private SetAndQueueInterface<Prescription> prescriptions = new SetAndQueue<>();
+    private SetAndQueueInterface<Prescription> prescriptionList = new SetQueueArray<>();
 
     public Consultation() {
         this("", "", "", "", "", "");
@@ -74,7 +75,7 @@ public class Consultation implements Comparable<Consultation> {
     }
 
     public SetAndQueueInterface<Prescription> getPrescriptions() {
-        return prescriptions;
+        return prescriptionList;
     }
 
     @Override

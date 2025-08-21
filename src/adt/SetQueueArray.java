@@ -2,7 +2,7 @@ package adt;
 
 import java.util.Iterator;
 
-public class SetAndQueue<T> implements SetAndQueueInterface<T> {
+public class SetQueueArray<T> implements SetAndQueueInterface<T> {
     //set
     private T[] elements;
     private int setSize;
@@ -16,11 +16,11 @@ public class SetAndQueue<T> implements SetAndQueueInterface<T> {
     //shared 
     private static final int DEFAULT_CAPACITY = 100;
     
-    public SetAndQueue() {
+    public SetQueueArray() {
         this(DEFAULT_CAPACITY);
     }
     
-    public SetAndQueue(int initialCapacity) {
+    public SetQueueArray(int initialCapacity) {
         //set
         elements = (T[]) new Object[DEFAULT_CAPACITY];
         setSize = 0;
@@ -182,7 +182,7 @@ public class SetAndQueue<T> implements SetAndQueueInterface<T> {
     
     @Override
     public SetAndQueueInterface<T> union(SetAndQueueInterface<T> otherSet) {
-        SetAndQueue<T> result = new SetAndQueue<>();
+        SetQueueArray<T> result = new SetQueueArray<>();
         result.addAll(this);
         result.addAll(otherSet);
         return result;
@@ -190,7 +190,7 @@ public class SetAndQueue<T> implements SetAndQueueInterface<T> {
     
     @Override
     public SetAndQueueInterface<T> intersection(SetAndQueueInterface<T> otherSet) {
-        SetAndQueue<T> result = new SetAndQueue<>();
+        SetQueueArray<T> result = new SetQueueArray<>();
         for (int i = 0; i < setSize; i++) {
             T entry = elements[i];
             if (otherSet.contains(entry)) {
@@ -202,7 +202,7 @@ public class SetAndQueue<T> implements SetAndQueueInterface<T> {
     
     @Override
     public SetAndQueueInterface<T> difference(SetAndQueueInterface<T> otherSet) {
-        SetAndQueue<T> result = new SetAndQueue<>();
+        SetQueueArray<T> result = new SetQueueArray<>();
         for (int i = 0; i < setSize; i++) {
             T entry = elements[i];
             if (!otherSet.contains(entry)) {

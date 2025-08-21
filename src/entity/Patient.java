@@ -1,8 +1,9 @@
 package entity;
 
 import adt.SetAndQueueInterface;
-import adt.SetAndQueue;
+import adt.SetQueueArray;
 
+//chong jian sheng
 public class Patient implements Comparable<Patient> {
     private int id;
     private String name;
@@ -14,10 +15,10 @@ public class Patient implements Comparable<Patient> {
     private String registrationDate;
     private String medicalHistory;
     private String status;
-    private SetAndQueueInterface<Consultation> consultations = new SetAndQueue<>();
-    private SetAndQueueInterface<Treatment> treatments = new SetAndQueue<>();
-    private SetAndQueueInterface<Prescription> prescriptions = new SetAndQueue<>();
-    private SetAndQueueInterface<PharmacyTransaction> pharmacyTransactions = new SetAndQueue<>();
+    private SetAndQueueInterface<Consultation> consultationList = new SetQueueArray<>();
+    private SetAndQueueInterface<Treatment> treatmentList = new SetQueueArray<>();
+    private SetAndQueueInterface<Prescription> prescriptionList = new SetQueueArray<>();
+    private SetAndQueueInterface<PharmacyTransaction> pharmacyTransactionList = new SetQueueArray<>();
 
     public Patient() {
         this(0, "", 0, "", "", "", "", "", "", "");
@@ -117,19 +118,19 @@ public class Patient implements Comparable<Patient> {
     }
 
     public SetAndQueueInterface<Consultation> getConsultations() {
-        return consultations;
+        return consultationList;
     }
 
     public SetAndQueueInterface<Treatment> getTreatments() {
-        return treatments;
+        return treatmentList;
     }
 
     public SetAndQueueInterface<Prescription> getPrescriptions() {
-        return prescriptions;
+        return prescriptionList;
     }
 
     public SetAndQueueInterface<PharmacyTransaction> getPharmacyTransactions() {
-        return pharmacyTransactions;
+        return pharmacyTransactionList;
     }
 
     @Override

@@ -1,8 +1,9 @@
 package entity;
 
 import adt.SetAndQueueInterface;
-import adt.SetAndQueue;
+import adt.SetQueueArray;
 
+//chan jee shen
 public class Prescription implements Comparable<Prescription> {
     private String prescriptionId;
     private String consultationId;
@@ -16,7 +17,7 @@ public class Prescription implements Comparable<Prescription> {
     private boolean isPaid;
 
     public Prescription() {
-        this("", "", "", "", "", new SetAndQueue<>(), "", "", 0.0, false);
+        this("", "", "", "", "", new SetQueueArray<>(), "", "", 0.0, false);
     }
 
     public Prescription(String prescriptionId, String consultationId, String patientId, String doctorId, String diagnosis, SetAndQueueInterface<PrescribedMedicine> prescribedMedicines, String prescriptionDate, String status, double totalCost, boolean isPaid) {

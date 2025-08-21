@@ -2,7 +2,7 @@ package control;
 
 import java.util.Scanner;
 import adt.SetAndQueueInterface;
-import adt.SetAndQueue;
+import adt.SetQueueArray;
 import utility.StringUtility;
 
 public class ReportManagement {
@@ -67,9 +67,9 @@ public class ReportManagement {
         int[] ageGroups = {0, 20, 30, 40, 50, 60, 100};
         String[] ageGroupNames = {"0-19", "20-29", "30-39", "40-49", "50-59", "60+"};
         int[] ageGroupCounts = new int[ageGroups.length - 1];
-        SetAndQueueInterface<String>[] diseaseByAgeGroup = new SetAndQueue[ageGroups.length - 1];
-        for (int i = 0; i < diseaseByAgeGroup.length; i++) diseaseByAgeGroup[i] = new SetAndQueue<>();
-        SetAndQueueInterface<String> allDiseases = new SetAndQueue<>();
+        SetAndQueueInterface<String>[] diseaseByAgeGroup = new SetQueueArray[ageGroups.length - 1];
+        for (int i = 0; i < diseaseByAgeGroup.length; i++) diseaseByAgeGroup[i] = new SetQueueArray<>();
+        SetAndQueueInterface<String> allDiseases = new SetQueueArray<>();
         for (Object prescriptionObj : prescriptionsArray) {
             entity.Prescription prescription = (entity.Prescription) prescriptionObj;
             String diagnosis = prescription.getDiagnosis();
@@ -162,9 +162,9 @@ public class ReportManagement {
         System.out.println(StringUtility.repeatString("-", 80));
 
         Object[] prescriptionsArray = treatmentManagement.getAllPrescriptions();
-        SetAndQueueInterface<String> medicineNames = new SetAndQueue<>();
-        SetAndQueueInterface<String>[] medicineToPatients = new SetAndQueue[100];
-        SetAndQueueInterface<String>[] medicineToDiseases = new SetAndQueue[100];
+        SetAndQueueInterface<String> medicineNames = new SetQueueArray<>();
+        SetAndQueueInterface<String>[] medicineToPatients = new SetQueueArray[100];
+        SetAndQueueInterface<String>[] medicineToDiseases = new SetQueueArray[100];
         int maxPatients = 0;
         int medicineIndex = 0;
         for (Object obj : prescriptionsArray) {
@@ -190,8 +190,8 @@ public class ReportManagement {
                 if (medIdx == -1) {
                     medIdx = medicineIndex++;
                     medicineNames.add(medName); //adt method
-                    medicineToPatients[medIdx] = new SetAndQueue<>();
-                    medicineToDiseases[medIdx] = new SetAndQueue<>();
+                    medicineToPatients[medIdx] = new SetQueueArray<>();
+                    medicineToDiseases[medIdx] = new SetQueueArray<>();
                 }
                 //track unique patients and diseases
                 medicineToPatients[medIdx].add(patientId); //adt method

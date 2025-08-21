@@ -1,7 +1,7 @@
 package control;
 
 import adt.SetAndQueueInterface;
-import adt.SetAndQueue;
+import adt.SetQueueArray;
 import entity.Consultation;
 import entity.Patient;
 import entity.Doctor;
@@ -13,7 +13,7 @@ import java.util.Scanner;
 import utility.InputValidator;
 
 public class ConsultationManagement {
-    private SetAndQueueInterface<Consultation> consultationList = new SetAndQueue<>();
+    private SetAndQueueInterface<Consultation> consultationList = new SetQueueArray<>();
     private Scanner scanner;
     private int consultationIdCounter = 2001;
     private DoctorManagement doctorManagement;
@@ -135,7 +135,7 @@ public class ConsultationManagement {
     public void displayAllConsultationsSorted() {
         Object[] consultationsArray = consultationList.toArray(); //adt method
 
-        SetAndQueueInterface<Consultation> tempList = new SetAndQueue<>();
+        SetAndQueueInterface<Consultation> tempList = new SetQueueArray<>();
         for (Object obj : consultationsArray) {
             tempList.add((Consultation) obj); //adt method
         }
@@ -194,7 +194,7 @@ public class ConsultationManagement {
         
         Object[] consultationsArray = consultationList.toArray(); //adt method
         String[] headers = {"Consultation ID", "Patient Name", "Date", "Status"};
-        SetAndQueueInterface<Object[]> rowList = new SetAndQueue<>();
+        SetAndQueueInterface<Object[]> rowList = new SetQueueArray<>();
         for (Object obj : consultationsArray) {
             Consultation consultation = (Consultation) obj;
             if (consultation.getDoctorId().equals(doctorId)) {
@@ -224,7 +224,7 @@ public class ConsultationManagement {
         
         Object[] consultationsArray = consultationList.toArray(); //adt method
         String[] headers = {"Consultation ID", "Doctor Name", "Date", "Status"};
-        SetAndQueueInterface<Object[]> rowList = new SetAndQueue<>();
+        SetAndQueueInterface<Object[]> rowList = new SetQueueArray<>();
         for (Object obj : consultationsArray) {
             Consultation consultation = (Consultation) obj;
             if (consultation.getPatientId().equals(patientId)) {
@@ -333,7 +333,7 @@ public class ConsultationManagement {
         Object[] consultationsArray = consultationList.toArray(); //adt method
         int totalConsultations = consultationsArray.length;
 
-        SetAndQueueInterface<String> uniqueDoctors = new SetAndQueue<>();
+        SetAndQueueInterface<String> uniqueDoctors = new SetQueueArray<>();
         int maxConsultations = 0;
 
         for (Object obj : consultationsArray) {

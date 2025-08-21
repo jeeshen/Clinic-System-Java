@@ -1,7 +1,7 @@
 package control;
 
 import adt.SetAndQueueInterface;
-import adt.SetAndQueue;
+import adt.SetQueueArray;
 import entity.Patient;
 import dao.DataInitializer;
 import utility.InputValidator;
@@ -14,8 +14,8 @@ import entity.Prescription;
 import utility.StringUtility;
 
 public class PatientManagement {
-    private SetAndQueueInterface<Patient> patientList = new SetAndQueue<>();
-    private SetAndQueueInterface<Patient> waitingPatientList = new SetAndQueue<>();
+    private SetAndQueueInterface<Patient> patientList = new SetQueueArray<>();
+    private SetAndQueueInterface<Patient> waitingPatientList = new SetQueueArray<>();
     private Scanner scanner;
     private int patientIdCounter = 1001;
     private ConsultationManagement consultationManagement;
@@ -187,7 +187,7 @@ public class PatientManagement {
         Patient patient = findPatientById(patientId);
         if (patient != null) {
             boolean foundInQueue = false;
-            SetAndQueueInterface<Patient> newQueue = new SetAndQueue<>();
+            SetAndQueueInterface<Patient> newQueue = new SetQueueArray<>();
             Object[] queueArray = waitingPatientList.toQueueArray();
             
             for (Object obj : queueArray) {
@@ -258,7 +258,7 @@ public class PatientManagement {
     public void displayAllPatientsSorted() {
         Object[] patientsArray = patientList.toArray(); //adt method
 
-        SetAndQueueInterface<Patient> tempList = new SetAndQueue<>();
+        SetAndQueueInterface<Patient> tempList = new SetQueueArray<>();
         for (Object obj : patientsArray) {
             tempList.add((Patient) obj); //adt method
         }
@@ -435,7 +435,7 @@ public class PatientManagement {
                 boolean removedFromList = patientList.remove(patient); //adt method
                 
                 boolean removedFromQueue = false;
-                SetAndQueueInterface<Patient> newQueue = new SetAndQueue<>();
+                SetAndQueueInterface<Patient> newQueue = new SetQueueArray<>();
                 Object[] queueArray = waitingPatientList.toQueueArray();
                 
                 for (Object obj : queueArray) {
@@ -476,10 +476,10 @@ public class PatientManagement {
         int maleCount = 0, femaleCount = 0;
 
         //create sets for set operations analysis
-        SetAndQueueInterface<Patient> malePatients = new SetAndQueue<>();
-        SetAndQueueInterface<Patient> femalePatients = new SetAndQueue<>();
-        SetAndQueueInterface<Patient> patientsWithConsultations = new SetAndQueue<>();
-        SetAndQueueInterface<Patient> patientsInQueue = new SetAndQueue<>();
+        SetAndQueueInterface<Patient> malePatients = new SetQueueArray<>();
+        SetAndQueueInterface<Patient> femalePatients = new SetQueueArray<>();
+        SetAndQueueInterface<Patient> patientsWithConsultations = new SetQueueArray<>();
+        SetAndQueueInterface<Patient> patientsInQueue = new SetQueueArray<>();
 
         //categorize patients and count gender
         for (Object obj : patientsArray) {
@@ -493,7 +493,7 @@ public class PatientManagement {
         }
         femaleCount = totalPatients - maleCount;
 
-        SetAndQueueInterface<String> patientIdsWithConsultations = new SetAndQueue<>();
+        SetAndQueueInterface<String> patientIdsWithConsultations = new SetQueueArray<>();
         int maxConsultations = 0;
         
         if (consultationManagement != null) {

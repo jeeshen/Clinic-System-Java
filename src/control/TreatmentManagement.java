@@ -1,7 +1,7 @@
 package control;
 
 import adt.SetAndQueueInterface;
-import adt.SetAndQueue;
+import adt.SetQueueArray;
 import entity.Prescription;
 import entity.PrescribedMedicine;
 import entity.Patient;
@@ -15,8 +15,8 @@ import utility.StringUtility;
 import utility.InputValidator;
 
 public class TreatmentManagement {
-    private SetAndQueueInterface<Prescription> prescriptionList = new SetAndQueue<>();
-    private SetAndQueueInterface<Medicine> medicineList = new SetAndQueue<>();
+    private SetAndQueueInterface<Prescription> prescriptionList = new SetQueueArray<>();
+    private SetAndQueueInterface<Medicine> medicineList = new SetQueueArray<>();
     private Scanner scanner;
     private int prescriptionIdCounter = 3001;
     private int prescribedMedicineIdCounter = 4001;
@@ -107,7 +107,7 @@ public class TreatmentManagement {
     
     public void createPrescription(String consultationId, Patient currentPatient, Doctor selectedDoctor, String diagnosis, String consultationDate) {
         String prescriptionId = "PRE" + String.format("%03d", prescriptionIdCounter++);
-        Prescription prescription = new Prescription(prescriptionId, consultationId, String.valueOf(currentPatient.getId()), selectedDoctor.getDoctorId(), diagnosis, new SetAndQueue<>(), consultationDate, "active", 0.0, false);
+        Prescription prescription = new Prescription(prescriptionId, consultationId, String.valueOf(currentPatient.getId()), selectedDoctor.getDoctorId(), diagnosis, new SetQueueArray<>(), consultationDate, "active", 0.0, false);
         
         //prescribe medicine
         System.out.println("\n=== PRESCRIBE MEDICINES ===");
@@ -200,7 +200,7 @@ public class TreatmentManagement {
         System.out.println(StringUtility.repeatString("-", 100));
         
         Object[] prescriptionsArray = prescriptionList.toArray(); //adt method
-        SetAndQueueInterface<Prescription> tempList = new SetAndQueue<>();
+        SetAndQueueInterface<Prescription> tempList = new SetQueueArray<>();
         for (Object obj : prescriptionsArray) {
             tempList.add((Prescription) obj); //adt method
         }
@@ -250,7 +250,7 @@ public class TreatmentManagement {
         
         Object[] prescriptionsArray = prescriptionList.toArray();
         String[] headers = {"Prescription ID", "Doctor ID", "Diagnosis", "Total Cost", "Status"};
-        SetAndQueueInterface<Object[]> rowList = new SetAndQueue<>();
+        SetAndQueueInterface<Object[]> rowList = new SetQueueArray<>();
         for (Object obj : prescriptionsArray) {
             Prescription prescription = (Prescription) obj;
             if (prescription.getPatientId().equals(patientId)) {
@@ -280,7 +280,7 @@ public class TreatmentManagement {
         
         Object[] prescriptionsArray = prescriptionList.toArray();
         String[] headers = {"Prescription ID", "Patient ID", "Diagnosis", "Total Cost", "Status"};
-        SetAndQueueInterface<Object[]> rowList = new SetAndQueue<>();
+        SetAndQueueInterface<Object[]> rowList = new SetQueueArray<>();
         for (Object obj : prescriptionsArray) {
             Prescription prescription = (Prescription) obj;
             if (prescription.getDoctorId().equals(doctorId)) {
@@ -398,7 +398,7 @@ public class TreatmentManagement {
         int totalPrescriptions = prescriptionsArray.length;
         int paidCount = 0;
 
-        SetAndQueueInterface<String> uniqueDiagnoses = new SetAndQueue<>();
+        SetAndQueueInterface<String> uniqueDiagnoses = new SetQueueArray<>();
         int maxDiagnosis = 0;
         
         for (Object obj : prescriptionsArray) {
@@ -468,7 +468,7 @@ public class TreatmentManagement {
         System.out.println(StringUtility.repeatString("-", 60));
 
         Object[] prescriptionsArray = prescriptionList.toArray();
-        SetAndQueueInterface<String> uniqueDiagnoses = new SetAndQueue<>();
+        SetAndQueueInterface<String> uniqueDiagnoses = new SetQueueArray<>();
         int maxDiagnosis = 0;
         
         for (Object obj : prescriptionsArray) {
