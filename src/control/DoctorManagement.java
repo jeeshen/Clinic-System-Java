@@ -134,7 +134,26 @@ public class DoctorManagement {
         Doctor doctor = findDoctorById(doctorId);
         if (doctor != null && onDutyDoctorList.contains(doctor)) { //adt method
             onDutyDoctorList.remove(doctor); //adt method
+            
+            // Sort the remaining doctors on duty to maintain proper order
+            if (onDutyDoctorList.size() > 1) {
+                Object[] remainingDoctors = onDutyDoctorList.toArray();
+                SetAndQueueInterface<Doctor> tempList = new SetQueueArray<>();
+                for (Object obj : remainingDoctors) {
+                    tempList.add((Doctor) obj); //adt method
+                }
+                tempList.sort(); //adt method
+                
+                // Clear and re-add sorted doctors
+                onDutyDoctorList.clearSet(); //adt method
+                Object[] sortedDoctors = tempList.toArray();
+                for (Object obj : sortedDoctors) {
+                    onDutyDoctorList.add((Doctor) obj); //adt method
+                }
+            }
+            
             System.out.println("Doctor " + doctor.getName() + " removed from duty successfully!");
+            System.out.println("Remaining doctors on duty have been sorted by ID.");
         } else {
             System.out.println("Doctor not found or not on duty!");
         }
@@ -397,28 +416,28 @@ public class DoctorManagement {
     }
     
     public void removeDoctor() {
-        System.out.println("\n" + StringUtility.repeatString("=", 60));
+        System.out.println("\n" + StringUtility.repeatString("=", 110));
         System.out.println("        REMOVE DOCTOR");
-        System.out.println(StringUtility.repeatString("=", 60));
+        System.out.println(StringUtility.repeatString("=", 110));
         
         System.out.println("CURRENT DOCTOR LIST:");
-        System.out.println(StringUtility.repeatString("-", 60));
-        System.out.printf("%-8s %-40s %-15s %-15s %-10s\n", "ID", "Name", "Specialization", "Contact", "Available");
-        System.out.println(StringUtility.repeatString("-", 60));
+        System.out.println(StringUtility.repeatString("-", 110));
+        System.out.printf("%-8s %-40s %-25s %-15s %-10s\n", "ID", "Name", "Specialization", "Contact", "Available");
+        System.out.println(StringUtility.repeatString("-", 110));
 
         Object[] doctorsArray = doctorList.toArray(); //adt method
         for (Object obj : doctorsArray) {
             Doctor doctor = (Doctor) obj;
-            System.out.printf("%-8s %-40s %-15s %-15s %-10s\n", 
+            System.out.printf("%-8s %-40s %-25s %-15s %-10s\n", 
                 doctor.getDoctorId(), 
                 doctor.getName(), 
                 doctor.getSpecialization(), 
                 doctor.getContactNumber(), 
                 doctor.isIsAvailable() ? "Yes" : "No");
         }
-        System.out.println(StringUtility.repeatString("-", 60));
+        System.out.println(StringUtility.repeatString("-", 110));
         System.out.println("Total Doctors: " + doctorsArray.length);
-        System.out.println(StringUtility.repeatString("=", 60));
+        System.out.println(StringUtility.repeatString("=", 110));
         
         System.out.print("Enter doctor ID to remove: ");
         String doctorId = scanner.nextLine();

@@ -35,6 +35,16 @@ public class PatientManagement {
             patient.setStatus("Active");
             patientList.add(patient); //adt method
         }
+        
+        if (samplePatients.length > 0) {
+            int maxId = 0;
+            for (Patient patient : samplePatients) {
+                if (patient.getId() > maxId) {
+                    maxId = patient.getId();
+                }
+            }
+            patientIdCounter = maxId + 1;
+        }
     }
     
     public void registerNewPatient() {
@@ -342,19 +352,19 @@ public class PatientManagement {
     }
     
     public void updatePatientInformation() {
-        System.out.println("\n" + StringUtility.repeatString("=", 60));
+        System.out.println("\n" + StringUtility.repeatString("=", 85));
         System.out.println("        UPDATE PATIENT INFORMATION");
-        System.out.println(StringUtility.repeatString("=", 60));
+        System.out.println(StringUtility.repeatString("=", 85));
 
-        System.out.println("📋 CURRENT PATIENT LIST:");
-        System.out.println(StringUtility.repeatString("-", 60));
-        System.out.printf("%-8s %-20s %-8s %-10s %-15s %-10s\n", "ID", "Name", "Age", "Gender", "Contact", "Status");
-        System.out.println(StringUtility.repeatString("-", 60));
+        System.out.println("CURRENT PATIENT LIST:");
+        System.out.println(StringUtility.repeatString("-", 85));
+        System.out.printf("%-8s %-30s %-8s %-10s %-15s %-10s\n", "ID", "Name", "Age", "Gender", "Contact", "Status");
+        System.out.println(StringUtility.repeatString("-", 85));
         
         Object[] patientsArray = patientList.toArray(); //adt method
         for (Object obj : patientsArray) {
             Patient patient = (Patient) obj;
-            System.out.printf("%-8s %-20s %-8s %-10s %-15s %-10s\n", 
+            System.out.printf("%-8s %-30s %-8s %-10s %-15s %-10s\n", 
                 patient.getId(), 
                 patient.getName(), 
                 patient.getAge(), 
@@ -362,9 +372,9 @@ public class PatientManagement {
                 patient.getContactNumber(), 
                 patient.getStatus());
         }
-        System.out.println(StringUtility.repeatString("-", 60));
+        System.out.println(StringUtility.repeatString("-", 85));
         System.out.println("Total Patients: " + patientsArray.length);
-        System.out.println(StringUtility.repeatString("=", 60));
+        System.out.println(StringUtility.repeatString("=", 85));
         
         int patientId = InputValidator.getValidInt(scanner, 1, 9999, "Enter patient ID to update: ");
         
@@ -377,12 +387,23 @@ public class PatientManagement {
             String name = InputValidator.getValidStringAllowEmpty(scanner, "Name [" + patient.getName() + "]: ");
             if (!name.isEmpty()) patient.setName(name);
             
-            String contact = InputValidator.getValidStringAllowEmpty(scanner, "Contact [" + patient.getContactNumber() + "]: ");
-            if (!contact.isEmpty()) {
-                if (contact.matches("^(01[0-9]|03|04|05|06|07|08|09)-?[0-9]{7,8}$")) {
-                    patient.setContactNumber(contact);
+            String contact = "";
+            boolean validContact = false;
+            while (!validContact) {
+                contact = InputValidator.getValidStringAllowEmpty(scanner, "Contact [" + patient.getContactNumber() + "]: ");
+                if (contact.isEmpty()) {
+                    validContact = true; // Skip update
+                } else if (contact.matches("^(01[0-9]|03|04|05|06|07|08|09)-?[0-9]{7,8}$")) {
+                    // Check if phone number already exists for another patient
+                    if (isPhoneNumberExistsForOtherPatient(contact, patient.getId())) {
+                        System.out.println("[ERROR] Phone number already exists for another patient. Please enter a different number or press Enter to skip.");
+                    } else {
+                        patient.setContactNumber(contact);
+                        System.out.println("[OK] Contact number updated successfully!");
+                        validContact = true;
+                    }
                 } else {
-                    System.out.println("Invalid phone number format. Contact number not updated.");
+                    System.out.println("Invalid phone number format. Please enter a valid number or press Enter to skip.");
                 }
             }
             
@@ -893,6 +914,17 @@ public class PatientManagement {
         for (Object obj : patientsArray) {
             Patient patient = (Patient) obj;
             if (patient.getContactNumber().equals(phoneNumber)) {
+                return true;
+            }
+        }
+        return false;
+    }
+    
+    private boolean isPhoneNumberExistsForOtherPatient(String contactNumber, int currentPatientId) {
+        Object[] patientsArray = patientList.toArray(); //adt method
+        for (Object obj : patientsArray) {
+            Patient patient = (Patient) obj;
+            if (patient.getContactNumber().equals(contactNumber) && patient.getId() != currentPatientId) {
                 return true;
             }
         }

@@ -305,19 +305,19 @@ public class TreatmentManagement {
     }
     
     public void removePrescription() {
-        System.out.println("\n" + StringUtility.repeatString("=", 60));
+        System.out.println("\n" + StringUtility.repeatString("=", 110));
         System.out.println("        REMOVE PRESCRIPTION");
-        System.out.println(StringUtility.repeatString("=", 60));
+        System.out.println(StringUtility.repeatString("=", 110));
         
         System.out.println("CURRENT PRESCRIPTION LIST:");
-        System.out.println(StringUtility.repeatString("-", 60));
-        System.out.printf("%-15s %-10s %-10s %-20s %-12s %-10s\n", "Prescription ID", "Patient ID", "Doctor ID", "Diagnosis", "Total Cost", "Status");
-        System.out.println(StringUtility.repeatString("-", 60));
+        System.out.println(StringUtility.repeatString("-", 110));
+        System.out.printf("%-15s %-10s %-10s %-40s %-12s %-10s\n", "Prescription ID", "Patient ID", "Doctor ID", "Diagnosis", "Total Cost", "Status");
+        System.out.println(StringUtility.repeatString("-", 110));
         
         Object[] prescriptionsArray = prescriptionList.toArray();
         for (Object obj : prescriptionsArray) {
             Prescription prescription = (Prescription) obj;
-            System.out.printf("%-15s %-10s %-10s %-20s %-12s %-10s\n", 
+            System.out.printf("%-15s %-10s %-10s %-40s %-12s %-10s\n", 
                 prescription.getPrescriptionId(), 
                 prescription.getPatientId(), 
                 prescription.getDoctorId(), 
@@ -325,9 +325,9 @@ public class TreatmentManagement {
                 "RM " + String.format("%.2f", prescription.getTotalCost()), 
                 prescription.getStatus());
         }
-        System.out.println(StringUtility.repeatString("-", 60));
+        System.out.println(StringUtility.repeatString("-", 110));
         System.out.println("Total Prescriptions: " + prescriptionsArray.length);
-        System.out.println(StringUtility.repeatString("=", 60));
+        System.out.println(StringUtility.repeatString("=", 110));
         
         System.out.print("Enter prescription ID to remove: ");
         String prescriptionId = scanner.nextLine();
