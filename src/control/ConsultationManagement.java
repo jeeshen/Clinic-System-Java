@@ -47,6 +47,24 @@ public class ConsultationManagement {
         for (Consultation consultation : sampleConsultations) {
             consultationList.add(consultation); //adt method
         }
+        
+        if (sampleConsultations.length > 0) {
+            int maxId = 0;
+            for (Consultation consultation : sampleConsultations) {
+                String consultationId = consultation.getConsultationId();
+                if (consultationId.startsWith("CON")) {
+                    try {
+                        int idNumber = Integer.parseInt(consultationId.substring(3));
+                        if (idNumber > maxId) {
+                            maxId = idNumber;
+                        }
+                    } catch (NumberFormatException e) {
+                        // Skip invalid IDs
+                    }
+                }
+            }
+            consultationIdCounter = maxId + 1;
+        }
     }
     
     public void initializeEntityRelationships() {
@@ -116,7 +134,7 @@ public class ConsultationManagement {
         String diagnosis = scanner.nextLine();
         
         //create consultation
-        String consultationId = "CONS" + consultationIdCounter++;
+        String consultationId = "CON" + consultationIdCounter++;
         String consultationDate = LocalDateTime.now().format(DateTimeFormatter.ofPattern("dd-MM-yyyy"));
         
         Consultation consultation = new Consultation(consultationId, String.valueOf(currentPatient.getId()), selectedDoctor.getDoctorId(), consultationDate, "Completed", diagnosis);
@@ -157,7 +175,7 @@ public class ConsultationManagement {
             consultationArray[i] = (Consultation) sortedConsultationsArray[i];
         }
         
-        String[] headers = {"Consultation ID", "Patient Name", "Doctor Name", "Date", "Status"};
+        String[] headers = {"Consultation ID", "Patient Name", "Doctor Name", "Date", "Status", "Notes"};
         Object[][] rows = new Object[consultationArray.length][headers.length];
         for (int i = 0; i < consultationArray.length; i++) {
             Consultation consultation = consultationArray[i];
@@ -166,12 +184,34 @@ public class ConsultationManagement {
             rows[i][2] = getDoctorName(consultation.getDoctorId());
             rows[i][3] = consultation.getConsultationDate();
             rows[i][4] = consultation.getStatus();
+            rows[i][5] = consultation.getNotes();
         }
-        System.out.print(StringUtility.formatTableNoDividers(
-            "ALL CONSULTATIONS (SORTED BY DATE)",
-            headers,
-            rows
-        ));
+
+        System.out.println("\n" + StringUtility.repeatString("=", 140));
+        System.out.println("                                    ALL CONSULTATIONS (SORTED BY DATE)");
+        System.out.println(StringUtility.repeatString("=", 140));
+        System.out.printf("%-15s %-25s %-25s %-12s %-12s %-45s\n", 
+            "Consultation ID", "Patient Name", "Doctor Name", "Date", "Status", "Notes");
+        System.out.println(StringUtility.repeatString("-", 140));
+        
+        for (int i = 0; i < consultationArray.length; i++) {
+            Consultation consultation = consultationArray[i];
+            String notes = consultation.getNotes();
+            
+            //truncate long fields to fit in table
+            if (notes.length() > 42) notes = notes.substring(0, 39) + "...";
+            
+            System.out.printf("%-15s %-25s %-25s %-12s %-12s %-45s\n",
+                consultation.getConsultationId(),
+                getPatientName(consultation.getPatientId()).length() > 23 ? getPatientName(consultation.getPatientId()).substring(0, 22) + "..." : getPatientName(consultation.getPatientId()),
+                getDoctorName(consultation.getDoctorId()).length() > 23 ? getDoctorName(consultation.getDoctorId()).substring(0, 22) + "..." : getDoctorName(consultation.getDoctorId()),
+                consultation.getConsultationDate(),
+                consultation.getStatus(),
+                notes);
+        }
+        System.out.println(StringUtility.repeatString("-", 140));
+        System.out.println("Total Consultations: " + consultationArray.length);
+        System.out.println(StringUtility.repeatString("=", 140));
         System.out.println("Press Enter to continue...");
         scanner.nextLine();
     }

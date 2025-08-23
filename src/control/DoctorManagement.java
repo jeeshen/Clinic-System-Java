@@ -174,7 +174,7 @@ public class DoctorManagement {
             doctorArray[i] = (Doctor) sortedDoctorsArray[i];
         }
         
-        String[] headers = {"ID", "Name", "Specialization", "Contact", "Available"};
+        String[] headers = {"ID", "Name", "Specialization", "Contact", "Email", "Duty Schedule", "On Leave", "Available"};
         Object[][] rows = new Object[doctorArray.length][headers.length];
         for (int i = 0; i < doctorArray.length; i++) {
             Doctor doctor = doctorArray[i];
@@ -182,13 +182,41 @@ public class DoctorManagement {
             rows[i][1] = doctor.getName();
             rows[i][2] = doctor.getSpecialization();
             rows[i][3] = doctor.getContactNumber();
-            rows[i][4] = doctor.isIsAvailable() ? "Yes" : "No";
+            rows[i][4] = doctor.getEmail();
+            rows[i][5] = doctor.getDutySchedule();
+            rows[i][6] = doctor.isOnLeave() ? "Yes" : "No";
+            rows[i][7] = doctor.isIsAvailable() ? "Yes" : "No";
         }
-        System.out.print(StringUtility.formatTableNoDividers(
-            "ALL DOCTORS (SORTED BY ID)",
-            headers,
-            rows
-        ));
+        
+        System.out.println("\n" + StringUtility.repeatString("=", 160));
+        System.out.println("                                        ALL DOCTORS (SORTED BY ID)");
+        System.out.println(StringUtility.repeatString("=", 160));
+        System.out.printf("%-8s %-25s %-20s %-15s %-30s %-25s %-10s %-10s\n", 
+            "ID", "Name", "Specialization", "Contact", "Email", "Duty Schedule", "On Leave", "Available");
+        System.out.println(StringUtility.repeatString("-", 160));
+        
+        for (int i = 0; i < doctorArray.length; i++) {
+            Doctor doctor = doctorArray[i];
+            String email = doctor.getEmail();
+            String dutySchedule = doctor.getDutySchedule();
+            
+            //truncate long fields to fit in table
+            if (email.length() > 28) email = email.substring(0, 25) + "...";
+            if (dutySchedule.length() > 23) dutySchedule = dutySchedule.substring(0, 20) + "...";
+            
+            System.out.printf("%-8s %-25s %-20s %-15s %-30s %-25s %-10s %-10s\n",
+                doctor.getDoctorId(),
+                doctor.getName().length() > 23 ? doctor.getName().substring(0, 22) + "..." : doctor.getName(),
+                doctor.getSpecialization().length() > 18 ? doctor.getSpecialization().substring(0, 17) + "..." : doctor.getSpecialization(),
+                doctor.getContactNumber(),
+                email,
+                dutySchedule,
+                doctor.isOnLeave() ? "Yes" : "No",
+                doctor.isIsAvailable() ? "Yes" : "No");
+        }
+        System.out.println(StringUtility.repeatString("-", 160));
+        System.out.println("Total Doctors: " + doctorArray.length);
+        System.out.println(StringUtility.repeatString("=", 160));
         System.out.println("Press Enter to continue...");
         scanner.nextLine();
     }

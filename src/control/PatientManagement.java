@@ -280,7 +280,7 @@ public class PatientManagement {
             patientArray[i] = (Patient) sortedPatientsArray[i];
         }
         
-        String[] headers = {"ID", "Name", "Age", "Gender", "Contact", "Status"};
+        String[] headers = {"ID", "Name", "Age", "Gender", "Contact", "Address", "Allergies", "Medical History", "Status"};
         Object[][] rows = new Object[patientArray.length][headers.length];
         for (int i = 0; i < patientArray.length; i++) {
             Patient patient = patientArray[i];
@@ -289,13 +289,44 @@ public class PatientManagement {
             rows[i][2] = patient.getAge();
             rows[i][3] = patient.getGender();
             rows[i][4] = patient.getContactNumber();
-            rows[i][5] = patient.getStatus();
+            rows[i][5] = patient.getAddress();
+            rows[i][6] = patient.getAllegy().isEmpty() ? "None" : patient.getAllegy();
+            rows[i][7] = patient.getMedicalHistory().isEmpty() ? "None" : patient.getMedicalHistory();
+            rows[i][8] = patient.getStatus();
         }
-        System.out.print(StringUtility.formatTableNoDividers(
-            "ALL PATIENTS (SORTED BY ID)",
-            headers,
-            rows
-        ));
+
+        System.out.println("\n" + StringUtility.repeatString("=", 150));
+        System.out.println("                                    ALL PATIENTS (SORTED BY ID)");
+        System.out.println(StringUtility.repeatString("=", 150));
+        System.out.printf("%-6s %-25s %-6s %-8s %-15s %-30s %-20s %-25s %-10s\n", 
+            "ID", "Name", "Age", "Gender", "Contact", "Address", "Allergies", "Medical History", "Status");
+        System.out.println(StringUtility.repeatString("-", 150));
+        
+        for (int i = 0; i < patientArray.length; i++) {
+            Patient patient = patientArray[i];
+            String address = patient.getAddress();
+            String allergies = patient.getAllegy().isEmpty() ? "None" : patient.getAllegy();
+            String medicalHistory = patient.getMedicalHistory().isEmpty() ? "None" : patient.getMedicalHistory();
+            
+            //truncate long fields to fit in table
+            if (address.length() > 28) address = address.substring(0, 25) + "...";
+            if (allergies.length() > 18) allergies = allergies.substring(0, 15) + "...";
+            if (medicalHistory.length() > 23) medicalHistory = medicalHistory.substring(0, 20) + "...";
+            
+            System.out.printf("%-6s %-25s %-6s %-8s %-15s %-30s %-20s %-25s %-10s\n",
+                patient.getId(),
+                patient.getName().length() > 23 ? patient.getName().substring(0, 22) + "..." : patient.getName(),
+                patient.getAge(),
+                patient.getGender(),
+                patient.getContactNumber(),
+                address,
+                allergies,
+                medicalHistory,
+                patient.getStatus());
+        }
+        System.out.println(StringUtility.repeatString("-", 150));
+        System.out.println("Total Patients: " + patientArray.length);
+        System.out.println(StringUtility.repeatString("=", 150));
         System.out.println("Press Enter to continue...");
         scanner.nextLine();
     }

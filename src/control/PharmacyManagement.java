@@ -46,7 +46,7 @@ public class PharmacyManagement {
             medicineArray[i] = (Medicine) sortedMedicinesArray[i];
         }
         
-        String[] headers = {"ID", "Name", "Brand", "Stock", "Price", "Purpose"};
+        String[] headers = {"ID", "Name", "Brand", "Stock", "Price", "Purpose", "Expiry Date", "Active Ingredient", "Category"};
         Object[][] rows = new Object[medicineArray.length][headers.length];
         for (int i = 0; i < medicineArray.length; i++) {
             Medicine medicine = medicineArray[i];
@@ -56,12 +56,35 @@ public class PharmacyManagement {
             rows[i][3] = medicine.getStockQuantity();
             rows[i][4] = "RM " + medicine.getPrice();
             rows[i][5] = medicine.getPurpose();
+            rows[i][6] = medicine.getExpiryDate();
+            rows[i][7] = medicine.getActiveIngredient();
+            rows[i][8] = medicine.getCategory();
         }
-        System.out.print(StringUtility.formatTableNoDividers(
-            "ALL MEDICINES (SORTED BY ID)",
-            headers,
-            rows
-        ));
+
+        System.out.println("\n" + StringUtility.repeatString("=", 160));
+        System.out.println("                                        ALL MEDICINES (SORTED BY ID)");
+        System.out.println(StringUtility.repeatString("=", 160));
+        System.out.printf("%-8s %-20s %-15s %-8s %-12s %-20s %-12s %-25s %-15s\n", 
+            "ID", "Name", "Brand", "Stock", "Price", "Purpose", "Expiry Date", "Active Ingredient", "Category");
+        System.out.println(StringUtility.repeatString("-", 160));
+        
+        for (int i = 0; i < medicineArray.length; i++) {
+            Medicine medicine = medicineArray[i];
+            
+            System.out.printf("%-8s %-20s %-15s %-8s %-12s %-20s %-12s %-25s %-15s\n",
+                medicine.getMedicineId(),
+                medicine.getName().length() > 18 ? medicine.getName().substring(0, 17) + "..." : medicine.getName(),
+                medicine.getBrand().length() > 13 ? medicine.getBrand().substring(0, 12) + "..." : medicine.getBrand(),
+                medicine.getStockQuantity(),
+                "RM " + String.format("%.2f", medicine.getPrice()),
+                medicine.getPurpose().length() > 18 ? medicine.getPurpose().substring(0, 17) + "..." : medicine.getPurpose(),
+                medicine.getExpiryDate(),
+                medicine.getActiveIngredient().length() > 23 ? medicine.getActiveIngredient().substring(0, 22) + "..." : medicine.getActiveIngredient(),
+                medicine.getCategory().length() > 13 ? medicine.getCategory().substring(0, 12) + "..." : medicine.getCategory());
+        }
+        System.out.println(StringUtility.repeatString("-", 160));
+        System.out.println("Total Medicines: " + medicineArray.length);
+        System.out.println(StringUtility.repeatString("=", 160));
         System.out.println("Press Enter to continue...");
         scanner.nextLine();
     }
