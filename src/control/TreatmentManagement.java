@@ -535,7 +535,7 @@ public class TreatmentManagement {
         System.out.println("\n" + StringUtility.repeatString("=", 95));
         System.out.println("                TUNKU ABDUL RAHMAN UNIVERSITY OF MANAGEMENT AND TECHNOLOGY");
         System.out.println("                          TREATMENT MANAGEMENT SUBSYSTEM");
-        System.out.println("                        DOCTOR PRESCRIPTION EFFICIENCY REPORT");
+        System.out.println("                     TREATMENT PRESCRIPTION EFFICIENCY REPORT");
         System.out.println(StringUtility.repeatString("=", 95));
         System.out.println();
         System.out.println("Generated at: " + StringUtility.getCurrentDateTime());
@@ -710,7 +710,12 @@ public class TreatmentManagement {
         if (doctorManagement != null) {
             Doctor doctor = doctorManagement.findDoctorById(doctorId);
             if (doctor != null) {
-                return doctor.getName();
+                String name = doctor.getName();
+                // Remove "Dr." prefix if present
+                if (name.startsWith("Dr.")) {
+                    name = name.substring(3).trim();
+                }
+                return name;
             }
         }
         return "Unknown Doctor";
