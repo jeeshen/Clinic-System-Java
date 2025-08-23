@@ -4,7 +4,6 @@ import control.ConsultationManagement;
 import control.DoctorManagement;
 import control.PatientManagement;
 import control.PharmacyManagement;
-import control.ReportManagement;
 import control.TreatmentManagement;
 import java.util.Scanner;
 
@@ -13,8 +12,8 @@ public class ClinicSystem {
     private DoctorManagementUI doctorUI;
     private ConsultationManagementUI consultationUI;
     private TreatmentManagementUI treatmentUI;
-    private ReportManagementUI reportUI;
     private PharmacyManagementUI pharmacyUI;
+    private ReportManagementUI reportUI;
     private Scanner scanner;
     
     public ClinicSystem() {
@@ -27,27 +26,27 @@ public class ClinicSystem {
         DoctorManagement doctorManagement = new DoctorManagement();
         ConsultationManagement consultationManagement = new ConsultationManagement();
         TreatmentManagement treatmentManagement = new TreatmentManagement();
-        ReportManagement reportManagement = new ReportManagement();
         PharmacyManagement pharmacyManagement = new PharmacyManagement();
         
         patientUI = new PatientManagementUI(patientManagement);
         doctorUI = new DoctorManagementUI(doctorManagement);
         consultationUI = new ConsultationManagementUI(consultationManagement);
         treatmentUI = new TreatmentManagementUI(treatmentManagement);
-        reportUI = new ReportManagementUI(reportManagement);
         pharmacyUI = new PharmacyManagementUI(pharmacyManagement);
+        reportUI = new ReportManagementUI();
 
         //connect to other controllers
         consultationUI.setDependencies(patientManagement, doctorManagement, treatmentManagement);
         consultationManagement.setDoctorManagement(doctorManagement);
         consultationManagement.setPatientManagement(patientManagement);
+        consultationManagement.setTreatmentManagement(treatmentManagement);
         patientManagement.setConsultationManagement(consultationManagement);
         doctorManagement.setConsultationManagement(consultationManagement);
-        reportUI.setDependencies(patientManagement, doctorManagement, consultationManagement, treatmentManagement);
         pharmacyUI.setDependencies(treatmentManagement);
         pharmacyManagement.setTreatmentManagement(treatmentManagement);
         treatmentManagement.setPatientManagement(patientManagement);
         treatmentManagement.setDoctorManagement(doctorManagement);
+        reportUI.setDependencies(patientManagement, doctorManagement, consultationManagement, treatmentManagement, pharmacyManagement);
         
         //initialize entity relationships for sample data
         consultationManagement.initializeEntityRelationships();
@@ -59,7 +58,7 @@ public class ClinicSystem {
         
         while (running) {
             displayMainMenu();
-            int choice = getUserInputInt(0, 11);
+            int choice = getUserInputInt(0, 10);
             
             switch (choice) {
                 case 1:
@@ -84,15 +83,12 @@ public class ClinicSystem {
                     treatmentUI.manageTreatmentHistory();
                     break;
                 case 8:
-                    reportUI.generateMedicalReports();
+                    reportUI.generateAllReports();
                     break;
                 case 9:
                     pharmacyUI.managePharmacyOperations();
                     break;
                 case 10:
-                    pharmacyUI.generatePharmacyReports();
-                    break;
-                case 11:
                     pharmacyUI.processPayment();
                     break;
                 case 0:
@@ -114,13 +110,12 @@ public class ClinicSystem {
         System.out.println("2 . Patient Records & Search");
         System.out.println("3 . Doctor Information & Duty Management");
         System.out.println("4 . Doctor Availability & Schedule");
-        System.out.println("5 . Conduct Consultation (Diagnose & Prescribe)");
+        System.out.println("5 . Conduct Consultation");
         System.out.println("6 . Consultation History & Appointments");
         System.out.println("7 . Treatment History & Diagnosis Records");
-        System.out.println("8 . Medical Reports & Analytics");
+        System.out.println("8 . Comprehensive Reports & Analytics");
         System.out.println("9 . Medicine Dispensing & Stock Control");
-        System.out.println("10. Pharmacy Reports & Inventory");
-        System.out.println("11. Process Payment");
+        System.out.println("10. Process Payment");
         System.out.println("0 . Exit System");
         System.out.println(utility.StringUtility.repeatString("-", 60));
         System.out.print("Enter your choice: ");

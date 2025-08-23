@@ -449,67 +449,199 @@ public class DoctorManagement {
             System.out.println("[ERROR] Doctor not found!");
         }
     }
-    
-    public void generateDoctorAvailabilityReport() {
-        System.out.println("\n" + StringUtility.repeatString("=", 60));
-        System.out.println("        DOCTOR AVAILABILITY REPORT");
-        System.out.println(StringUtility.repeatString("=", 60));
+
+    public void generateDoctorPerformanceAndWorkloadReport() {
+        System.out.println("\n" + StringUtility.repeatString("=", 95));
+        System.out.println("                TUNKU ABDUL RAHMAN UNIVERSITY OF MANAGEMENT AND TECHNOLOGY");
+        System.out.println("                           DOCTOR MANAGEMENT SUBSYSTEM");
+        System.out.println("                            DOCTOR PERFORMANCE REPORT");
+        System.out.println(StringUtility.repeatString("=", 95));
+        System.out.println();
         System.out.println("Generated at: " + StringUtility.getCurrentDateTime());
-        System.out.println(StringUtility.repeatString("-", 60));
+        System.out.println(StringUtility.repeatString("-", 95));
+        System.out.println();
+        System.out.println(StringUtility.repeatString("*", 95));
+        System.out.println("   TUNKU ABDUL RAHMAN UNIVERSITY OF MANAGEMENT AND TECHNOLOGY HIGHLY CONFIDENTIAL DOCUMENT");
+        System.out.println(StringUtility.repeatString("*", 95));
+        System.out.println();
 
-        Object[] doctorsArray = doctorList.toArray(); //adt method
+        Object[] doctorsArray = doctorList.toArray();
         int totalDoctors = doctorsArray.length;
-        int availableCount = 0, onLeaveCount = 0, onDutyCount = 0;
 
-        String[] headers = {"ID", "Name", "Specialty", "Available", "On Leave", "On Duty"};
-        Object[][] rows = new Object[doctorsArray.length][headers.length];
-        for (int i = 0; i < doctorsArray.length; i++) {
-            Doctor d = (Doctor) doctorsArray[i];
-            boolean available = d.isIsAvailable();
-            boolean onLeave = d.isOnLeave();
-            boolean onDuty = onDutyDoctorList.contains(d); //adt method
-            if (available) availableCount++;
-            if (onLeave) onLeaveCount++;
-            if (onDuty) onDutyCount++;
-            rows[i][0] = d.getDoctorId();
-            rows[i][1] = d.getName();
-            rows[i][2] = d.getSpecialization();
-            rows[i][3] = available ? "Yes" : "No";
-            rows[i][4] = onLeave ? "Yes" : "No";
-            rows[i][5] = onDuty ? "Yes" : "No";
+        String reset = "\u001B[0m";
+
+        int[] consultationCounts = new int[totalDoctors];
+
+        //analyze doctor performance
+        if (consultationManagement != null) {
+            Object[] consultationsArray = consultationManagement.getAllConsultations();
+
+            for (int i = 0; i < totalDoctors; i++) {
+                Doctor doctor = (Doctor) doctorsArray[i];
+                String doctorId = doctor.getDoctorId();
+
+                //count consultations
+                for (Object obj : consultationsArray) {
+                    Consultation consultation = (Consultation) obj;
+                    if (consultation.getDoctorId().equals(doctorId)) {
+                        consultationCounts[i]++;
+                    }
+                }
+            }
         }
-        System.out.println("\nDOCTOR LIST:");
-        System.out.print(StringUtility.formatTableWithDividers(headers, rows));
 
-        System.out.println("\nSUMMARY:");
-        System.out.println("• Total Doctors: " + totalDoctors);
-        System.out.println("• Available Doctors: " + availableCount);
-        System.out.println("• Doctors on Leave: " + onLeaveCount);
-        System.out.println("• Doctors on Duty: " + onDutyCount);
-        System.out.println(StringUtility.repeatString("=", 60));
+        //sort doctors by consultation count (bubble sort)
+        for (int i = 0; i < totalDoctors - 1; i++) {
+            for (int j = 0; j < totalDoctors - i - 1; j++) {
+                if (consultationCounts[j] < consultationCounts[j + 1]) {
+                    //swap doctors
+                    Object tempDoctor = doctorsArray[j];
+                    doctorsArray[j] = doctorsArray[j + 1];
+                    doctorsArray[j + 1] = tempDoctor;
+
+                    //swap counts
+                    int tempConsult = consultationCounts[j];
+                    consultationCounts[j] = consultationCounts[j + 1];
+                    consultationCounts[j + 1] = tempConsult;
+                }
+            }
+        }
+
+        //display top performing doctors table
+        System.out.println("TOP DOCTORS BY CONSULTATION COUNT");
+        System.out.println(StringUtility.repeatString("-", 95));
+        System.out.print("| Doctor ID | Doctor Name               | Specialization    | Consultations                   |");
+        System.out.println();
+        System.out.println(StringUtility.repeatString("-", 95));
+
+        for (int i = 0; i < Math.min(totalDoctors, 10); i++) {
+            Doctor d = (Doctor) doctorsArray[i];
+            System.out.printf("| %-9s | %-25s | %-17s | %-31d |%n",
+                d.getDoctorId(),
+                d.getName().length() > 25 ? d.getName().substring(0, 25) : d.getName(),
+                d.getSpecialization().length() > 17 ? d.getSpecialization().substring(0, 17) : d.getSpecialization(),
+                consultationCounts[i]);
+        }
+        System.out.println(StringUtility.repeatString("-", 95));
+        System.out.println();
+
+        //calculate totals
+        int totalConsultations = 0;
+        for (int i = 0; i < totalDoctors; i++) {
+            totalConsultations += consultationCounts[i];
+        }
+
+        System.out.println("Total Number of Doctors: " + totalDoctors);
+        System.out.println("Total Number of Consultations: " + totalConsultations);
+        System.out.println("Average Consultations per Doctor: " + (totalDoctors > 0 ? totalConsultations / totalDoctors : 0));
+        System.out.println();
+
+        //top doctors consultation count chart
+        System.out.println(StringUtility.repeatString("-", 95));
+        System.out.println("                TOP DOCTORS CONSULTATION COUNT CHART");
+        System.out.println(StringUtility.repeatString("-", 95));
+        System.out.println();
+
+        System.out.println("Top Doctors by Consultation Count Chart:");
+        System.out.println("   ^");
+        int maxConsultations = 0;
+        int numDoctors = Math.min(totalDoctors, 10); //show up to 10 doctors
+        for (int i = 0; i < numDoctors; i++) {
+            if (consultationCounts[i] > maxConsultations) maxConsultations = consultationCounts[i];
+        }
+
+        String barColor = "\u001B[44m"; //blue background
+
+        for (int level = maxConsultations; level > 0; level--) {
+            System.out.printf("%2d |", level);
+            for (int i = 0; i < numDoctors; i++) {
+                if (consultationCounts[i] >= level) {
+                    System.out.print(" " + barColor + "  " + reset + " ");
+                } else {
+                    System.out.print("    ");
+                }
+                //add 1 space between bars
+                System.out.print(" ");
+            }
+            System.out.println();
+        }
+
+        //draw axis line that matches the data width exactly (4 characters per doctor + 1 space between)
+        System.out.print("   +");
+        for (int i = 0; i < numDoctors; i++) {
+            System.out.print("----");
+            if (i < numDoctors - 1) { //don't add space after the last bar
+                System.out.print("-");
+            }
+        }
+        System.out.println("> Doctors");
+
+        //draw labels aligned with bars (clean names without Dr. prefix, max 4 characters)
+        System.out.print("    ");
+        for (int i = 0; i < numDoctors; i++) {
+            Doctor d = (Doctor) doctorsArray[i];
+            String displayName = d.getName();
+            //remove "Dr." prefix if present
+            if (displayName.startsWith("Dr. ")) {
+                displayName = displayName.substring(4);
+            }
+            //show first 4 characters maximum
+            if (displayName.length() > 4) {
+                displayName = displayName.substring(0, 4);
+            }
+            System.out.printf("%-4s", displayName);
+            //add 1 space between labels
+            if (i < numDoctors - 1) { //don't add space after the last label
+                System.out.print(" ");
+            }
+        }
+        System.out.println();
+        System.out.println();
+
+        if (totalDoctors > 0) {
+            Doctor topDoctor = (Doctor) doctorsArray[0];
+            System.out.printf("Doctor with most consultations: < %s with %d consultations >%n",
+                topDoctor.getName(), consultationCounts[0]);
+        }
+
+        System.out.println();
+        System.out.println(StringUtility.repeatString("*", 95));
+        System.out.println("                                END OF THE REPORT");
+        System.out.println(StringUtility.repeatString("*", 95));
+        System.out.println();
         System.out.println("Press Enter to continue...");
         scanner.nextLine();
     }
-    
-    public void generateDoctorSpecializationReport() {
-        System.out.println("\n" + StringUtility.repeatString("=", 60));
-        System.out.println("        DOCTOR SPECIALIZATION REPORT");
-        System.out.println(StringUtility.repeatString("=", 60));
+
+    public void generateDoctorSpecializationAndAvailabilityReport() {
+        System.out.println("\n" + StringUtility.repeatString("=", 95));
+        System.out.println("                TUNKU ABDUL RAHMAN UNIVERSITY OF MANAGEMENT AND TECHNOLOGY");
+        System.out.println("                           DOCTOR MANAGEMENT SUBSYSTEM");
+        System.out.println("                     DOCTOR SPECIALIZATION ANALYSIS REPORT");
+        System.out.println(StringUtility.repeatString("=", 95));
+        System.out.println();
         System.out.println("Generated at: " + StringUtility.getCurrentDateTime());
-        System.out.println(StringUtility.repeatString("-", 60));
+        System.out.println(StringUtility.repeatString("-", 95));
+        System.out.println();
+        System.out.println(StringUtility.repeatString("*", 95));
+        System.out.println("   TUNKU ABDUL RAHMAN UNIVERSITY OF MANAGEMENT AND TECHNOLOGY HIGHLY CONFIDENTIAL DOCUMENT");
+        System.out.println(StringUtility.repeatString("*", 95));
+        System.out.println();
 
-        Object[] doctorsArray = doctorList.toArray(); //adt method
+        Object[] doctorsArray = doctorList.toArray();
         int totalDoctors = doctorsArray.length;
-        SetAndQueueInterface<String> specializationSet = new SetQueueArray<>();
 
+        //specialization analysis
+        SetAndQueueInterface<String> specializationSet = new SetQueueArray<>();
         int[] specializationCounts = new int[100];
         String[] specializationArray = new String[100];
         int specializationIndex = 0;
-        
+
+        //analyze specializations
         for (Object obj : doctorsArray) {
             Doctor doctor = (Doctor) obj;
             String specialization = doctor.getSpecialization();
-            specializationSet.add(specialization); //adt method
+            specializationSet.add(specialization);
 
             //count specializations
             boolean found = false;
@@ -520,54 +652,141 @@ public class DoctorManagement {
                     break;
                 }
             }
-            if (!found) {
+            if (!found && specializationIndex < 100) {
                 specializationArray[specializationIndex] = specialization;
                 specializationCounts[specializationIndex] = 1;
                 specializationIndex++;
             }
         }
 
-        String[] headers = {"ID", "Name", "Specialization", "Contact", "Available"};
-        Object[][] rows = new Object[doctorsArray.length][headers.length];
-        for (int i = 0; i < doctorsArray.length; i++) {
-            Doctor d = (Doctor) doctorsArray[i];
-            rows[i][0] = d.getDoctorId();
-            rows[i][1] = d.getName();
-            rows[i][2] = d.getSpecialization();
-            rows[i][3] = d.getContactNumber();
-            rows[i][4] = d.isIsAvailable() ? "Yes" : "No";
-        }
-        System.out.println("\nDOCTOR LIST:");
-        System.out.print(StringUtility.formatTableWithDividers(headers, rows));
+        //sort specializations by count (bubble sort)
+        for (int i = 0; i < specializationIndex - 1; i++) {
+            for (int j = 0; j < specializationIndex - i - 1; j++) {
+                if (specializationCounts[j] < specializationCounts[j + 1]) {
+                    //swap specializations
+                    String tempSpec = specializationArray[j];
+                    specializationArray[j] = specializationArray[j + 1];
+                    specializationArray[j + 1] = tempSpec;
 
-        System.out.println("\nSPECIALIZATION DISTRIBUTION:");
-        int barWidth = 30;
-        int maxSpecialization = 0;
-        for (int i = 0; i < specializationIndex; i++) {
-            if (specializationCounts[i] > maxSpecialization) {
-                maxSpecialization = specializationCounts[i];
+                    //swap counts
+                    int tempCount = specializationCounts[j];
+                    specializationCounts[j] = specializationCounts[j + 1];
+                    specializationCounts[j + 1] = tempCount;
+                }
             }
         }
-        
-        for (int i = 0; i < specializationIndex; i++) {
-            String specialization = specializationArray[i];
-            int count = specializationCounts[i];
-            double percentage = (double) count / totalDoctors * 100;
-            System.out.printf("%-25s [%s] %d doctors (%.1f%%)\n", 
-                specialization + ":", 
-                StringUtility.greenBarChart(count, maxSpecialization, barWidth),
-                count, 
-                percentage);
+
+        //display specialization and consultation count table
+        System.out.println("SPECIALIZATION AND CONSULTATION COUNT TABLE");
+        System.out.println(StringUtility.repeatString("-", 95));
+        System.out.print("| Specialization            | Number of Doctors | Total Consultations                         |");
+        System.out.println();
+        System.out.println(StringUtility.repeatString("-", 95));
+
+        //calculate consultation counts for each specialization
+        int[] consultationCountsBySpec = new int[specializationIndex];
+        if (consultationManagement != null) {
+            Object[] consultationsArray = consultationManagement.getAllConsultations();
+            
+            for (Object obj : consultationsArray) {
+                Consultation consultation = (Consultation) obj;
+                String doctorId = consultation.getDoctorId();
+                
+                //find the doctor and their specialization
+                for (Object doctorObj : doctorsArray) {
+                    Doctor doctor = (Doctor) doctorObj;
+                    if (doctor.getDoctorId().equals(doctorId)) {
+                        String specialization = doctor.getSpecialization();
+                        
+                        //find specialization index and add consultation count
+                        for (int i = 0; i < specializationIndex; i++) {
+                            if (specializationArray[i].equals(specialization)) {
+                                consultationCountsBySpec[i]++;
+                                break;
+                            }
+                        }
+                        break;
+                    }
+                }
+            }
         }
 
-        System.out.println("\nSUMMARY:");
-        System.out.println("• Total Doctors: " + totalDoctors);
-        System.out.println("• Total Specializations: " + specializationIndex);
-        System.out.println(StringUtility.repeatString("=", 60));
+        for (int i = 0; i < specializationIndex; i++) {
+            System.out.printf("| %-25s | %-17d | %-43d |%n",
+                specializationArray[i].length() > 25 ? specializationArray[i].substring(0, 25) : specializationArray[i],
+                specializationCounts[i],
+                consultationCountsBySpec[i]);
+        }
+        System.out.println(StringUtility.repeatString("-", 95));
+        System.out.println();
+
+        System.out.println("Total Number of Doctors: " + totalDoctors);
+        System.out.println("Total Number of Specializations: " + specializationIndex);
+        System.out.println();
+
+        System.out.println(StringUtility.repeatString("-", 95));
+        System.out.println("                SPECIALIZATION VS CONSULTATIONS CHART");
+        System.out.println(StringUtility.repeatString("-", 95));
+        System.out.println();
+
+        System.out.println("Specialization vs Consultations Chart:");
+        System.out.println("   ^");
+
+        //use actual consultation counts by specialization
+        int maxLoad = 0;
+        for (int load : consultationCountsBySpec) {
+            if (load > maxLoad) maxLoad = load;
+        }
+
+        String barColor = "\u001B[46m"; //cyan background
+        String reset = "\u001B[0m";
+
+        for (int level = maxLoad; level > 0; level--) {
+            System.out.printf("%2d |", level);
+            for (int i = 0; i < Math.min(specializationIndex, 5); i++) {
+                if (consultationCountsBySpec[i] >= level) {
+                    System.out.print(" " + barColor + "    " + reset + " ");
+                } else {
+                    System.out.print("      ");
+                }
+            }
+            System.out.println();
+        }
+
+        System.out.print("   +");
+        for (int i = 0; i < Math.min(specializationIndex, 5); i++) {
+            System.out.print("------");
+        }
+        System.out.println("> Specializations");
+
+        System.out.print("    ");
+        for (int i = 0; i < Math.min(specializationIndex, 5); i++) {
+            String shortSpec = specializationArray[i].length() > 4 ? specializationArray[i].substring(0, 4) : specializationArray[i];
+            System.out.printf("%-4s  ", shortSpec);
+        }
+        System.out.println();
+        System.out.println();
+
+        //summary
+        if (specializationIndex > 0) {
+            System.out.printf("Most common specialization: < %s with %d doctors >%n",
+                specializationArray[0], specializationCounts[0]);
+        }
+
+        if (specializationIndex > 1) {
+            System.out.printf("Least common specialization: < %s with %d doctors >%n",
+                specializationArray[specializationIndex - 1], specializationCounts[specializationIndex - 1]);
+        }
+
+        System.out.println();
+        System.out.println(StringUtility.repeatString("*", 95));
+        System.out.println("                                END OF THE REPORT");
+        System.out.println(StringUtility.repeatString("*", 95));
+        System.out.println();
         System.out.println("Press Enter to continue...");
         scanner.nextLine();
     }
-    
+
     public Doctor findDoctorById(String doctorId) {
         Doctor dummy = new Doctor();
         dummy.setDoctorId(doctorId);
@@ -595,107 +814,6 @@ public class DoctorManagement {
         return doctorList.toArray(); //adt method
     }
 
-    private int countConsultationsForDoctor(String doctorId, Object[] consultationsArray) {
-        int count = 0;
-        for (Object obj : consultationsArray) {
-            Consultation consultation = (Consultation) obj;
-            if (consultation.getDoctorId().equals(doctorId)) {
-                count++;
-            }
-        }
-        return count;
-    }
-    
-    public void generateDoctorPerformanceReport() {
-        if (consultationManagement == null) {
-            System.out.println("Consultation management not available!");
-            return;
-        }
-        
-        System.out.println("\n" + utility.StringUtility.repeatString("=", 80));
-        System.out.println("        DOCTOR PERFORMANCE REPORT");
-        System.out.println(utility.StringUtility.repeatString("=", 80));
-        System.out.println("Generated at: " + utility.StringUtility.getCurrentDateTime());
-        System.out.println(utility.StringUtility.repeatString("-", 80));
-
-        Object[] consultationsArray = consultationManagement.getAllConsultations();
-
-        SetAndQueueInterface<String> uniqueDoctors = new SetQueueArray<>();
-        int maxConsultations = 0;
-        
-        for (Object obj : consultationsArray) {
-            Consultation consultation = (Consultation) obj;
-            String doctorId = consultation.getDoctorId();
-            uniqueDoctors.add(doctorId); //adt method
-            int consultationCount = countConsultationsForDoctor(doctorId, consultationsArray);
-            if (consultationCount > maxConsultations) {
-                maxConsultations = consultationCount;
-            }
-        }
-
-        Object[] doctorsArray = uniqueDoctors.toArray(); //adt method
-        int[] consultationCounts = new int[doctorsArray.length];
-        int[] daysWorkedCounts = new int[doctorsArray.length];
-        for (int i = 0; i < doctorsArray.length; i++) {
-            String doctorId = (String) doctorsArray[i];
-            consultationCounts[i] = countConsultationsForDoctor(doctorId, consultationsArray);
-            daysWorkedCounts[i] = countUniqueConsultationDaysForDoctor(doctorId, consultationsArray);
-        }
-
-        String[] headers = {"Doctor Name", "Doctor ID", "Consultations", "Days Worked"};
-        Object[][] rows = new Object[doctorsArray.length][headers.length];
-        for (int i = 0; i < doctorsArray.length; i++) {
-            String doctorId = (String) doctorsArray[i];
-            rows[i][0] = getDoctorName(doctorId);
-            rows[i][1] = doctorId;
-            rows[i][2] = consultationCounts[i];
-            rows[i][3] = daysWorkedCounts[i];
-        }
-        System.out.println("\nDOCTOR PERFORMANCE:");
-        System.out.print(utility.StringUtility.formatTableWithDividers(headers, rows));
-        
-        //calculate max days worked for bar chart scaling
-        int maxDaysWorked = 0;
-        for (int i = 0; i < daysWorkedCounts.length; i++) {
-            if (daysWorkedCounts[i] > maxDaysWorked) {
-                maxDaysWorked = daysWorkedCounts[i];
-            }
-        }
-        
-        System.out.println("\nDAYS WORKED PER DOCTOR:");
-        int barWidth = 30;
-        for (int i = 0; i < doctorsArray.length; i++) {
-            String doctorId = (String) doctorsArray[i];
-            int daysWorked = daysWorkedCounts[i];
-            System.out.printf("%-35s [%s] %d days\n", getDoctorName(doctorId), utility.StringUtility.greenBarChart(daysWorked, maxDaysWorked, barWidth), daysWorked);
-        }
-        System.out.println("\nSUMMARY:");
-        System.out.println("• Total Consultations: " + consultationsArray.length);
-        System.out.println("• Total Doctors: " + doctorsArray.length);
-        System.out.println(utility.StringUtility.repeatString("=", 80));
-        System.out.println("Press Enter to continue...");
-        scanner.nextLine();
-    }
-
-    private int countUniqueConsultationDaysForDoctor(String doctorId, Object[] consultationsArray) {
-        SetAndQueueInterface<String> uniqueDates = new SetQueueArray<>();
-        for (Object obj : consultationsArray) {
-            Consultation consultation = (Consultation) obj;
-            if (consultation.getDoctorId().equals(doctorId)) {
-                uniqueDates.add(consultation.getConsultationDate()); //adt method
-            }
-        }
-        return uniqueDates.size(); //adt method
-    }
-    
-    private String getDoctorName(String doctorId) {
-        Doctor doctor = findDoctorById(doctorId);
-        if (doctor != null) {
-            return doctor.getName();
-        }
-        return "Unknown Doctor";
-    }
-    
     public void searchDoctorConsultations() {
         System.out.print("Enter doctor ID to search consultations: ");
         String doctorId = scanner.nextLine();

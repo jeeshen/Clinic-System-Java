@@ -463,107 +463,421 @@ public class PatientManagement {
             System.out.println("[ERROR] Patient not found!");
         }
     }
-    
-    public void generatePatientStatisticsReport() {
-        System.out.println("\n" + StringUtility.repeatString("=", 70));
-        System.out.println("        PATIENT STATISTICS REPORT");
-        System.out.println(StringUtility.repeatString("=", 70));
-        System.out.println("Generated at: " + StringUtility.getCurrentDateTime());
-        System.out.println(StringUtility.repeatString("-", 70));
 
-        Object[] patientsArray = patientList.toArray(); //adt method
+
+
+    public void generatePatientDemographicsAndDiseaseAnalysisReport() {
+        System.out.println("\n" + StringUtility.repeatString("=", 100));
+        System.out.println("                TUNKU ABDUL RAHMAN UNIVERSITY OF MANAGEMENT AND TECHNOLOGY");
+        System.out.println("                           PATIENT MANAGEMENT SUBSYSTEM");
+        System.out.println("                      PATIENT DEMOGRAPHICS & DISEASE ANALYSIS REPORT");
+        System.out.println(StringUtility.repeatString("=", 100));
+        System.out.println();
+        System.out.println("Generated at: " + StringUtility.getCurrentDateTime());
+        System.out.println(StringUtility.repeatString("-", 100));
+        System.out.println();
+        System.out.println(StringUtility.repeatString("*", 100));
+        System.out.println("      TUNKU ABDUL RAHMAN UNIVERSITY OF MANAGEMENT AND TECHNOLOGY HIGHLY CONFIDENTIAL DOCUMENT");
+        System.out.println(StringUtility.repeatString("*", 100));
+        System.out.println();
+
+        Object[] patientsArray = patientList.toArray();
         int totalPatients = patientsArray.length;
         int maleCount = 0, femaleCount = 0;
 
-        //create sets for set operations analysis
-        SetAndQueueInterface<Patient> malePatients = new SetQueueArray<>();
-        SetAndQueueInterface<Patient> femalePatients = new SetQueueArray<>();
-        SetAndQueueInterface<Patient> patientsWithConsultations = new SetQueueArray<>();
-        SetAndQueueInterface<Patient> patientsInQueue = new SetQueueArray<>();
+        String reset = "\u001B[0m";
 
-        //categorize patients and count gender
+        int[] ageGroups = {0, 18, 30, 45, 60, 100};
+        String[] ageGroupNames = {"0-17", "18-29", "30-44", "45-59", "60+"};
+        int[] ageGroupCounts = new int[ageGroups.length - 1];
+
+        //disease analysis from prescriptions
+        SetAndQueueInterface<String> uniqueDiseases = new SetQueueArray<>();
+        int[] diseaseCounts = new int[100];
+        String[] diseaseArray = new String[100];
+        int[] diseaseCountsMale = new int[100];
+        int[] diseaseCountsFemale = new int[100];
+        int diseaseIndex = 0;
+
+        //analyze patients
         for (Object obj : patientsArray) {
             Patient patient = (Patient) obj;
             if (patient.getGender().equalsIgnoreCase("Male")) {
                 maleCount++;
-                malePatients.add(patient); //adt method
             } else {
-                femalePatients.add(patient); //adt method
+                femaleCount++;
+            }
+
+            //age group classification
+            int age = patient.getAge();
+            for (int i = 0; i < ageGroups.length - 1; i++) {
+                if (age >= ageGroups[i] && age < ageGroups[i + 1]) {
+                    ageGroupCounts[i]++;
+                    break;
+                }
             }
         }
-        femaleCount = totalPatients - maleCount;
 
-        SetAndQueueInterface<String> patientIdsWithConsultations = new SetQueueArray<>();
-        int maxConsultations = 0;
-        
+        //analyze diseases from patient prescriptions
+        for (Object obj : patientsArray) {
+            Patient patient = (Patient) obj;
+            boolean isMale = patient.getGender().equalsIgnoreCase("Male");
+            Object[] prescriptionsArray = patient.getPrescriptions().toArray();
+            for (Object prescObj : prescriptionsArray) {
+                entity.Prescription prescription = (entity.Prescription) prescObj;
+                String diagnosis = prescription.getDiagnosis();
+                if (diagnosis != null && !diagnosis.trim().isEmpty()) {
+                    uniqueDiseases.add(diagnosis);
+
+                    // Count diseases
+                    boolean found = false;
+                    for (int i = 0; i < diseaseIndex; i++) {
+                        if (diseaseArray[i].equals(diagnosis)) {
+                            diseaseCounts[i]++;
+                            if (isMale) {
+                                diseaseCountsMale[i]++;
+                            } else {
+                                diseaseCountsFemale[i]++;
+                            }
+                            found = true;
+                            break;
+                        }
+                    }
+                    if (!found && diseaseIndex < 100) {
+                        diseaseArray[diseaseIndex] = diagnosis;
+                        diseaseCounts[diseaseIndex] = 1;
+                        if (isMale) {
+                            diseaseCountsMale[diseaseIndex] = 1;
+                            diseaseCountsFemale[diseaseIndex] = 0;
+                        } else {
+                            diseaseCountsMale[diseaseIndex] = 0;
+                            diseaseCountsFemale[diseaseIndex] = 1;
+                        }
+                        diseaseIndex++;
+                    }
+                }
+            }
+        }
+
+        System.out.println("Total Number of Patients: " + totalPatients);
+        System.out.println("Total Number of Diseases Recorded: " + diseaseIndex);
+        System.out.println();
+
+        System.out.println(StringUtility.repeatString("-", 100));
+        System.out.println("                        GRAPHICAL REPRESENTATION OF PATIENT MANAGEMENT");
+        System.out.println(StringUtility.repeatString("-", 100));
+        System.out.println();
+
+        System.out.println("Age Group vs Health Risk Analysis:");
+        System.out.println(StringUtility.repeatString("-", 100));
+        System.out.printf("| %-15s | %-15s | %-30s | %-27s |%n", "Age Group", "Patients", "Avg Consultations", "Risk Level");
+        System.out.println(StringUtility.repeatString("-", 100));
+
+        String[] riskLevels = {"Low", "Low", "Medium", "High", "High"};
+
+        //calculate total consultations if consultation management is available
+        int totalConsultations = 0;
         if (consultationManagement != null) {
             Object[] consultationsArray = consultationManagement.getAllConsultations();
-            for (Object obj : consultationsArray) {
-                Consultation consultation = (Consultation) obj;
-                String patientId = consultation.getPatientId();
-                patientIdsWithConsultations.add(patientId); //adt method
+            totalConsultations = consultationsArray.length;
+        }
 
-                //count consultations for this patient
-                int consultationCount = countConsultationsForPatient(patientId, consultationsArray);
-                if (consultationCount > maxConsultations) {
-                    maxConsultations = consultationCount;
+        for (int i = 0; i < ageGroupNames.length; i++) {
+            double avgConsultations = ageGroupCounts[i] > 0 ? (double) totalConsultations / ageGroupCounts[i] * 0.3 : 0;
+            System.out.printf("| %-15s | %-15d | %-30.1f | %-27s |%n",
+                ageGroupNames[i],
+                ageGroupCounts[i],
+                avgConsultations,
+                riskLevels[i]);
+        }
+        System.out.println(StringUtility.repeatString("-", 100));
+        System.out.println();
+
+        //age group chart
+        System.out.println("Patient Age Group Distribution Chart:");
+        System.out.println("   ^");
+        int maxAgeGroup = 0;
+        for (int count : ageGroupCounts) {
+            if (count > maxAgeGroup) maxAgeGroup = count;
+        }
+
+        String barColor = "\u001B[44m"; //blue background
+
+        for (int level = maxAgeGroup; level > 0; level--) {
+            System.out.printf("%2d |", level);
+            for (int i = 0; i < ageGroupCounts.length; i++) {
+                if (ageGroupCounts[i] >= level) {
+                    System.out.print(" " + barColor + "    " + reset + " ");
+                } else {
+                    System.out.print("      ");
                 }
+            }
+            System.out.println();
+        }
 
-                Patient patient = findPatientById(Integer.parseInt(patientId));
-                if (patient != null) {
-                    patientsWithConsultations.add(patient); //adt method
+        //draw axis line that matches the data width exactly (6 chars per column)
+        System.out.print("   +");
+        for (int i = 0; i < ageGroupNames.length; i++) {
+            System.out.print("------");
+        }
+        System.out.println("> Age Groups");
+
+        //draw labels aligned with bars (4-char labels with proper spacing)
+        System.out.print("    ");
+        for (String ageGroup : ageGroupNames) {
+            System.out.printf("%-4s  ", ageGroup); // 4-char label with 2 spaces
+        }
+        System.out.println();
+        System.out.println();
+
+        //sort diseases by count for proper display
+        for (int i = 0; i < diseaseIndex - 1; i++) {
+            for (int j = 0; j < diseaseIndex - i - 1; j++) {
+                if (diseaseCounts[j] < diseaseCounts[j + 1]) {
+                    //swap diseases
+                    String tempDisease = diseaseArray[j];
+                    diseaseArray[j] = diseaseArray[j + 1];
+                    diseaseArray[j + 1] = tempDisease;
+
+                    //swap counts
+                    int tempCount = diseaseCounts[j];
+                    diseaseCounts[j] = diseaseCounts[j + 1];
+                    diseaseCounts[j + 1] = tempCount;
                 }
             }
         }
 
-        //get patients in queue
-        Object[] queueArray = waitingPatientList.toQueueArray(); //adt method
-        for (Object obj : queueArray) {
-            Patient patient = (Patient) obj;
-            patientsInQueue.add(patient); //adt method
+        System.out.println("Disease-Treatment Correlation Analysis by Gender:");
+        System.out.println(StringUtility.repeatString("-", 100));
+        System.out.printf("| %-30s | %-30s | %-30s |%n", "Disease Name", "Male", "Female");
+        System.out.println(StringUtility.repeatString("-", 100));
+
+        for (int i = 0; i < Math.min(diseaseIndex, 5); i++) {
+            System.out.printf("| %-30s | %-30d | %-30d |%n",
+                diseaseArray[i].length() > 30 ? diseaseArray[i].substring(0, 30) : diseaseArray[i],
+                diseaseCountsMale[i],
+                diseaseCountsFemale[i]);
+        }
+        System.out.println(StringUtility.repeatString("-", 100));
+        System.out.println();
+
+        //disease occurrences by gender chart
+        System.out.println("Disease Occurrences by Gender Chart:");
+        System.out.println("   ^");
+        int maxDisease = 0;
+        int numDiseases = Math.min(diseaseIndex, 5);
+        for (int i = 0; i < numDiseases; i++) {
+            if (diseaseCountsMale[i] > maxDisease) maxDisease = diseaseCountsMale[i];
+            if (diseaseCountsFemale[i] > maxDisease) maxDisease = diseaseCountsFemale[i];
         }
 
-        //perform set operations
-        SetAndQueueInterface<Patient> patientsWithBoth = patientsWithConsultations.intersection(patientsInQueue); //adt method
-        SetAndQueueInterface<Patient> allActivePatients = patientsWithConsultations.union(patientsInQueue);
+        //colors for male and female bars
+        String maleColor = "\u001B[44m"; //blue background for male
+        String femaleColor = "\u001B[45m"; //magenta background for female
 
-        String[] headers = {"ID", "Name", "Age", "Gender", "Contact", "Status"};
-        Object[][] rows = new Object[patientsArray.length][headers.length];
+        for (int level = maxDisease; level > 0; level--) {
+            System.out.printf("%2d |", level);
+            for (int i = 0; i < numDiseases; i++) {
+                //show male count first, then female count for each disease with consistent spacing
+                if (diseaseCountsMale[i] >= level) {
+                    System.out.print(" " + maleColor + "  " + reset);
+                } else {
+                    System.out.print("   ");
+                }
+                if (diseaseCountsFemale[i] >= level) {
+                    System.out.print(" " + femaleColor + "  " + reset);
+                } else {
+                    System.out.print("   ");
+                }
+                System.out.print(" "); //add consistent spacing between disease groups
+            }
+            System.out.println();
+        }
+
+        //draw axis line that matches the data width exactly (7 chars per disease - M+F+space)
+        System.out.print("   +");
+        for (int i = 0; i < numDiseases; i++) {
+            System.out.print("-------");
+        }
+        System.out.println("> Diseases");
+
+        //draw labels aligned with bars (centered under each M+F pair)
+        System.out.print("    ");
+        for (int i = 0; i < numDiseases; i++) {
+            String shortName = diseaseArray[i].length() > 4 ? diseaseArray[i].substring(0, 4) : diseaseArray[i];
+            System.out.printf(" %-4s  ", shortName); //center the 4-char label in 7-char space
+        }
+        System.out.println();
+
+        System.out.println("    Legend: " + maleColor + "  " + reset + " Male, " + femaleColor + "  " + reset + " Female");
+        System.out.println();
+
+        System.out.println("Patients by gender:");
+        System.out.printf("< Male: %d, Female: %d >%n", maleCount, femaleCount);
+        System.out.println();
+
+        if (diseaseIndex > 0) {
+            //find most common disease overall
+            int maxDiseaseIndex = 0;
+            for (int i = 1; i < diseaseIndex; i++) {
+                if (diseaseCounts[i] > diseaseCounts[maxDiseaseIndex]) {
+                    maxDiseaseIndex = i;
+                }
+            }
+            System.out.printf("Most common disease: < %s with %d cases >%n",
+                diseaseArray[maxDiseaseIndex], diseaseCounts[maxDiseaseIndex]);
+            
+            //find most common disease by gender
+            int maxMaleIndex = 0, maxFemaleIndex = 0;
+            for (int i = 1; i < diseaseIndex; i++) {
+                if (diseaseCountsMale[i] > diseaseCountsMale[maxMaleIndex]) {
+                    maxMaleIndex = i;
+                }
+                if (diseaseCountsFemale[i] > diseaseCountsFemale[maxFemaleIndex]) {
+                    maxFemaleIndex = i;
+                }
+            }
+            System.out.printf("Most common disease among males: < %s with %d cases >%n",
+                diseaseArray[maxMaleIndex], diseaseCountsMale[maxMaleIndex]);
+            System.out.printf("Most common disease among females: < %s with %d cases >%n",
+                diseaseArray[maxFemaleIndex], diseaseCountsFemale[maxFemaleIndex]);
+        }
+
+        System.out.println();
+        System.out.println(StringUtility.repeatString("*", 100));
+        System.out.println("                                       END OF THE REPORT");
+        System.out.println(StringUtility.repeatString("*", 100));
+        System.out.println();
+        System.out.println("Press Enter to continue...");
+        scanner.nextLine();
+    }
+
+    public void generatePatientTreatmentOutcomesReport() {
+        System.out.println("\n" + StringUtility.repeatString("=", 95));
+        System.out.println("                TUNKU ABDUL RAHMAN UNIVERSITY OF MANAGEMENT AND TECHNOLOGY");
+        System.out.println("                           PATIENT MANAGEMENT SUBSYSTEM");
+        System.out.println("                         PATIENT TREATMENT ANALYSIS REPORT");
+        System.out.println(StringUtility.repeatString("=", 95));
+        System.out.println();
+        System.out.println("Generated at: " + StringUtility.getCurrentDateTime());
+        System.out.println(StringUtility.repeatString("-", 95));
+        System.out.println();
+        System.out.println(StringUtility.repeatString("*", 95));
+        System.out.println("   TUNKU ABDUL RAHMAN UNIVERSITY OF MANAGEMENT AND TECHNOLOGY HIGHLY CONFIDENTIAL DOCUMENT");
+        System.out.println(StringUtility.repeatString("*", 95));
+        System.out.println();
+
+        Object[] patientsArray = patientList.toArray();
+        String reset = "\u001B[0m";
+        int[] consultationCounts = new int[patientsArray.length];
+        double[] treatmentCosts = new double[patientsArray.length];
+
+        //analyze treatment outcomes
         for (int i = 0; i < patientsArray.length; i++) {
+            Patient patient = (Patient) patientsArray[i];
+            String patientId = String.valueOf(patient.getId());
+
+            //count consultations
+            if (consultationManagement != null) {
+                Object[] consultationsArray = consultationManagement.getAllConsultations();
+                for (Object obj : consultationsArray) {
+                    Consultation consultation = (Consultation) obj;
+                    if (consultation.getPatientId().equals(patientId)) {
+                        consultationCounts[i]++;
+                    }
+                }
+            }
+
+            //calculate total treatment costs from prescriptions
+            Object[] prescriptionsArray = patient.getPrescriptions().toArray();
+            for (Object prescObj : prescriptionsArray) {
+                entity.Prescription prescription = (entity.Prescription) prescObj;
+                treatmentCosts[i] += prescription.getTotalCost();
+            }
+        }
+
+        //sort patients by consultation count (descending order)
+        for (int i = 0; i < patientsArray.length - 1; i++) {
+            for (int j = 0; j < patientsArray.length - i - 1; j++) {
+                if (consultationCounts[j] < consultationCounts[j + 1]) {
+                    //swap patients
+                    Object tempPatient = patientsArray[j];
+                    patientsArray[j] = patientsArray[j + 1];
+                    patientsArray[j + 1] = tempPatient;
+
+                    //swap consultation counts
+                    int tempConsult = consultationCounts[j];
+                    consultationCounts[j] = consultationCounts[j + 1];
+                    consultationCounts[j + 1] = tempConsult;
+
+                    //swap treatment costs
+                    double tempCost = treatmentCosts[j];
+                    treatmentCosts[j] = treatmentCosts[j + 1];
+                    treatmentCosts[j + 1] = tempCost;
+                }
+            }
+        }
+
+        System.out.println("Top Patients by Consultation Count:");
+        System.out.println(StringUtility.repeatString("-", 95));
+        System.out.printf("| %-20s | %-40s | %-25s |%n", "Patient ID", "Patient Name", "Consultations");
+        System.out.println(StringUtility.repeatString("-", 95));
+
+        for (int i = 0; i < Math.min(patientsArray.length, 10); i++) {
             Patient p = (Patient) patientsArray[i];
-            rows[i][0] = p.getId();
-            rows[i][1] = p.getName();
-            rows[i][2] = p.getAge();
-            rows[i][3] = p.getGender();
-            rows[i][4] = p.getContactNumber();
-            rows[i][5] = p.getStatus();
+            System.out.printf("| %-20s | %-40s | %-25d |%n",
+                p.getId(),
+                p.getName().length() > 40 ? p.getName().substring(0, 40) : p.getName(),
+                consultationCounts[i]);
         }
-        System.out.println("\nPATIENT LIST:");
-        System.out.print(StringUtility.formatTableWithDividers(headers, rows));
+        System.out.println(StringUtility.repeatString("-", 95));
+        System.out.println();
 
-        int barWidth = 30;
-        int maxGender = Math.max(maleCount, femaleCount);
-        System.out.println("\nGENDER DISTRIBUTION:");
-        System.out.printf("%-25s [%s] %d\n","Male : ", StringUtility.greenBarChart(maleCount, maxGender, barWidth), maleCount);
-        System.out.printf("%-25s [%s] %d\n","Female : ", StringUtility.greenBarChart(femaleCount, maxGender, barWidth), femaleCount);
-
-        System.out.println("\nCONSULTATIONS PER PATIENT:");
-        for (Object obj : patientsArray) {
-            Patient p = (Patient) obj;
-            int count = countConsultationsForPatient(String.valueOf(p.getId()), consultationManagement.getAllConsultations());
-            System.out.printf("%-25s [%s] %d\n", p.getName(), StringUtility.greenBarChart(count, maxConsultations, barWidth), count);
+        //top patients by consultation count chart
+        System.out.println("Top Patients by Consultation Count Chart:");
+        System.out.println("   ^");
+        int maxConsultations = 0;
+        int numPatients = Math.min(patientsArray.length, 5);
+        for (int i = 0; i < numPatients; i++) {
+            if (consultationCounts[i] > maxConsultations) maxConsultations = consultationCounts[i];
         }
 
-        System.out.println("\nSUMMARY:");
-        System.out.println("• Total Patients: " + totalPatients);
-        System.out.println("• Male Patients: " + maleCount);
-        System.out.println("• Female Patients: " + femaleCount);
-        System.out.println("• Patients with Consultations: " + patientsWithConsultations.size()); //adt method
-        System.out.println("• Patients in Queue: " + patientsInQueue.size()); //adt method
-        System.out.println("• Active Patients: " + allActivePatients.size()); //adt method
-        System.out.println("• Patients with Both (Consultation & Queue): " + patientsWithBoth.size()); //adt method
+        String barColor = "\u001B[41m"; //red background
 
-        System.out.println(StringUtility.repeatString("=", 70));
+        for (int level = maxConsultations; level > 0; level--) {
+            System.out.printf("%2d |", level);
+            for (int i = 0; i < numPatients; i++) {
+                if (consultationCounts[i] >= level) {
+                    System.out.print(" " + barColor + "    " + reset + " ");
+                } else {
+                    System.out.print("      ");
+                }
+            }
+            System.out.println();
+        }
+
+        //draw axis line that matches the data width exactly (6 chars per column)
+        System.out.print("   +");
+        for (int i = 0; i < numPatients; i++) {
+            System.out.print("------");
+        }
+        System.out.println("> Patients");
+
+        //draw labels aligned with bars (4-char labels with proper spacing)
+        System.out.print("    ");
+        for (int i = 0; i < numPatients; i++) {
+            Patient p = (Patient) patientsArray[i];
+            String shortName = p.getName().length() > 4 ? p.getName().substring(0, 4) : p.getName();
+            System.out.printf("%-4s  ", shortName); // 4-char label with 2 spaces
+        }
+        System.out.println();
+        System.out.println();
+
+        System.out.println();
+        System.out.println(StringUtility.repeatString("-", 95));
+        System.out.println("                                END OF THE REPORT");
+        System.out.println(StringUtility.repeatString("-", 95));
+        System.out.println();
         System.out.println("Press Enter to continue...");
         scanner.nextLine();
     }

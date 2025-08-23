@@ -1,5 +1,6 @@
 package entity;
 
+//edward long wai pin
 public class Treatment implements Comparable<Treatment> {
     private String treatmentId;
     private String patientId;

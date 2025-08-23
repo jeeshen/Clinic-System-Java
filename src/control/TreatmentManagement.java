@@ -387,144 +387,333 @@ public class TreatmentManagement {
         scanner.nextLine();
     }
     
-    public void generateTreatmentStatisticsReport() {
-        System.out.println("\n" + StringUtility.repeatString("=", 80));
-        System.out.println("        TREATMENT STATISTICS REPORT");
-        System.out.println(StringUtility.repeatString("=", 80));
+    public void generatePatientMedicineAdherenceReport() {
+        System.out.println("\n" + StringUtility.repeatString("=", 95));
+        System.out.println("                TUNKU ABDUL RAHMAN UNIVERSITY OF MANAGEMENT AND TECHNOLOGY");
+        System.out.println("                          TREATMENT MANAGEMENT SUBSYSTEM");
+        System.out.println("                     TREATMENT PRESCRIPTION ANALYSIS REPORT");
+        System.out.println(StringUtility.repeatString("=", 95));
+        System.out.println();
         System.out.println("Generated at: " + StringUtility.getCurrentDateTime());
-        System.out.println(StringUtility.repeatString("-", 80));
+        System.out.println(StringUtility.repeatString("-", 95));
+        System.out.println();
+        System.out.println(StringUtility.repeatString("*", 95));
+        System.out.println("   TUNKU ABDUL RAHMAN UNIVERSITY OF MANAGEMENT AND TECHNOLOGY HIGHLY CONFIDENTIAL DOCUMENT");
+        System.out.println(StringUtility.repeatString("*", 95));
+        System.out.println();
+
+        Object[] prescriptionsArray = prescriptionList.toArray();
+
+        String reset = "\u001B[0m";
+
+        //patient prescription analysis
+        SetAndQueueInterface<String> uniquePatients = new SetQueueArray<>();
+        int[] patientPrescriptionCounts = new int[100];
+        String[] patientArray = new String[100];
+        int patientIndex = 0;
+
+        //analyze prescriptions per patient
+        for (Object obj : prescriptionsArray) {
+            Prescription prescription = (Prescription) obj;
+            String patientId = prescription.getPatientId();
+
+            uniquePatients.add(patientId);
+
+            //count prescriptions per patient
+            boolean patientFound = false;
+            for (int i = 0; i < patientIndex; i++) {
+                if (patientArray[i].equals(patientId)) {
+                    patientPrescriptionCounts[i]++;
+                    patientFound = true;
+                    break;
+                }
+            }
+            if (!patientFound && patientIndex < 100) {
+                patientArray[patientIndex] = patientId;
+                patientPrescriptionCounts[patientIndex] = 1;
+                patientIndex++;
+            }
+
+
+        }
+
+        //sort patients by prescription count
+        for (int i = 0; i < patientIndex - 1; i++) {
+            for (int j = 0; j < patientIndex - i - 1; j++) {
+                if (patientPrescriptionCounts[j] < patientPrescriptionCounts[j + 1]) {
+                    //swap patients
+                    String tempPatient = patientArray[j];
+                    patientArray[j] = patientArray[j + 1];
+                    patientArray[j + 1] = tempPatient;
+
+                    //swap counts
+                    int tempCount = patientPrescriptionCounts[j];
+                    patientPrescriptionCounts[j] = patientPrescriptionCounts[j + 1];
+                    patientPrescriptionCounts[j + 1] = tempCount;
+                }
+            }
+        }
+
+        System.out.println("PATIENT MEDICINE TABLE");
+        System.out.println(StringUtility.repeatString("-", 95));
+        System.out.print("| Patient ID | Patient Name               | Prescriptions                                     |");
+        System.out.println();
+        System.out.println(StringUtility.repeatString("-", 95));
+
+        for (int i = 0; i < Math.min(patientIndex, 10); i++) {
+            String patientId = patientArray[i];
+            String patientName = getPatientName(patientId);
+            int prescriptions = patientPrescriptionCounts[i];
+
+            System.out.printf("| %-10s | %-25s | %-50d |%n",
+                patientId,
+                patientName.length() > 25 ? patientName.substring(0, 25) : patientName,
+                prescriptions);
+        }
+        System.out.println(StringUtility.repeatString("-", 95));
+        System.out.println();
+
+        //prescriptions vs patients chart
+        System.out.println(StringUtility.repeatString("-", 95));
+        System.out.println("                PRESCRIPTIONS VS PATIENTS CHART");
+        System.out.println(StringUtility.repeatString("-", 95));
+        System.out.println();
+
+        System.out.println("Prescriptions vs Patients Chart:");
+        System.out.println("   ^");
+
+        int maxPrescriptions = 0;
+        int numPatients = Math.min(patientIndex, 5);
+        for (int i = 0; i < numPatients; i++) {
+            if (patientPrescriptionCounts[i] > maxPrescriptions) maxPrescriptions = patientPrescriptionCounts[i];
+        }
+
+        String chartColor = "\u001B[42m"; //green for prescriptions
+
+        for (int level = maxPrescriptions; level > 0; level--) {
+            System.out.printf("%2d |", level);
+            for (int i = 0; i < numPatients; i++) {
+                if (patientPrescriptionCounts[i] >= level) {
+                    System.out.print(" " + chartColor + "    " + reset + " ");
+                } else {
+                    System.out.print("      ");
+                }
+            }
+            System.out.println();
+        }
+
+        System.out.print("   +");
+        for (int i = 0; i < numPatients; i++) {
+            System.out.print("------");
+        }
+        System.out.println("> Patients");
+
+        System.out.print("     ");
+        for (int i = 0; i < numPatients; i++) {
+            String shortName = getPatientName(patientArray[i]);
+            String shortNameDisplay = shortName.length() > 4 ? shortName.substring(0, 4) : shortName;
+            System.out.printf("%-4s  ", shortNameDisplay);
+        }
+        System.out.println();
+        System.out.println();
+
+        if (patientIndex > 0) {
+            System.out.printf("Patient with most prescriptions: < %s with %d prescriptions >%n",
+                getPatientName(patientArray[0]), patientPrescriptionCounts[0]);
+        }
+
+        System.out.println();
+        System.out.println(StringUtility.repeatString("*", 95));
+        System.out.println("                                END OF THE REPORT");
+        System.out.println(StringUtility.repeatString("*", 95));
+        System.out.println();
+        System.out.println("Press Enter to continue...");
+        scanner.nextLine();
+    }
+
+    public void generateDoctorPrescriptionEfficiencyReport() {
+        System.out.println("\n" + StringUtility.repeatString("=", 95));
+        System.out.println("                TUNKU ABDUL RAHMAN UNIVERSITY OF MANAGEMENT AND TECHNOLOGY");
+        System.out.println("                          TREATMENT MANAGEMENT SUBSYSTEM");
+        System.out.println("                        DOCTOR PRESCRIPTION EFFICIENCY REPORT");
+        System.out.println(StringUtility.repeatString("=", 95));
+        System.out.println();
+        System.out.println("Generated at: " + StringUtility.getCurrentDateTime());
+        System.out.println(StringUtility.repeatString("-", 95));
+        System.out.println();
+        System.out.println(StringUtility.repeatString("*", 95));
+        System.out.println("   TUNKU ABDUL RAHMAN UNIVERSITY OF MANAGEMENT AND TECHNOLOGY HIGHLY CONFIDENTIAL DOCUMENT");
+        System.out.println(StringUtility.repeatString("*", 95));
+        System.out.println();
 
         Object[] prescriptionsArray = prescriptionList.toArray();
         int totalPrescriptions = prescriptionsArray.length;
-        int paidCount = 0;
 
-        SetAndQueueInterface<String> uniqueDiagnoses = new SetQueueArray<>();
-        int maxDiagnosis = 0;
-        
+        String reset = "\u001B[0m";
+
+        //doctor efficiency analysis
+        SetAndQueueInterface<String> uniqueDoctors = new SetQueueArray<>();
+        int[] doctorPrescriptionCounts = new int[100];
+        String[] doctorArray = new String[100];
+        double[] doctorRevenue = new double[100];
+        int doctorIndex = 0;
+
+        //analyze prescriptions for doctor efficiency
         for (Object obj : prescriptionsArray) {
             Prescription prescription = (Prescription) obj;
-            if (prescription.isPaid()) paidCount++;
-            String diagnosis = prescription.getDiagnosis();
-            uniqueDiagnoses.add(diagnosis);
-        }
+            String doctorId = prescription.getDoctorId();
+            double cost = prescription.getTotalCost();
 
-        Object[] diagnosesArray = uniqueDiagnoses.toArray();
-        int[] diagnosisCounts = new int[diagnosesArray.length];
-        
-        for (int i = 0; i < diagnosesArray.length; i++) {
-            String diagnosis = (String) diagnosesArray[i];
-            int count = countDiagnosisOccurrences(diagnosis, prescriptionsArray);
-            diagnosisCounts[i] = count;
-            if (count > maxDiagnosis) {
-                maxDiagnosis = count;
+            uniqueDoctors.add(doctorId);
+
+            //count prescriptions per doctor
+            boolean doctorFound = false;
+            for (int i = 0; i < doctorIndex; i++) {
+                if (doctorArray[i].equals(doctorId)) {
+                    doctorPrescriptionCounts[i]++;
+                    doctorRevenue[i] += cost;
+                    doctorFound = true;
+                    break;
+                }
+            }
+            if (!doctorFound && doctorIndex < 100) {
+                doctorArray[doctorIndex] = doctorId;
+                doctorPrescriptionCounts[doctorIndex] = 1;
+                doctorRevenue[doctorIndex] = cost;
+                doctorIndex++;
             }
         }
 
-        String[] headers = {"Prescription ID", "Patient ID", "Diagnosis", "Date", "Paid"};
-        Object[][] rows = new Object[prescriptionsArray.length][headers.length];
-        for (int i = 0; i < prescriptionsArray.length; i++) {
-            Prescription p = (Prescription) prescriptionsArray[i];
-            rows[i][0] = p.getPrescriptionId();
-            rows[i][1] = p.getPatientId();
-            rows[i][2] = p.getDiagnosis();
-            rows[i][3] = p.getPrescriptionDate();
-            rows[i][4] = p.isPaid() ? "Yes" : "No";
-        }
-        System.out.println("\nPRESCRIPTION LIST:");
-        System.out.print(StringUtility.formatTableWithDividers(headers, rows));
+        //sort doctors by prescription count
+        for (int i = 0; i < doctorIndex - 1; i++) {
+            for (int j = 0; j < doctorIndex - i - 1; j++) {
+                if (doctorPrescriptionCounts[j] < doctorPrescriptionCounts[j + 1]) {
+                    //swap doctors
+                    String tempDoctor = doctorArray[j];
+                    doctorArray[j] = doctorArray[j + 1];
+                    doctorArray[j + 1] = tempDoctor;
 
-        System.out.println("\nDIAGNOSIS COUNTS:");
-        int barWidth = 30;
-        for (int i = 0; i < diagnosesArray.length; i++) {
-            String diag = (String) diagnosesArray[i];
-            int count = diagnosisCounts[i];
-            System.out.printf("%-30s [%s] %d cases\n", diag, StringUtility.greenBarChart(count, maxDiagnosis, barWidth), count);
+                    //swap counts
+                    int tempCount = doctorPrescriptionCounts[j];
+                    doctorPrescriptionCounts[j] = doctorPrescriptionCounts[j + 1];
+                    doctorPrescriptionCounts[j + 1] = tempCount;
+
+                    //swap revenue
+                    double tempRevenue = doctorRevenue[j];
+                    doctorRevenue[j] = doctorRevenue[j + 1];
+                    doctorRevenue[j + 1] = tempRevenue;
+                }
+            }
         }
 
-        System.out.println("\nSUMMARY:");
-        System.out.println("• Total Prescriptions: " + totalPrescriptions);
-        System.out.println("• Paid Prescriptions: " + paidCount);
-        System.out.println(StringUtility.repeatString("=", 80));
+        //display doctor efficiency table
+        System.out.println("DOCTOR PRESCRIPTION EFFICIENCY TABLE");
+        System.out.println(StringUtility.repeatString("-", 95));
+        System.out.print("| Doctor ID | Doctor Name               | Prescriptions | Total Revenue                       |");
+        System.out.println();
+        System.out.println(StringUtility.repeatString("-", 95));
+
+        for (int i = 0; i < Math.min(doctorIndex, 10); i++) {
+            String doctorId = doctorArray[i];
+            String doctorName = getDoctorName(doctorId);
+            int prescriptions = doctorPrescriptionCounts[i];
+            double revenue = doctorRevenue[i];
+
+            System.out.printf("| %-9s | %-25s | %-13d | RM %-32.2f |%n",
+                doctorId,
+                doctorName.length() > 25 ? doctorName.substring(0, 25) : doctorName,
+                prescriptions,
+                revenue);
+        }
+        System.out.println(StringUtility.repeatString("-", 95));
+        System.out.println();
+
+        System.out.println(StringUtility.repeatString("-", 95));
+        System.out.println("                DOCTOR EFFICIENCY CHART");
+        System.out.println(StringUtility.repeatString("-", 95));
+        System.out.println();
+
+        System.out.println("Doctor Efficiency Chart:");
+        System.out.println("   ^");
+
+        int maxPrescriptions = 0;
+        int numDoctors = Math.min(doctorIndex, 5);
+        for (int i = 0; i < numDoctors; i++) {
+            if (doctorPrescriptionCounts[i] > maxPrescriptions) maxPrescriptions = doctorPrescriptionCounts[i];
+        }
+
+        String efficiencyColor = "\u001B[44m"; //blue for efficiency
+
+        for (int level = maxPrescriptions; level > 0; level--) {
+            System.out.printf("%2d |", level);
+            for (int i = 0; i < numDoctors; i++) {
+                if (doctorPrescriptionCounts[i] >= level) {
+                    System.out.print(" " + efficiencyColor + "    " + reset + " ");
+                } else {
+                    System.out.print("      ");
+                }
+            }
+            System.out.println();
+        }
+
+        System.out.print("   +");
+        for (int i = 0; i < numDoctors; i++) {
+            System.out.print("------");
+        }
+        System.out.println("> Doctors");
+
+        System.out.print("    ");
+        for (int i = 0; i < numDoctors; i++) {
+            String shortName = getDoctorName(doctorArray[i]);
+            String shortNameDisplay = shortName.length() > 4 ? shortName.substring(0, 4) : shortName;
+            System.out.printf("%-4s  ", shortNameDisplay);
+        }
+        System.out.println();
+        System.out.println();
+
+        //summary
+        if (doctorIndex > 0) {
+            System.out.printf("Most efficient doctor: < %s with %d prescriptions >%n",
+                getDoctorName(doctorArray[0]), doctorPrescriptionCounts[0]);
+            System.out.printf("Highest revenue doctor: < %s with RM %.2f >%n",
+                getDoctorName(doctorArray[0]), doctorRevenue[0]);
+        }
+
+        System.out.println("Average prescriptions per doctor: " + String.format("%.1f", 
+            (double)totalPrescriptions / doctorIndex));
+
+        System.out.println();
+        System.out.println(StringUtility.repeatString("*", 95));
+        System.out.println("                                END OF THE REPORT");
+        System.out.println(StringUtility.repeatString("*", 95));
+        System.out.println();
         System.out.println("Press Enter to continue...");
         scanner.nextLine();
     }
-    
-    private int countDiagnosisOccurrences(String diagnosis, Object[] prescriptionsArray) {
-        int count = 0;
-        for (Object obj : prescriptionsArray) {
-            Prescription prescription = (Prescription) obj;
-            if (prescription.getDiagnosis().equals(diagnosis)) {
-                count++;
+
+    private String getPatientName(String patientId) {
+        if (patientManagement != null) {
+            try {
+                int patientIdInt = Integer.parseInt(patientId);
+                Patient patient = patientManagement.findPatientById(patientIdInt);
+                if (patient != null) {
+                    return patient.getName();
+                }
+            } catch (NumberFormatException e) {
+                System.out.println("Error: Invalid patient ID format");
             }
         }
-        return count;
+        return "Unknown Patient";
     }
     
-    public void generateDiagnosisAnalysisReport() {
-        System.out.println("\n" + StringUtility.repeatString("=", 60));
-        System.out.println("        DIAGNOSIS ANALYSIS REPORT");
-        System.out.println(StringUtility.repeatString("=", 60));
-        System.out.println("Generated at: " + StringUtility.getCurrentDateTime());
-        System.out.println(StringUtility.repeatString("-", 60));
-
-        Object[] prescriptionsArray = prescriptionList.toArray();
-        SetAndQueueInterface<String> uniqueDiagnoses = new SetQueueArray<>();
-        int maxDiagnosis = 0;
-        
-        for (Object obj : prescriptionsArray) {
-            Prescription prescription = (Prescription) obj;
-            String diagnosis = prescription.getDiagnosis();
-            uniqueDiagnoses.add(diagnosis);
-        }
-
-        Object[] diagnosesArray = uniqueDiagnoses.toArray();
-        int[] diagnosisCounts = new int[diagnosesArray.length];
-        
-        for (int i = 0; i < diagnosesArray.length; i++) {
-            String diagnosis = (String) diagnosesArray[i];
-            int count = countDiagnosisOccurrences(diagnosis, prescriptionsArray);
-            diagnosisCounts[i] = count;
-            if (count > maxDiagnosis) {
-                maxDiagnosis = count;
+    private String getDoctorName(String doctorId) {
+        if (doctorManagement != null) {
+            Doctor doctor = doctorManagement.findDoctorById(doctorId);
+            if (doctor != null) {
+                return doctor.getName();
             }
         }
-
-        String[] headers = {"Diagnosis", "Cases"};
-        Object[][] rows = new Object[diagnosesArray.length][headers.length];
-        
-        for (int i = 0; i < diagnosesArray.length; i++) {
-            String diag = (String) diagnosesArray[i];
-            rows[i][0] = diag;
-            rows[i][1] = diagnosisCounts[i];
-        }
-        
-        System.out.println("\nDIAGNOSIS ANALYSIS:");
-        System.out.print(StringUtility.formatTableWithDividers(headers, rows));
-
-        System.out.println("\nDIAGNOSIS DISTRIBUTION:");
-        int barWidth = 30;
-        for (int i = 0; i < diagnosesArray.length; i++) {
-            String diag = (String) diagnosesArray[i];
-            int count = diagnosisCounts[i];
-            System.out.printf("%-30s [%s] %d cases\n", diag, StringUtility.greenBarChart(count, maxDiagnosis, barWidth), count);
-        }
-
-        System.out.println("\nSUMMARY:");
-        System.out.println("• Total Diagnoses: " + diagnosesArray.length);
-        System.out.println("• Most Common Diagnosis: " + getMostCommonDiagnosis(diagnosesArray, diagnosisCounts));
-        System.out.println(StringUtility.repeatString("=", 60));
-        System.out.println("Press Enter to continue...");
-        scanner.nextLine();
-    }
-    
-    private String getMostCommonDiagnosis(Object[] diagnosesArray, int[] diagnosisCounts) {
-        int maxIndex = 0;
-        for (int i = 1; i < diagnosisCounts.length; i++) {
-            if (diagnosisCounts[i] > diagnosisCounts[maxIndex]) {
-                maxIndex = i;
-            }
-        }
-        return (String) diagnosesArray[maxIndex];
+        return "Unknown Doctor";
     }
     
     public void displayAvailableMedicines() {

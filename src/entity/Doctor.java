@@ -3,6 +3,7 @@ package entity;
 import adt.SetAndQueueInterface;
 import adt.SetQueueArray;
 
+//leow wei lun
 public class Doctor implements Comparable<Doctor> {
     private String doctorId;
     private String name;

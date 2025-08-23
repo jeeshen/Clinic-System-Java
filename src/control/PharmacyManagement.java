@@ -374,11 +374,19 @@ public class PharmacyManagement {
     }
     
     public void generateMedicineStockReport() {
-        System.out.println("\n" + StringUtility.repeatString("=", 60));
-        System.out.println("        MEDICINE STOCK REPORT");
-        System.out.println(StringUtility.repeatString("=", 60));
+        System.out.println("\n" + StringUtility.repeatString("=", 95));
+        System.out.println("                TUNKU ABDUL RAHMAN UNIVERSITY OF MANAGEMENT AND TECHNOLOGY");
+        System.out.println("                           PHARMACY MANAGEMENT SUBSYSTEM");
+        System.out.println("                              MEDICINE STOCK REPORT");
+        System.out.println(StringUtility.repeatString("=", 95));
+        System.out.println();
         System.out.println("Generated at: " + StringUtility.getCurrentDateTime());
-        System.out.println(StringUtility.repeatString("-", 60));
+        System.out.println(StringUtility.repeatString("-", 95));
+        System.out.println();
+        System.out.println(StringUtility.repeatString("*", 95));
+        System.out.println("   TUNKU ABDUL RAHMAN UNIVERSITY OF MANAGEMENT AND TECHNOLOGY HIGHLY CONFIDENTIAL DOCUMENT");
+        System.out.println(StringUtility.repeatString("*", 95));
+        System.out.println();
         
         Object[] medicinesArray = medicineList.toArray();
         int totalMedicines = medicinesArray.length;
@@ -472,11 +480,16 @@ public class PharmacyManagement {
         }
 
         System.out.println("\nSUMMARY:");
+        System.out.println(StringUtility.repeatString("-", 95));
         System.out.println("• Total Medicines: " + totalMedicines);
         System.out.println("• Low Stock (≤10): " + lowStockCount);
         System.out.println("• Out of Stock: " + outOfStockCount);
         System.out.println("• Total Inventory Value: RM " + String.format("%.2f", totalInventoryValue));
-        System.out.println(StringUtility.repeatString("=", 60));
+        System.out.println();
+        System.out.println(StringUtility.repeatString("*", 95));
+        System.out.println("                                END OF THE REPORT");
+        System.out.println(StringUtility.repeatString("*", 95));
+        System.out.println();
         System.out.println("Press Enter to continue...");
         scanner.nextLine();
     }
@@ -771,9 +784,19 @@ public class PharmacyManagement {
             return;
         }
 
-        System.out.println("\n" + StringUtility.repeatString("=", 60));
-        System.out.println("        DISPENSING STATISTICS REPORT");
-        System.out.println(StringUtility.repeatString("=", 60));
+        System.out.println("\n" + StringUtility.repeatString("=", 95));
+        System.out.println("                TUNKU ABDUL RAHMAN UNIVERSITY OF MANAGEMENT AND TECHNOLOGY");
+        System.out.println("                           PHARMACY MANAGEMENT SUBSYSTEM");
+        System.out.println("                         DISPENSING STATISTICS REPORT");
+        System.out.println(StringUtility.repeatString("=", 95));
+        System.out.println();
+        System.out.println("Generated at: " + StringUtility.getCurrentDateTime());
+        System.out.println(StringUtility.repeatString("-", 95));
+        System.out.println();
+        System.out.println(StringUtility.repeatString("*", 95));
+        System.out.println("   TUNKU ABDUL RAHMAN UNIVERSITY OF MANAGEMENT AND TECHNOLOGY HIGHLY CONFIDENTIAL DOCUMENT");
+        System.out.println(StringUtility.repeatString("*", 95));
+        System.out.println();
 
         Object[] prescriptionsArray = treatmentManagement.getAllPrescriptions();
         int totalPrescriptions = prescriptionsArray.length;
@@ -796,7 +819,8 @@ public class PharmacyManagement {
             }
         }
 
-        System.out.println("Dispensing Statistics:");
+        System.out.println("DISPENSING STATISTICS SUMMARY:");
+        System.out.println(StringUtility.repeatString("-", 95));
         System.out.println("• Total Prescriptions: " + totalPrescriptions);
         System.out.println("• Total Medicines Prescribed: " + totalMedicines);
         System.out.println("• Prescriptions Dispensed: " + dispensedMedicines);
@@ -807,7 +831,12 @@ public class PharmacyManagement {
             System.out.println("• Average Medicines per Prescription: " + String.format("%.1f", (double)totalMedicines/totalPrescriptions));
         }
 
-        System.out.println("\nPress Enter to continue...");
+        System.out.println();
+        System.out.println(StringUtility.repeatString("*", 95));
+        System.out.println("                                END OF THE REPORT");
+        System.out.println(StringUtility.repeatString("*", 95));
+        System.out.println();
+        System.out.println("Press Enter to continue...");
         scanner.nextLine();
     }
 
@@ -1143,5 +1172,508 @@ public class PharmacyManagement {
 
     public Object[] getAllMedicines() {
         return medicineList.toArray(); //adt method
+    }
+
+    public void generatePharmacyInventoryAndUsageReport() {
+        System.out.println("\n" + StringUtility.repeatString("=", 95));
+        System.out.println("                TUNKU ABDUL RAHMAN UNIVERSITY OF MANAGEMENT AND TECHNOLOGY");
+        System.out.println("                           PHARMACY MANAGEMENT SUBSYSTEM");
+        System.out.println("                        PHARMACY INVENTORY & USAGE REPORT");
+        System.out.println(StringUtility.repeatString("=", 95));
+        System.out.println();
+        System.out.println("Generated at: " + StringUtility.getCurrentDateTime());
+        System.out.println(StringUtility.repeatString("-", 95));
+        System.out.println();
+        System.out.println(StringUtility.repeatString("*", 95));
+        System.out.println("   TUNKU ABDUL RAHMAN UNIVERSITY OF MANAGEMENT AND TECHNOLOGY HIGHLY CONFIDENTIAL DOCUMENT");
+        System.out.println(StringUtility.repeatString("*", 95));
+        System.out.println();
+
+        String reset = "\u001B[0m";
+
+        Object[] medicinesArray = medicineList.toArray();
+        int totalMedicines = medicinesArray.length;
+
+        //medicine usage analysis from prescriptions
+        SetAndQueueInterface<String> uniqueMedicines = new SetQueueArray<>();
+        int[] medicineUsageCounts = new int[100];
+        String[] medicineArray = new String[100];
+        double[] medicineValues = new double[100];
+        int medicineIndex = 0;
+
+        //stock level analysis
+        int lowStock = 0, mediumStock = 0, highStock = 0, outOfStock = 0;
+
+        //category analysis
+        SetAndQueueInterface<String> uniqueCategories = new SetQueueArray<>();
+        int[] categoryCounts = new int[20];
+        String[] categoryArray = new String[20];
+        int categoryIndex = 0;
+
+        //analyze medicines
+        for (Object obj : medicinesArray) {
+            Medicine medicine = (Medicine) obj;
+            String medicineName = medicine.getName();
+            String category = medicine.getPurpose();
+            int stock = medicine.getStockQuantity();
+
+            uniqueMedicines.add(medicineName);
+            uniqueCategories.add(category);
+
+            //stock level categorization
+            if (stock == 0) outOfStock++;
+            else if (stock <= LOW_STOCK_THRESHOLD) lowStock++;
+            else if (stock <= 50) mediumStock++;
+            else highStock++;
+
+            //category analysis
+            boolean categoryFound = false;
+            for (int i = 0; i < categoryIndex; i++) {
+                if (categoryArray[i].equals(category)) {
+                    categoryCounts[i]++;
+                    categoryFound = true;
+                    break;
+                }
+            }
+            if (!categoryFound && categoryIndex < 20) {
+                categoryArray[categoryIndex] = category;
+                categoryCounts[categoryIndex] = 1;
+                categoryIndex++;
+            }
+        }
+
+        //get usage data from prescriptions if available
+        if (treatmentManagement != null) {
+            Object[] prescriptionsArray = treatmentManagement.getAllPrescriptions();
+            for (Object prescObj : prescriptionsArray) {
+                Prescription prescription = (Prescription) prescObj;
+                Object[] prescribedMedicinesArray = prescription.getPrescribedMedicines().toArray();
+
+                for (Object medObj : prescribedMedicinesArray) {
+                    PrescribedMedicine prescribedMedicine = (PrescribedMedicine) medObj;
+                    String medicineName = prescribedMedicine.getMedicineName();
+                    int quantity = prescribedMedicine.getQuantity();
+
+                    //count medicine usage
+                    boolean medicineFound = false;
+                    for (int i = 0; i < medicineIndex; i++) {
+                        if (medicineArray[i].equals(medicineName)) {
+                            medicineUsageCounts[i] += quantity;
+                            medicineFound = true;
+                            break;
+                        }
+                    }
+                    if (!medicineFound && medicineIndex < 100) {
+                        medicineArray[medicineIndex] = medicineName;
+                        medicineUsageCounts[medicineIndex] = quantity;
+
+                        //find medicine value
+                        for (Object obj : medicinesArray) {
+                            Medicine medicine = (Medicine) obj;
+                            if (medicine.getName().equals(medicineName)) {
+                                medicineValues[medicineIndex] = medicine.getPrice();
+                                break;
+                            }
+                        }
+                        medicineIndex++;
+                    }
+                }
+            }
+        }
+
+        //sort medicines by usage (bubble sort)
+        for (int i = 0; i < medicineIndex - 1; i++) {
+            for (int j = 0; j < medicineIndex - i - 1; j++) {
+                if (medicineUsageCounts[j] < medicineUsageCounts[j + 1]) {
+                    //swap medicines
+                    String tempMedicine = medicineArray[j];
+                    medicineArray[j] = medicineArray[j + 1];
+                    medicineArray[j + 1] = tempMedicine;
+
+                    //swap counts
+                    int tempCount = medicineUsageCounts[j];
+                    medicineUsageCounts[j] = medicineUsageCounts[j + 1];
+                    medicineUsageCounts[j + 1] = tempCount;
+
+                    //swap values
+                    double tempValue = medicineValues[j];
+                    medicineValues[j] = medicineValues[j + 1];
+                    medicineValues[j + 1] = tempValue;
+                }
+            }
+        }
+
+        //sort categories by count (bubble sort)
+        for (int i = 0; i < categoryIndex - 1; i++) {
+            for (int j = 0; j < categoryIndex - i - 1; j++) {
+                if (categoryCounts[j] < categoryCounts[j + 1]) {
+                    //swap categories
+                    String tempCategory = categoryArray[j];
+                    categoryArray[j] = categoryArray[j + 1];
+                    categoryArray[j + 1] = tempCategory;
+
+                    //swap counts
+                    int tempCount = categoryCounts[j];
+                    categoryCounts[j] = categoryCounts[j + 1];
+                    categoryCounts[j + 1] = tempCount;
+                }
+            }
+        }
+
+        System.out.println("PHARMACY INVENTORY SUMMARY:");
+        System.out.println(StringUtility.repeatString("-", 95));
+        System.out.printf("Total Medicines in Inventory: %d%n", totalMedicines);
+        System.out.printf("Total Medicine Categories: %d%n", categoryIndex);
+        System.out.printf("Total Medicines Dispensed: %d%n", getTotalDispensedMedicines());
+        System.out.println();
+
+        System.out.println("Stock Level vs Reorder Analysis:");
+        System.out.println(StringUtility.repeatString("-", 95));
+        System.out.printf("| %-20s | %-68s |%n", "Stock Level", "Count");
+        System.out.println(StringUtility.repeatString("-", 95));
+
+        String[] stockLevels = {"Out of Stock", "Low Stock", "Medium Stock", "High Stock"};
+        int[] stockCounts = {outOfStock, lowStock, mediumStock, highStock};
+
+        for (int i = 0; i < stockLevels.length; i++) {
+            System.out.printf("| %-20s | %-68d |%n",
+                stockLevels[i],
+                stockCounts[i]);
+        }
+        System.out.println(StringUtility.repeatString("-", 95));
+        System.out.println();
+
+        System.out.println("Medicine Usage:");
+        System.out.println(StringUtility.repeatString("-", 95));
+        System.out.printf("| %-20s | %-68s |%n", "Medicine Name", "Usage");
+        System.out.println(StringUtility.repeatString("-", 95));
+
+        for (int i = 0; i < Math.min(medicineIndex, 5); i++) {
+            System.out.printf("| %-20s | %-68d |%n",
+                medicineArray[i].length() > 20 ? medicineArray[i].substring(0, 20) : medicineArray[i],
+                medicineUsageCounts[i]);
+        }
+        System.out.println(StringUtility.repeatString("-", 95));
+        System.out.println();
+
+        System.out.println(StringUtility.repeatString("-", 95));
+        System.out.println("                GRAPHICAL REPRESENTATION OF PHARMACY MANAGEMENT");
+        System.out.println(StringUtility.repeatString("-", 95));
+        System.out.println();
+
+        System.out.println("Top Medicines by Usage Chart:");
+        System.out.println("   ^");
+        int maxUsage = 0;
+        int numMedicines = Math.min(medicineIndex, 5);
+        for (int i = 0; i < numMedicines; i++) {
+            if (medicineUsageCounts[i] > maxUsage) maxUsage = medicineUsageCounts[i];
+        }
+
+        String barColor = "\u001B[42m"; //green background
+
+        int increment = 50;
+        int maxLevel = ((maxUsage / increment) + 1) * increment; //round up to next 50
+        
+        for (int level = maxLevel; level > 0; level -= increment) {
+            System.out.printf("%3d |", level);
+            for (int i = 0; i < numMedicines; i++) {
+                if (medicineUsageCounts[i] >= level) {
+                    System.out.print(" " + barColor + "    " + reset + " ");
+                } else {
+                    System.out.print("      ");
+                }
+            }
+            System.out.println();
+        }
+
+        //draw axis line that matches the data width exactly (6 chars per column)
+        System.out.print("    +");
+        for (int i = 0; i < numMedicines; i++) {
+            System.out.print("------");
+        }
+        System.out.println("> Medicines");
+
+        //draw labels aligned with bars (4-char labels with proper spacing)
+        System.out.print("     ");
+        for (int i = 0; i < numMedicines; i++) {
+            String shortName = medicineArray[i].length() > 4 ? medicineArray[i].substring(0, 4) : medicineArray[i];
+            System.out.printf("%-4s  ", shortName);
+        }
+        System.out.println();
+        System.out.println();
+
+        if (medicineIndex > 0) {
+            System.out.printf("Most used medicine: < %s with %d units dispensed >%n",
+                medicineArray[0], medicineUsageCounts[0]);
+        }
+
+        System.out.printf("Stock level breakdown: < Out: %d, Low: %d, Medium: %d, High: %d >%n",
+            outOfStock, lowStock, mediumStock, highStock);
+
+        System.out.println();
+        System.out.println(StringUtility.repeatString("*", 95));
+        System.out.println("                                END OF THE REPORT");
+        System.out.println(StringUtility.repeatString("*", 95));
+        System.out.println();
+        System.out.println("Press Enter to continue...");
+        scanner.nextLine();
+    }
+
+    private int getTotalDispensedMedicines() {
+        int total = 0;
+        if (treatmentManagement != null) {
+            Object[] prescriptionsArray = treatmentManagement.getAllPrescriptions();
+            for (Object prescObj : prescriptionsArray) {
+                Prescription prescription = (Prescription) prescObj;
+                Object[] prescribedMedicinesArray = prescription.getPrescribedMedicines().toArray();
+                for (Object medObj : prescribedMedicinesArray) {
+                    PrescribedMedicine prescribedMedicine = (PrescribedMedicine) medObj;
+                    total += prescribedMedicine.getQuantity();
+                }
+            }
+        }
+        return total;
+    }
+
+    public void generatePharmacyFinancialAndCategoryReport() {
+        System.out.println("\n" + StringUtility.repeatString("=", 95));
+        System.out.println("                TUNKU ABDUL RAHMAN UNIVERSITY OF MANAGEMENT AND TECHNOLOGY");
+        System.out.println("                           PHARMACY MANAGEMENT SUBSYSTEM");
+        System.out.println("                      PHARMACY FINANCIAL & CATEGORY REPORT");
+        System.out.println(StringUtility.repeatString("=", 95));
+        System.out.println();
+        System.out.println("Generated at: " + StringUtility.getCurrentDateTime());
+        System.out.println(StringUtility.repeatString("-", 95));
+        System.out.println();
+        System.out.println(StringUtility.repeatString("*", 95));
+        System.out.println("   TUNKU ABDUL RAHMAN UNIVERSITY OF MANAGEMENT AND TECHNOLOGY HIGHLY CONFIDENTIAL DOCUMENT");
+        System.out.println(StringUtility.repeatString("*", 95));
+        System.out.println();
+
+        String reset = "\u001B[0m";
+
+        Object[] medicinesArray = medicineList.toArray();
+        int totalMedicines = medicinesArray.length;
+
+        //category analysis
+        int[] categoryCounts = new int[20];
+        String[] categoryArray = new String[20];
+        double[] categoryValues = new double[20];
+        int categoryIndex = 0;
+
+        //price range analysis
+        int lowPrice = 0, mediumPrice = 0, highPrice = 0, premiumPrice = 0;
+
+        //brand analysis
+        int[] brandCounts = new int[50];
+        String[] brandArray = new String[50];
+        int brandIndex = 0;
+
+        //financial metrics
+        double totalInventoryValue = 0;
+        double averagePrice = 0;
+        double highestPrice = 0;
+        double lowestPrice = Double.MAX_VALUE;
+
+        //analyze medicines
+        for (Object obj : medicinesArray) {
+            Medicine medicine = (Medicine) obj;
+            String category = medicine.getPurpose();
+            String brand = medicine.getBrand();
+            double price = medicine.getPrice();
+            int stock = medicine.getStockQuantity();
+            double itemValue = price * stock;
+
+            totalInventoryValue += itemValue;
+            averagePrice += price;
+
+            if (price > highestPrice) highestPrice = price;
+            if (price < lowestPrice) lowestPrice = price;
+
+            //price range categorization
+            if (price <= 10.0) lowPrice++;
+            else if (price <= 50.0) mediumPrice++;
+            else if (price <= 100.0) highPrice++;
+            else premiumPrice++;
+
+            //category analysis
+            boolean categoryFound = false;
+            for (int i = 0; i < categoryIndex; i++) {
+                if (categoryArray[i].equals(category)) {
+                    categoryCounts[i]++;
+                    categoryValues[i] += itemValue;
+                    categoryFound = true;
+                    break;
+                }
+            }
+            if (!categoryFound && categoryIndex < 20) {
+                categoryArray[categoryIndex] = category;
+                categoryCounts[categoryIndex] = 1;
+                categoryValues[categoryIndex] = itemValue;
+                categoryIndex++;
+            }
+
+            //brand analysis
+            boolean brandFound = false;
+            for (int i = 0; i < brandIndex; i++) {
+                if (brandArray[i].equals(brand)) {
+                    brandCounts[i]++;
+                    brandFound = true;
+                    break;
+                }
+            }
+            if (!brandFound && brandIndex < 50) {
+                brandArray[brandIndex] = brand;
+                brandCounts[brandIndex] = 1;
+                brandIndex++;
+            }
+        }
+
+        averagePrice = totalMedicines > 0 ? averagePrice / totalMedicines : 0;
+
+        //sort categories by count (bubble sort)
+        for (int i = 0; i < categoryIndex - 1; i++) {
+            for (int j = 0; j < categoryIndex - i - 1; j++) {
+                if (categoryCounts[j] < categoryCounts[j + 1]) {
+                    //swap categories
+                    String tempCategory = categoryArray[j];
+                    categoryArray[j] = categoryArray[j + 1];
+                    categoryArray[j + 1] = tempCategory;
+
+                    //swap counts
+                    int tempCount = categoryCounts[j];
+                    categoryCounts[j] = categoryCounts[j + 1];
+                    categoryCounts[j + 1] = tempCount;
+
+                    //swap values
+                    double tempValue = categoryValues[j];
+                    categoryValues[j] = categoryValues[j + 1];
+                    categoryValues[j + 1] = tempValue;
+                }
+            }
+        }
+
+        //sort brands by count (bubble sort)
+        for (int i = 0; i < brandIndex - 1; i++) {
+            for (int j = 0; j < brandIndex - i - 1; j++) {
+                if (brandCounts[j] < brandCounts[j + 1]) {
+                    //swap brands
+                    String tempBrand = brandArray[j];
+                    brandArray[j] = brandArray[j + 1];
+                    brandArray[j + 1] = tempBrand;
+
+                    //swap counts
+                    int tempCount = brandCounts[j];
+                    brandCounts[j] = brandCounts[j + 1];
+                    brandCounts[j + 1] = tempCount;
+                }
+            }
+        }
+
+        System.out.println("PHARMACY FINANCIAL SUMMARY:");
+        System.out.println(StringUtility.repeatString("-", 95));
+        System.out.printf("Total Inventory Value: RM %.2f%n", totalInventoryValue);
+        System.out.printf("Average Medicine Price: RM %.2f%n", averagePrice);
+        System.out.printf("Highest Priced Medicine: RM %.2f%n", highestPrice);
+        System.out.printf("Lowest Priced Medicine: RM %.2f%n", lowestPrice);
+        System.out.printf("Total Medicine Categories: %d%n", categoryIndex);
+        System.out.printf("Total Brands Available: %d%n", brandIndex);
+        System.out.println();
+
+        System.out.println("Price Range Analysis:");
+        System.out.println(StringUtility.repeatString("-", 95));
+        System.out.printf("| %-20s | %-10s | %-55s |%n", "Price Range", "Count", "Percentage");
+        System.out.println(StringUtility.repeatString("-", 95));
+
+        double lowPricePct = totalMedicines > 0 ? (double) lowPrice / totalMedicines * 100 : 0;
+        double mediumPricePct = totalMedicines > 0 ? (double) mediumPrice / totalMedicines * 100 : 0;
+        double highPricePct = totalMedicines > 0 ? (double) highPrice / totalMedicines * 100 : 0;
+        double premiumPricePct = totalMedicines > 0 ? (double) premiumPrice / totalMedicines * 100 : 0;
+
+        System.out.printf("| %-20s | %-10d | %-54.1f%% |%n", "Low (≤RM10)", lowPrice, lowPricePct);
+        System.out.printf("| %-20s | %-10d | %-54.1f%% |%n", "Medium (RM11-50)", mediumPrice, mediumPricePct);
+        System.out.printf("| %-20s | %-10d | %-54.1f%% |%n", "High (RM51-100)", highPrice, highPricePct);
+        System.out.printf("| %-20s | %-10d | %-54.1f%% |%n", "Premium (>RM100)", premiumPrice, premiumPricePct);
+        System.out.println(StringUtility.repeatString("-", 95));
+        System.out.println();
+
+        System.out.println("Top Medicine Categories Data:");
+        System.out.println(StringUtility.repeatString("-", 95));
+        System.out.printf("| %-20s | %-10s | %-12s | %-40s |%n", "Category", "Count", "Total Value", "Percentage");
+        System.out.println(StringUtility.repeatString("-", 95));
+
+        for (int i = 0; i < Math.min(categoryIndex, 5); i++) {
+            double categoryPct = totalMedicines > 0 ? (double) categoryCounts[i] / totalMedicines * 100 : 0;
+            System.out.printf("| %-20s | %-10d | RM %-8.2f | %-40.1f%% |%n",
+                categoryArray[i].length() > 20 ? categoryArray[i].substring(0, 20) : categoryArray[i],
+                categoryCounts[i],
+                categoryValues[i],
+                categoryPct);
+        }
+        System.out.println(StringUtility.repeatString("-", 95));
+        System.out.println();
+
+        System.out.println(StringUtility.repeatString("-", 95));
+        System.out.println("                GRAPHICAL REPRESENTATION OF PHARMACY FINANCIALS");
+        System.out.println(StringUtility.repeatString("-", 95));
+        System.out.println();
+
+        System.out.println("Top Medicine Categories Chart:");
+        System.out.println("   ^");
+        int maxCategory = 0;
+        int numCategories = Math.min(categoryIndex, 5);
+        for (int i = 0; i < numCategories; i++) {
+            if (categoryCounts[i] > maxCategory) maxCategory = categoryCounts[i];
+        }
+
+        String barColor = "\u001B[44m"; //blue background
+
+        for (int level = maxCategory; level > 0; level--) {
+            System.out.printf("%2d |", level);
+            for (int i = 0; i < numCategories; i++) {
+                if (categoryCounts[i] >= level) {
+                    System.out.print(" " + barColor + "    " + reset + " ");
+                } else {
+                    System.out.print("      ");
+                }
+            }
+            System.out.println();
+        }
+
+        //draw axis line that matches the data width exactly (6 chars per column)
+        System.out.print("   +");
+        for (int i = 0; i < numCategories; i++) {
+            System.out.print("------");
+        }
+        System.out.println("> Categories");
+
+        //draw labels aligned with bars (4-char labels with proper spacing)
+        System.out.print("     ");
+        for (int i = 0; i < numCategories; i++) {
+            String shortName = categoryArray[i].length() > 4 ? categoryArray[i].substring(0, 4) : categoryArray[i];
+            System.out.printf("%-4s  ", shortName);
+        }
+        System.out.println();
+        System.out.println();
+
+        if (categoryIndex > 0) {
+            System.out.printf("Most common category: < %s with %d medicines >%n",
+                categoryArray[0], categoryCounts[0]);
+        }
+        if (brandIndex > 0) {
+            System.out.printf("Most common brand: < %s with %d medicines >%n",
+                brandArray[0], brandCounts[0]);
+        }
+
+        System.out.printf("Price distribution: < Low: %d, Medium: %d, High: %d, Premium: %d >%n",
+            lowPrice, mediumPrice, highPrice, premiumPrice);
+
+        System.out.println();
+        System.out.println(StringUtility.repeatString("*", 95));
+        System.out.println("                                END OF THE REPORT");
+        System.out.println(StringUtility.repeatString("*", 95));
+        System.out.println();
+        System.out.println("Press Enter to continue...");
+        scanner.nextLine();
     }
 }
