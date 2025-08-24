@@ -269,8 +269,13 @@ public class ConsultationManagement {
     }
     
     public void searchConsultationsByPatient() {
-        System.out.print("Enter patient ID to search consultations: ");
-        String patientId = scanner.nextLine();
+        System.out.print("Enter patient ID to search consultations (or press Enter to cancel): ");
+        String patientId = scanner.nextLine().trim();
+        
+        if (patientId.isEmpty()) {
+            System.out.println("Operation cancelled.");
+            return;
+        }
         
         Object[] consultationsArray = consultationList.toArray(); //adt method
         String[] headers = {"Consultation ID", "Doctor Name", "Date", "Status"};
@@ -322,8 +327,13 @@ public class ConsultationManagement {
         System.out.println("Total Consultations: " + consultationsArray.length);
         System.out.println(StringUtility.repeatString("=", 60));
         
-        System.out.print("Enter consultation ID to remove: ");
-        String consultationId = scanner.nextLine();
+        System.out.print("Enter consultation ID to remove (or press Enter to cancel): ");
+        String consultationId = scanner.nextLine().trim();
+        
+        if (consultationId.isEmpty()) {
+            System.out.println("Operation cancelled.");
+            return;
+        }
         
         Consultation consultation = findConsultationById(consultationId);
         if (consultation != null) {

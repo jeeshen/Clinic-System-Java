@@ -15,6 +15,7 @@ public class DoctorManagement {
     private SetAndQueueInterface<Doctor> doctorList = new SetQueueArray<>();
     private SetAndQueueInterface<Doctor> onDutyDoctorList = new SetQueueArray<>();
     private Scanner scanner;
+    private int doctorIdCounter = 21;
     private ConsultationManagement consultationManagement;
     
     public DoctorManagement() {
@@ -33,6 +34,24 @@ public class DoctorManagement {
             if (doctor.isIsAvailable() && !doctor.isOnLeave()) {
                 onDutyDoctorList.add(doctor); //adt method
             }
+        }
+
+        if (sampleDoctors.length > 0) {
+            int maxId = 0;
+            for (Doctor doctor : sampleDoctors) {
+                String doctorId = doctor.getDoctorId();
+                if (doctorId.startsWith("DOC")) {
+                    try {
+                        int idNumber = Integer.parseInt(doctorId.substring(3));
+                        if (idNumber > maxId) {
+                            maxId = idNumber;
+                        }
+                    } catch (NumberFormatException e) {
+                        // Skip invalid IDs
+                    }
+                }
+            }
+            doctorIdCounter = maxId + 1;
         }
     }
     
@@ -304,7 +323,7 @@ public class DoctorManagement {
             doctorArray[i] = (Doctor) sortedDoctorsArray[i];
         }
         
-        String[] headers = {"ID", "Name", "Specialization", "Contact", "Available"};
+        String[] headers = {"ID", "Name", "Specialization", "Contact", "Email", "Available"};
         Object[][] rows = new Object[doctorArray.length][headers.length];
         for (int i = 0; i < doctorArray.length; i++) {
             Doctor doctor = doctorArray[i];
@@ -312,7 +331,8 @@ public class DoctorManagement {
             rows[i][1] = doctor.getName();
             rows[i][2] = doctor.getSpecialization();
             rows[i][3] = doctor.getContactNumber();
-            rows[i][4] = doctor.isIsAvailable() ? "Yes" : "No";
+            rows[i][4] = doctor.getEmail();
+            rows[i][5] = doctor.isIsAvailable() ? "Yes" : "No";
         }
         System.out.print(StringUtility.formatTableNoDividers(
             "AVAILABLE DOCTORS",
@@ -347,7 +367,26 @@ public class DoctorManagement {
             //update contact number
             System.out.print("Contact Number [" + doctor.getContactNumber() + "]: ");
             String contact = scanner.nextLine();
-            if (!contact.isEmpty()) doctor.setContactNumber(contact);
+            if (!contact.isEmpty()) {
+                //check if contact number already exists for another doctor
+                if (!contact.equals(doctor.getContactNumber()) && isContactNumberExists(contact)) {
+                    System.out.println("Contact number already exists for another doctor! Update cancelled.");
+                    return;
+                }
+                doctor.setContactNumber(contact);
+            }
+            
+            //update email
+            System.out.print("Email [" + doctor.getEmail() + "]: ");
+            String email = scanner.nextLine();
+            if (!email.isEmpty()) {
+                //check if email already exists for another doctor
+                if (!email.equals(doctor.getEmail()) && isEmailExists(email)) {
+                    System.out.println("Email already exists for another doctor! Update cancelled.");
+                    return;
+                }
+                doctor.setEmail(email);
+            }
             
             System.out.println("\n[OK] Doctor details updated successfully!");
             System.out.println("\nUpdated doctor information:");
@@ -376,7 +415,7 @@ public class DoctorManagement {
             doctorArray[i] = (Doctor) sortedDoctorsArray[i];
         }
         
-        String[] headers = {"ID", "Name", "Specialization", "Contact", "Available"};
+        String[] headers = {"ID", "Name", "Specialization", "Contact", "Email", "Available"};
         Object[][] rows = new Object[doctorArray.length][headers.length];
         for (int i = 0; i < doctorArray.length; i++) {
             Doctor doctor = doctorArray[i];
@@ -384,7 +423,8 @@ public class DoctorManagement {
             rows[i][1] = doctor.getName();
             rows[i][2] = doctor.getSpecialization();
             rows[i][3] = doctor.getContactNumber();
-            rows[i][4] = doctor.isIsAvailable() ? "Yes" : "No";
+            rows[i][4] = doctor.getEmail();
+            rows[i][5] = doctor.isIsAvailable() ? "Yes" : "No";
         }
         System.out.print(StringUtility.formatTableNoDividers(
             "AVAILABLE DOCTORS",
@@ -426,11 +466,11 @@ public class DoctorManagement {
             }
             
             if (doctor.isOnLeave()) {
-                System.out.print("Leave Start Date [" + doctor.getLeaveDateStart() + "]: ");
+                System.out.print("Leave Start Date [" + doctor.getLeaveDateStart() + "] (YYYY-MM-DD): ");
                 String leaveStart = scanner.nextLine();
                 if (!leaveStart.isEmpty()) doctor.setLeaveDateStart(leaveStart);
                 
-                System.out.print("Leave End Date [" + doctor.getLeaveDateEnd() + "]: ");
+                System.out.print("Leave End Date [" + doctor.getLeaveDateEnd() + "] (YYYY-MM-DD): ");
                 String leaveEnd = scanner.nextLine();
                 if (!leaveEnd.isEmpty()) doctor.setLeaveDateEnd(leaveEnd);
             }
@@ -440,6 +480,90 @@ public class DoctorManagement {
             displayDoctorDetails(doctor);
         } else {
             System.out.println("[ERROR] Doctor not found!");
+        }
+    }
+    
+    public void addNewDoctor() {
+        System.out.println("\n" + StringUtility.repeatString("=", 80));
+        System.out.println("        ADD NEW DOCTOR");
+        System.out.println(StringUtility.repeatString("=", 80));
+        
+        System.out.println("Enter new doctor information:");
+        System.out.println(StringUtility.repeatString("-", 80));
+        
+        //auto-generate doctor ID
+        String doctorId = "DOC" + String.format("%03d", doctorIdCounter++);
+        System.out.println("Generated Doctor ID: " + doctorId);
+
+        String name;
+        do {
+            System.out.print("Enter Doctor Name: ");
+            name = scanner.nextLine().trim();
+            if (name.isEmpty()) {
+                System.out.println("Doctor name cannot be empty. Please try again.");
+            }
+        } while (name.isEmpty());
+
+        String specialization;
+        do {
+            System.out.print("Enter Specialization: ");
+            specialization = scanner.nextLine().trim();
+            if (specialization.isEmpty()) {
+                System.out.println("Specialization cannot be empty. Please try again.");
+            }
+        } while (specialization.isEmpty());
+
+        String contactNumber;
+        do {
+            contactNumber = InputValidator.getValidPhoneNumber(scanner, "Enter Contact Number: ");
+            if (isContactNumberExists(contactNumber)) {
+                System.out.println("Contact number already exists for another doctor! Please use a different number.");
+            }
+        } while (isContactNumberExists(contactNumber));
+
+        String email;
+        do {
+            email = InputValidator.getValidEmail(scanner, "Enter Email: ");
+            if (isEmailExists(email)) {
+                System.out.println("Email already exists for another doctor! Please use a different email.");
+            }
+        } while (isEmailExists(email));
+
+        String dutySchedule;
+        do {
+            System.out.print("Enter Duty Schedule (e.g., Mon-Fri 9AM-5PM): ");
+            dutySchedule = scanner.nextLine().trim();
+            if (dutySchedule.isEmpty()) {
+                System.out.println("Duty schedule cannot be empty. Please try again.");
+            }
+        } while (dutySchedule.isEmpty());
+
+        boolean isAvailable = true;
+        boolean onLeave = false;
+        String leaveDateStart = "";
+        String leaveDateEnd = "";
+
+        Doctor newDoctor = new Doctor(doctorId, name, specialization, contactNumber, email, 
+                                    isAvailable, dutySchedule, onLeave, leaveDateStart, leaveDateEnd);
+
+        boolean added = doctorList.add(newDoctor);
+        
+        if (added) {
+            //add to on-duty list if available
+            if (isAvailable && !onLeave) {
+                onDutyDoctorList.add(newDoctor);
+            }
+            
+            System.out.println("\n[OK] Doctor added successfully!");
+            System.out.println("Auto-generated Doctor ID: " + doctorId);
+            System.out.println("Name: " + name);
+            System.out.println("Specialization: " + specialization);
+            System.out.println("Status: Available and added to duty");
+            
+            System.out.println("\nNew doctor information:");
+            displayDoctorDetails(newDoctor);
+        } else {
+            System.out.println("[ERROR] Failed to add doctor to system!");
         }
     }
     
@@ -838,6 +962,28 @@ public class DoctorManagement {
         Doctor dummy = new Doctor();
         dummy.setDoctorId(doctorId);
         return doctorList.search(dummy); //adt method
+    }
+    
+    private boolean isContactNumberExists(String contactNumber) {
+        Object[] doctorsArray = doctorList.toArray();
+        for (Object obj : doctorsArray) {
+            Doctor doctor = (Doctor) obj;
+            if (doctor.getContactNumber().equals(contactNumber)) {
+                return true;
+            }
+        }
+        return false;
+    }
+    
+    private boolean isEmailExists(String email) {
+        Object[] doctorsArray = doctorList.toArray();
+        for (Object obj : doctorsArray) {
+            Doctor doctor = (Doctor) obj;
+            if (doctor.getEmail().equals(email)) {
+                return true;
+            }
+        }
+        return false;
     }
 
     public Doctor[] getDoctorsOnDuty() {

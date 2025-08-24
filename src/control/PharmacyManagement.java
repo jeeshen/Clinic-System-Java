@@ -528,32 +528,33 @@ public class PharmacyManagement {
         System.out.println(StringUtility.repeatString("=", 60));
 
         System.out.println("Prescriptions with Undispensed Medicines:");
-        System.out.println(StringUtility.repeatString("-", 80));
-        System.out.printf("%-15s %-10s %-20s %-15s %-10s\n", "Prescription ID", "Patient ID", "Diagnosis", "Total Cost", "Status");
-        System.out.println(StringUtility.repeatString("-", 80));
+        System.out.println(StringUtility.repeatString("-", 100));
+        System.out.printf("%-15s %-10s %-20s %-15s %-10s %-15s\n", "Prescription ID", "Patient ID", "Diagnosis", "Total Cost", "Status", "Payment");
+        System.out.println(StringUtility.repeatString("-", 100));
 
         Object[] prescriptionsArray = treatmentManagement.getAllPrescriptions();
         boolean hasUndispensed = false;
         for (Object obj : prescriptionsArray) {
             Prescription prescription = (Prescription) obj;
             if (prescription.getStatus().equals("active") && hasUndispensedMedicines(prescription)) {
-                System.out.printf("%-15s %-10s %-20s %-15s %-10s\n",
+                String paymentStatus = prescription.isPaid() ? "[PAID]" : "[UNPAID]";
+                System.out.printf("%-15s %-10s %-20s %-15s %-10s %-15s\n",
                     prescription.getPrescriptionId(), prescription.getPatientId(),
                     prescription.getDiagnosis(), "RM " + String.format("%.2f", prescription.getTotalCost()),
-                    prescription.getStatus());
+                    prescription.getStatus(), paymentStatus);
                 hasUndispensed = true;
             }
         }
 
         if (!hasUndispensed) {
             System.out.println("No prescriptions with undispensed medicines found.");
-            System.out.println(StringUtility.repeatString("-", 80));
+            System.out.println(StringUtility.repeatString("-", 100));
             System.out.println("Press Enter to continue...");
             scanner.nextLine();
             return;
         }
 
-        System.out.println(StringUtility.repeatString("-", 80));
+        System.out.println(StringUtility.repeatString("-", 100));
 
         System.out.print("Enter prescription ID to dispense medicines: ");
         String prescriptionId = scanner.nextLine();
@@ -586,11 +587,12 @@ public class PharmacyManagement {
         System.out.println("Patient ID: " + prescription.getPatientId());
         System.out.println("Diagnosis: " + prescription.getDiagnosis());
         System.out.println("Date: " + prescription.getPrescriptionDate());
+        System.out.println("Payment Status: " + (prescription.isPaid() ? "[PAID]" : "[UNPAID]"));
 
         System.out.println("\nPrescribed Medicines:");
-        System.out.println(StringUtility.repeatString("-", 100));
-        System.out.printf("%-20s %-10s %-20s %-10s %-10s %-10s\n", "Medicine", "Quantity", "Dosage", "Instructions", "Price", "Dispensed");
-        System.out.println(StringUtility.repeatString("-", 100));
+        System.out.println(StringUtility.repeatString("-", 120));
+        System.out.printf("%-20s %-10s %-20s %-20s %-10s %-10s %-15s\n", "Medicine", "Quantity", "Dosage", "Instructions", "Price", "Dispensed", "Payment Status");
+        System.out.println(StringUtility.repeatString("-", 120));
 
         Object[] prescribedMedicinesArray = prescription.getPrescribedMedicines().toArray();
         boolean allDispensed = true;
@@ -598,10 +600,11 @@ public class PharmacyManagement {
             PrescribedMedicine pm = (PrescribedMedicine) obj;
             String dosage = (pm.getDosage() == null || pm.getDosage().trim().isEmpty()) ? "-" : pm.getDosage();
             String instructions = (pm.getInstructions() == null || pm.getInstructions().trim().isEmpty()) ? "-" : pm.getInstructions();
-            System.out.printf("%-20s %-10s %-20s %-20s %-10s %-10s\n",
+            String paymentStatus = prescription.isPaid() ? "[PAID]" : "[UNPAID]";
+            System.out.printf("%-20s %-10s %-20s %-20s %-10s %-10s %-15s\n",
                 pm.getMedicineName(), pm.getQuantity(), dosage,
                 instructions, "RM " + String.format("%.2f", pm.getUnitPrice()),
-                pm.isDispensed() ? "Yes" : "No");
+                pm.isDispensed() ? "Yes" : "No", paymentStatus);
             if (!pm.isDispensed()) allDispensed = false;
         }
         if (allDispensed) {
@@ -611,7 +614,7 @@ public class PharmacyManagement {
             return;
         }
 
-        System.out.println(StringUtility.repeatString("-", 100));
+        System.out.println(StringUtility.repeatString("-", 120));
         System.out.println("\nDispensing Options:");
         System.out.println("1. Dispense all undispensed medicines");
         System.out.println("2. Dispense specific medicine");
@@ -1189,7 +1192,7 @@ public class PharmacyManagement {
     
     public Medicine findMedicineById(String medicineId) {
         Medicine dummy = new Medicine();
-        dummy.setMedicineId(medicineId);
+        dummy.setMedicineId(medicineId.toUpperCase());
         return medicineList.search(dummy); //adt method
     }
 

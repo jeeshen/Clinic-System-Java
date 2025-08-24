@@ -55,20 +55,21 @@ public class DoctorManagementUI {
             System.out.println("\n" + StringUtility.repeatString("=", 50));
             System.out.println("        DOCTOR AVAILABILITY MANAGEMENT");
             System.out.println(StringUtility.repeatString("=", 50));
-            System.out.println("1 . View All Doctors (Sorted by ID)");
-            System.out.println("2 . Search Doctor by ID");
-            System.out.println("3 . Search Doctor by Specialization");
-            System.out.println("4 . Search Doctor Consultations");
-            System.out.println("5 . Search Doctor Treatments");
-            System.out.println("6 . Search Doctor Prescriptions");
-            System.out.println("7 . Update Doctor Details");
-            System.out.println("8 . Update Doctor Schedule");
-            System.out.println("9 . Remove Doctor");
-            System.out.println("0 . Back to Main Menu");
-            System.out.println(StringUtility.repeatString("-", 50));
-            System.out.print("Enter your choice: ");
-            
-            int choice = getUserInputInt(0, 9);
+                    System.out.println("1 . View All Doctors (Sorted by ID)");
+        System.out.println("2 . Search Doctor by ID");
+        System.out.println("3 . Search Doctor by Specialization");
+        System.out.println("4 . Search Doctor Consultations");
+        System.out.println("5 . Search Doctor Treatments");
+        System.out.println("6 . Search Doctor Prescriptions");
+        System.out.println("7 . Add New Doctor");
+        System.out.println("8 . Update Doctor Details");
+        System.out.println("9 . Update Doctor Schedule");
+        System.out.println("10. Remove Doctor");
+        System.out.println("0 . Back to Main Menu");
+        System.out.println(StringUtility.repeatString("-", 50));
+        System.out.print("Enter your choice: ");
+        
+        int choice = getUserInputInt(0, 10);
             
             switch (choice) {
                 case 1:
@@ -90,12 +91,15 @@ public class DoctorManagementUI {
                     doctorManagement.searchDoctorPrescriptions();
                     break;
                 case 7:
-                    doctorManagement.updateDoctorDetails();
+                    doctorManagement.addNewDoctor();
                     break;
                 case 8:
-                    doctorManagement.updateDoctorSchedule();
+                    doctorManagement.updateDoctorDetails();
                     break;
                 case 9:
+                    doctorManagement.updateDoctorSchedule();
+                    break;
+                case 10:
                     doctorManagement.removeDoctor();
                     break;
                 case 0:

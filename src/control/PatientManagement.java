@@ -110,7 +110,12 @@ public class PatientManagement {
             rows
         ));
 
-        int patientId = InputValidator.getValidInt(scanner, 1, 9999, "Enter patient ID to add to queue: ");
+        Integer patientId = InputValidator.getValidIntAllowCancel(scanner, 1, 9999, "Enter patient ID to add to queue");
+        
+        if (patientId == null) {
+            System.out.println("Operation cancelled.");
+            return;
+        }
         
         Patient selectedPatient = findPatientById(patientId);
         if (selectedPatient != null) {
@@ -192,7 +197,12 @@ public class PatientManagement {
             ));
         }
 
-        int patientId = InputValidator.getValidInt(scanner, 1, 9999, "Enter patient ID to remove from queue: ");
+        Integer patientId = InputValidator.getValidIntAllowCancel(scanner, 1, 9999, "Enter patient ID to remove from queue");
+        
+        if (patientId == null) {
+            System.out.println("Operation cancelled.");
+            return;
+        }
         
         Patient patient = findPatientById(patientId);
         if (patient != null) {
@@ -332,7 +342,12 @@ public class PatientManagement {
     }
     
     public void searchPatientById() {
-        int patientId = InputValidator.getValidInt(scanner, 1, 9999, "Enter patient ID to search: ");
+        Integer patientId = InputValidator.getValidIntAllowCancel(scanner, 1, 9999, "Enter patient ID to search");
+        
+        if (patientId == null) {
+            System.out.println("Operation cancelled.");
+            return;
+        }
         
         Patient foundPatient = findPatientById(patientId);
         if (foundPatient != null) {
@@ -343,7 +358,12 @@ public class PatientManagement {
     }
     
     public void searchPatientByName() {
-        String patientName = InputValidator.getValidString(scanner, "Enter patient name to search: ");
+        String patientName = InputValidator.getValidStringAllowCancel(scanner, "Enter patient name to search");
+        
+        if (patientName == null) {
+            System.out.println("Operation cancelled.");
+            return;
+        }
         
         Object[] patientsArray = patientList.toArray(); //adt method
         Patient foundPatient = null;
@@ -407,7 +427,12 @@ public class PatientManagement {
         System.out.println("Total Patients: " + patientsArray.length);
         System.out.println(StringUtility.repeatString("=", 85));
         
-        int patientId = InputValidator.getValidInt(scanner, 1, 9999, "Enter patient ID to update: ");
+        Integer patientId = InputValidator.getValidIntAllowCancel(scanner, 1, 9999, "Enter patient ID to update");
+        
+        if (patientId == null) {
+            System.out.println("Operation cancelled.");
+            return;
+        }
         
         Patient patient = findPatientById(patientId);
         if (patient != null) {
@@ -475,7 +500,12 @@ public class PatientManagement {
         System.out.println("Total Patients: " + patientsArray.length);
         System.out.println(StringUtility.repeatString("=", 60));
         
-        int patientId = InputValidator.getValidInt(scanner, 1, 9999, "Enter patient ID to remove: ");
+        Integer patientId = InputValidator.getValidIntAllowCancel(scanner, 1, 9999, "Enter patient ID to remove");
+        
+        if (patientId == null) {
+            System.out.println("Operation cancelled.");
+            return;
+        }
         
         Patient patient = findPatientById(patientId);
         if (patient != null) {
@@ -1010,7 +1040,12 @@ public class PatientManagement {
     }
     
     public void searchPatientConsultations() {
-        int patientId = InputValidator.getValidInt(scanner, 1, 9999, "Enter patient ID to search consultations: ");
+        Integer patientId = InputValidator.getValidIntAllowCancel(scanner, 1, 9999, "Enter patient ID to search consultations");
+        
+        if (patientId == null) {
+            System.out.println("Operation cancelled.");
+            return;
+        }
         
         Patient patient = findPatientById(patientId);
         if (patient == null) {
@@ -1042,7 +1077,12 @@ public class PatientManagement {
     }
     
     public void searchPatientTreatments() {
-        int patientId = InputValidator.getValidInt(scanner, 1, 9999, "Enter patient ID to search treatments: ");
+        Integer patientId = InputValidator.getValidIntAllowCancel(scanner, 1, 9999, "Enter patient ID to search treatments");
+        
+        if (patientId == null) {
+            System.out.println("Operation cancelled.");
+            return;
+        }
         
         Patient patient = findPatientById(patientId);
         if (patient == null) {
@@ -1074,7 +1114,12 @@ public class PatientManagement {
     }
     
     public void searchPatientPrescriptions() {
-        int patientId = InputValidator.getValidInt(scanner, 1, 9999, "Enter patient ID to search prescriptions: ");
+        Integer patientId = InputValidator.getValidIntAllowCancel(scanner, 1, 9999, "Enter patient ID to search prescriptions");
+        
+        if (patientId == null) {
+            System.out.println("Operation cancelled.");
+            return;
+        }
         
         Patient patient = findPatientById(patientId);
         if (patient == null) {

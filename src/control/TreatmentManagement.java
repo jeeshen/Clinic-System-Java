@@ -46,6 +46,45 @@ public class TreatmentManagement {
         for (Prescription prescription : samplePrescriptions) {
             prescriptionList.add(prescription); //adt method
         }
+        
+        //update prescription ID counter to continue from the last used ID
+        if (samplePrescriptions.length > 0) {
+            int maxPrescriptionId = 0;
+            int maxPrescribedMedicineId = 0;
+            
+            for (Prescription prescription : samplePrescriptions) {
+                String prescriptionId = prescription.getPrescriptionId();
+                if (prescriptionId.startsWith("PRE")) {
+                    try {
+                        int idNumber = Integer.parseInt(prescriptionId.substring(3));
+                        if (idNumber > maxPrescriptionId) {
+                            maxPrescriptionId = idNumber;
+                        }
+                    } catch (NumberFormatException e) {
+                        //skip invalid IDs
+                    }
+                }
+                
+                //check prescribed medicine IDs within each prescription
+                Object[] prescribedMedicinesArray = prescription.getPrescribedMedicines().toArray();
+                for (Object obj : prescribedMedicinesArray) {
+                    PrescribedMedicine pm = (PrescribedMedicine) obj;
+                    String pmId = pm.getPrescribedMedicineId();
+                    if (pmId.startsWith("PM")) {
+                        try {
+                            int idNumber = Integer.parseInt(pmId.substring(2));
+                            if (idNumber > maxPrescribedMedicineId) {
+                                maxPrescribedMedicineId = idNumber;
+                            }
+                        } catch (NumberFormatException e) {
+                            //skip invalid IDs
+                        }
+                    }
+                }
+            }
+            prescriptionIdCounter = maxPrescriptionId + 1;
+            prescribedMedicineIdCounter = maxPrescribedMedicineId + 1;
+        }
     }
     
     public void initializeEntityRelationships() {
@@ -233,8 +272,13 @@ public class TreatmentManagement {
     }
     
     public void searchPrescriptionById() {
-        System.out.print("Enter prescription ID to search: ");
-        String prescriptionId = scanner.nextLine();
+        System.out.print("Enter prescription ID to search (or press Enter to cancel): ");
+        String prescriptionId = scanner.nextLine().trim();
+        
+        if (prescriptionId.isEmpty()) {
+            System.out.println("Operation cancelled.");
+            return;
+        }
         
         Prescription foundPrescription = findPrescriptionById(prescriptionId);
         if (foundPrescription != null) {
@@ -245,8 +289,13 @@ public class TreatmentManagement {
     }
     
     public void searchPrescriptionsByPatient() {
-        System.out.print("Enter patient ID to search prescriptions: ");
-        String patientId = scanner.nextLine();
+        System.out.print("Enter patient ID to search prescriptions (or press Enter to cancel): ");
+        String patientId = scanner.nextLine().trim();
+        
+        if (patientId.isEmpty()) {
+            System.out.println("Operation cancelled.");
+            return;
+        }
         
         Object[] prescriptionsArray = prescriptionList.toArray();
         String[] headers = {"Prescription ID", "Doctor ID", "Diagnosis", "Total Cost", "Status"};
@@ -329,8 +378,13 @@ public class TreatmentManagement {
         System.out.println("Total Prescriptions: " + prescriptionsArray.length);
         System.out.println(StringUtility.repeatString("=", 110));
         
-        System.out.print("Enter prescription ID to remove: ");
-        String prescriptionId = scanner.nextLine();
+        System.out.print("Enter prescription ID to remove (or press Enter to cancel): ");
+        String prescriptionId = scanner.nextLine().trim();
+        
+        if (prescriptionId.isEmpty()) {
+            System.out.println("Operation cancelled.");
+            return;
+        }
         
         Prescription prescription = findPrescriptionById(prescriptionId);
         if (prescription != null) {
@@ -738,7 +792,7 @@ public class TreatmentManagement {
     
     public Prescription findPrescriptionById(String prescriptionId) {
         Prescription dummy = new Prescription();
-        dummy.setPrescriptionId(prescriptionId);
+        dummy.setPrescriptionId(prescriptionId.toUpperCase());
         return prescriptionList.search(dummy); //adt method
     }
     
@@ -746,7 +800,7 @@ public class TreatmentManagement {
         Object[] medicinesArray = medicineList.toArray();
         for (Object obj : medicinesArray) {
             Medicine medicine = (Medicine) obj;
-            if (medicine.getMedicineId().equals(medicineId)) {
+            if (medicine.getMedicineId().equalsIgnoreCase(medicineId)) {
                 return medicine;
             }
         }

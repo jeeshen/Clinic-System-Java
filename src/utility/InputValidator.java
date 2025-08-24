@@ -202,4 +202,35 @@ public class InputValidator {
         } while (quantity <= 0);
         return quantity;
     }
+    
+    public static Integer getValidIntAllowCancel(Scanner scanner, int min, int max, String prompt) {
+        Integer input = null;
+        do {
+            System.out.print(prompt + " (or press Enter to cancel): ");
+            String userInput = scanner.nextLine().trim();
+            
+            if (userInput.isEmpty()) {
+                return null; //user cancelled
+            }
+            
+            try {
+                input = Integer.parseInt(userInput);
+                if (input < min || input > max) {
+                    System.out.println("Please enter a number between " + min + " and " + max + " or press Enter to cancel.");
+                    input = null;
+                }
+            } catch (NumberFormatException e) {
+                System.out.println("Invalid input! Please enter a number between " + min + " and " + max + " or press Enter to cancel.");
+                input = null;
+            }
+        } while (input == null);
+        
+        return input;
+    }
+    
+    public static String getValidStringAllowCancel(Scanner scanner, String prompt) {
+        System.out.print(prompt + " (or press Enter to cancel): ");
+        String userInput = scanner.nextLine().trim();
+        return userInput.isEmpty() ? null : userInput; //return null if cancelled, otherwise return the input
+    }
 } 
