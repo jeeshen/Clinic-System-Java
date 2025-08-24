@@ -28,15 +28,16 @@ public class PharmacyManagementUI {
             System.out.println("1 . View All Medicines (Sorted by ID)");
             System.out.println("2 . Search Medicine by ID");
             System.out.println("3 . Search Medicine by Name");
-            System.out.println("4 . Update Medicine Information");
-            System.out.println("5 . Update Medicine Stock");
-            System.out.println("6 . Remove Medicine");
-            System.out.println("7 . Dispense Medicines");
+            System.out.println("4 . Add New Medicine");
+            System.out.println("5 . Update Medicine Information");
+            System.out.println("6 . Update Medicine Stock");
+            System.out.println("7 . Remove Medicine");
+            System.out.println("8 . Dispense Medicines");
             System.out.println("0 . Back to Main Menu");
             System.out.println(StringUtility.repeatString("-", 50));
             System.out.print("Enter your choice: ");
             
-            int choice = getUserInputInt(0, 7);
+            int choice = getUserInputInt(0, 8);
             
             switch (choice) {
                 case 1:
@@ -49,15 +50,18 @@ public class PharmacyManagementUI {
                     pharmacyManagement.searchMedicineByName();
                     break;
                 case 4:
-                    pharmacyManagement.updateMedicineInfo();
+                    pharmacyManagement.addNewMedicine();
                     break;
                 case 5:
-                    pharmacyManagement.updateMedicineStock();
+                    pharmacyManagement.updateMedicineInfo();
                     break;
                 case 6:
-                    pharmacyManagement.removeMedicine();
+                    pharmacyManagement.updateMedicineStock();
                     break;
                 case 7:
+                    pharmacyManagement.removeMedicine();
+                    break;
+                case 8:
                     pharmacyManagement.dispenseMedicines();
                     break;
                 case 0:

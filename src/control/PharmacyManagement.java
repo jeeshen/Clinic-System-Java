@@ -131,6 +131,143 @@ public class PharmacyManagement {
         scanner.nextLine();
     }
     
+    public void addNewMedicine() {
+        System.out.println("\n" + StringUtility.repeatString("=", 80));
+        System.out.println("                    ADD NEW MEDICINE");
+        System.out.println(StringUtility.repeatString("=", 80));
+        
+        //generate new medicine ID
+        String newMedicineId = generateNewMedicineId();
+        System.out.println("New Medicine ID: " + newMedicineId);
+        
+        System.out.println("\nPlease enter the following information:");
+        System.out.println(StringUtility.repeatString("-", 80));
+
+        System.out.print("Medicine Name: ");
+        String name = scanner.nextLine();
+        if (name.trim().isEmpty()) {
+            System.out.println("[ERROR] Medicine name cannot be empty!");
+            return;
+        }
+        
+        System.out.print("Brand: ");
+        String brand = scanner.nextLine();
+        if (brand.trim().isEmpty()) {
+            System.out.println("[ERROR] Brand cannot be empty!");
+            return;
+        }
+        
+        System.out.print("Purpose (e.g., Pain Relief, Antibiotic): ");
+        String purpose = scanner.nextLine();
+        if (purpose.trim().isEmpty()) {
+            System.out.println("[ERROR] Purpose cannot be empty!");
+            return;
+        }
+        
+        System.out.print("Active Ingredient: ");
+        String activeIngredient = scanner.nextLine();
+        if (activeIngredient.trim().isEmpty()) {
+            System.out.println("[ERROR] Active ingredient cannot be empty!");
+            return;
+        }
+        
+        System.out.print("Category (e.g., Analgesic, Antibiotic): ");
+        String category = scanner.nextLine();
+        if (category.trim().isEmpty()) {
+            System.out.println("[ERROR] Category cannot be empty!");
+            return;
+        }
+        
+        System.out.print("Stock Quantity: ");
+        int stockQuantity = getUserInputInt(0, 10000);
+        
+        System.out.print("Price (RM): ");
+        double price = getUserInputDouble(0.01, 10000.00);
+        
+        System.out.print("Expiry Date (YYYY-MM-DD): ");
+        String expiryDate = scanner.nextLine();
+        if (expiryDate.trim().isEmpty()) {
+            System.out.println("[ERROR] Expiry date cannot be empty!");
+            return;
+        }
+
+        Medicine newMedicine = new Medicine(newMedicineId, name, brand, stockQuantity, 
+                                          expiryDate, price, purpose, activeIngredient, category);
+
+        boolean added = medicineList.add(newMedicine);
+        if (added) {
+            //also add to treatment management if available
+            if (treatmentManagement != null) {
+                treatmentManagement.addMedicine(newMedicine);
+            }
+            
+            System.out.println("\n[OK] Medicine added successfully!");
+            System.out.println("\nNew Medicine Details:");
+            displayMedicineDetails(newMedicine);
+        } else {
+            System.out.println("[ERROR] Failed to add medicine to system!");
+        }
+    }
+    
+    private String generateNewMedicineId() {
+        Object[] medicinesArray = medicineList.toArray();
+        int maxId = 0;
+        
+        for (Object obj : medicinesArray) {
+            Medicine medicine = (Medicine) obj;
+            String medicineId = medicine.getMedicineId();
+            if (medicineId.startsWith("MED")) {
+                try {
+                    int idNumber = Integer.parseInt(medicineId.substring(3));
+                    if (idNumber > maxId) {
+                        maxId = idNumber;
+                    }
+                } catch (NumberFormatException e) {
+                    //skip invalid IDs
+                }
+            }
+        }
+        
+        return "MED" + String.format("%03d", maxId + 1);
+    }
+    
+    private boolean isValidDateFormat(String date) {
+        if (!date.matches("\\d{4}-\\d{2}-\\d{2}")) {
+            return false;
+        }
+        
+        try {
+            //parse the date to validate it's a real date
+            String[] parts = date.split("-");
+            int year = Integer.parseInt(parts[0]);
+            int month = Integer.parseInt(parts[1]);
+            int day = Integer.parseInt(parts[2]);
+
+            if (year < 2024 || year > 2030) {
+                return false;
+            }
+            if (month < 1 || month > 12) {
+                return false;
+            }
+            if (day < 1 || day > 31) {
+                return false;
+            }
+
+            if ((month == 4 || month == 6 || month == 9 || month == 11) && day > 30) {
+                return false;
+            }
+            if (month == 2) {
+                if (day > 29) {
+                    return false;
+                }
+            }
+            
+            return true;
+        } catch (Exception e) {
+            return false;
+        }
+    }
+    
     public void removeMedicine() {
         System.out.println("\n" + StringUtility.repeatString("=", 60));
         System.out.println("        REMOVE MEDICINE");
@@ -199,11 +336,6 @@ public class PharmacyManagement {
         System.out.println("\n" + StringUtility.repeatString("=", 80));
         System.out.println("                    UPDATE MEDICINE INFORMATION");
         System.out.println(StringUtility.repeatString("=", 80));
-
-        System.out.println("CURRENT MEDICINE LIST:");
-        System.out.println(StringUtility.repeatString("-", 80));
-        System.out.printf("%-12s %-25s %-15s %-10s %-10s %-10s\n", "ID", "Name", "Brand", "Stock", "Price", "Status");
-        System.out.println(StringUtility.repeatString("-", 80));
         
         Object[] medicinesArray = medicineList.toArray();
         String[] headers = {"ID", "Name", "Brand", "Stock", "Price", "Status"};
@@ -271,7 +403,14 @@ public class PharmacyManagement {
 
             System.out.print("Expiry Date [" + medicine.getExpiryDate() + "] (YYYY-MM-DD): ");
             String expiryDate = scanner.nextLine();
-            if (!expiryDate.isEmpty()) medicine.setExpiryDate(expiryDate);
+            if (!expiryDate.isEmpty()) {
+                if (isValidDateFormat(expiryDate)) {
+                    medicine.setExpiryDate(expiryDate);
+                } else {
+                    System.out.println("[ERROR] Invalid date format! Please use YYYY-MM-DD format (e.g., 2025-12-31)");
+                    System.out.println("Expiry date not updated.");
+                }
+            }
 
             System.out.print("Price [" + String.format("%.2f", medicine.getPrice()) + "] (Enter new price or press Enter): ");
             String priceInput = scanner.nextLine();
@@ -302,11 +441,6 @@ public class PharmacyManagement {
         System.out.println("\n" + StringUtility.repeatString("=", 80));
         System.out.println("                    UPDATE MEDICINE STOCK");
         System.out.println(StringUtility.repeatString("=", 80));
-
-        System.out.println("CURRENT MEDICINE LIST:");
-        System.out.println(StringUtility.repeatString("-", 80));
-        System.out.printf("%-12s %-25s %-15s %-10s %-10s %-10s\n", "ID", "Name", "Brand", "Stock", "Price", "Status");
-        System.out.println(StringUtility.repeatString("-", 80));
         
         Object[] medicinesArray = medicineList.toArray();
         String[] headers = {"ID", "Name", "Brand", "Stock", "Price", "Status"};
@@ -701,104 +835,6 @@ public class PharmacyManagement {
                 System.out.println("[ERROR] Medicine not found or already dispensed!");
             }
         }
-
-        System.out.println("\nPress Enter to continue...");
-        scanner.nextLine();
-    }
-
-    public void processPayment() {
-        if (treatmentManagement == null) {
-            System.out.println("Treatment management not available!");
-            return;
-        }
-
-        System.out.println("\n" + StringUtility.repeatString("=", 60));
-        System.out.println("        PAYMENT PROCESSING");
-        System.out.println(StringUtility.repeatString("=", 60));
-
-        System.out.println("Unpaid Active Prescriptions:");
-        System.out.println(StringUtility.repeatString("-", 80));
-        System.out.printf("%-15s %-10s %-20s %-15s %-10s\n", "Prescription ID", "Patient ID", "Diagnosis", "Total Cost", "Status");
-        System.out.println(StringUtility.repeatString("-", 80));
-
-        Object[] prescriptionsArray = treatmentManagement.getAllPrescriptions();
-        boolean hasUnpaid = false;
-        for (Object obj : prescriptionsArray) {
-            Prescription prescription = (Prescription) obj;
-            if (prescription.getStatus().equals("active") && !prescription.isPaid()) {
-                System.out.printf("%-15s %-10s %-20s %-15s %-10s\n",
-                        prescription.getPrescriptionId(), prescription.getPatientId(),
-                        prescription.getDiagnosis(), "RM " + String.format("%.2f", prescription.getTotalCost()),
-                        prescription.getStatus());
-                hasUnpaid = true;
-            }
-        }
-
-        if (!hasUnpaid) {
-            System.out.println("No unpaid active prescriptions found.");
-            System.out.println("Press Enter to continue...");
-            scanner.nextLine();
-            return;
-        }
-
-        System.out.println(StringUtility.repeatString("-", 80));
-        System.out.print("Enter prescription ID to process payment: ");
-        String prescriptionId = scanner.nextLine();
-        Prescription prescription = treatmentManagement.findPrescriptionById(prescriptionId);
-        if (prescription == null) {
-            System.out.println("Prescription not found!");
-            System.out.println("Press Enter to continue...");
-            scanner.nextLine();
-            return;
-        }
-        if (!prescription.getStatus().equals("active")) {
-            System.out.println("Cannot process payment for non-active prescription!");
-            System.out.println("Press Enter to continue...");
-            scanner.nextLine();
-            return;
-        }
-
-        System.out.println("\nPrescription Details:");
-        System.out.println("Prescription ID: " + prescription.getPrescriptionId());
-        System.out.println("Patient ID: " + prescription.getPatientId());
-        System.out.println("Diagnosis: " + prescription.getDiagnosis());
-        System.out.println("Total Cost: RM " + String.format("%.2f", prescription.getTotalCost()));
-
-        System.out.println("\nPayment Methods:");
-        System.out.println("1. Cash");
-        System.out.println("2. Credit Card");
-        System.out.println("3. Debit Card");
-        System.out.println("4. Online Banking");
-        System.out.print("Select payment method (1-4): ");
-        int paymentMethod = getUserInputInt(1, 4);
-        String paymentMethodStr = "";
-        switch (paymentMethod) {
-            case 1: paymentMethodStr = "Cash"; break;
-            case 2: paymentMethodStr = "Credit Card"; break;
-            case 3: paymentMethodStr = "Debit Card"; break;
-            case 4: paymentMethodStr = "Online Banking"; break;
-        }
-
-        System.out.print("Enter amount received: RM ");
-        double amountReceived = getUserInputDouble(prescription.getTotalCost(), prescription.getTotalCost() * 2);
-        double change = amountReceived - prescription.getTotalCost();
-        prescription.setPaid(true);
-
-        System.out.println("\n" + StringUtility.repeatString("=", 50));
-        System.out.println("        PAYMENT RECEIPT");
-        System.out.println(StringUtility.repeatString("=", 50));
-        System.out.println("Prescription ID: " + prescription.getPrescriptionId());
-        System.out.println("Patient ID: " + prescription.getPatientId());
-        System.out.println("Diagnosis: " + prescription.getDiagnosis());
-        System.out.println("Total Cost: RM " + String.format("%.2f", prescription.getTotalCost()));
-        System.out.println("Amount Received: RM " + String.format("%.2f", amountReceived));
-        System.out.println("Change: RM " + String.format("%.2f", change));
-        System.out.println("Payment Method: " + paymentMethodStr);
-        System.out.println("Payment Status: PAID");
-        System.out.println("Date: " + java.time.LocalDate.now());
-        System.out.println("Time: " + java.time.LocalTime.now().toString().substring(0, 8));
-        System.out.println(StringUtility.repeatString("=", 50));
-        System.out.println("Thank you for your payment!");
 
         System.out.println("\nPress Enter to continue...");
         scanner.nextLine();

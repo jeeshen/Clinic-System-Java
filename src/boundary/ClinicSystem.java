@@ -92,8 +92,10 @@ public class ClinicSystem {
                     pharmacyUI.processPayment();
                     break;
                 case 0:
-                    System.out.println("Thank you for using Integrated Clinic Management System!");
-                    running = false;
+                    if (confirmExit()) {
+                        System.out.println("Thank you for using Clinic Management System!");
+                        running = false;
+                    }
                     break;
                 default:
                     System.out.println("Invalid choice! Please try again.");
@@ -137,6 +139,20 @@ public class ClinicSystem {
         } while (input < min || input > max);
         
         return input;
+    }
+    
+    private boolean confirmExit() {
+        System.out.println("\n" + utility.StringUtility.repeatString("=", 50));
+        System.out.println("        EXIT SYSTEM CONFIRMATION");
+        System.out.println(utility.StringUtility.repeatString("=", 50));
+        System.out.println("Are you sure you want to exit the system?");
+        System.out.println("1. Yes, Exit System");
+        System.out.println("2. No, Continue Using System");
+        System.out.println(utility.StringUtility.repeatString("-", 50));
+        System.out.print("Enter your choice (1-2): ");
+        
+        int choice = getUserInputInt(1, 2);
+        return choice == 1;
     }
     
     public static void main(String[] args) {

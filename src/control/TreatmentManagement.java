@@ -886,9 +886,16 @@ public class TreatmentManagement {
         }
         
         System.out.println(StringUtility.repeatString("-", 80));
-
-        System.out.print("Enter prescription ID to process payment: ");
+        System.out.println("Enter prescription ID to process payment or '0' to cancel:");
+        System.out.print("Prescription ID: ");
         String prescriptionId = scanner.nextLine();
+        
+        if (prescriptionId.equals("0")) {
+            System.out.println("\nPayment process cancelled. Returning to main menu...");
+            System.out.println("Press Enter to continue...");
+            scanner.nextLine();
+            return;
+        }
         
         Prescription prescription = findPrescriptionById(prescriptionId);
         if (prescription == null) {
@@ -923,9 +930,17 @@ public class TreatmentManagement {
         System.out.println("2. Credit Card");
         System.out.println("3. Debit Card");
         System.out.println("4. Online Banking");
-        System.out.print("Select payment method (1-4): ");
+        System.out.println("0. Cancel Payment");
+        System.out.print("Select payment method (0-4): ");
         
-        int paymentMethod = getUserInputInt(1, 4);
+        int paymentMethod = getUserInputInt(0, 4);
+        
+        if (paymentMethod == 0) {
+            System.out.println("\nPayment cancelled. Returning to main menu...");
+            System.out.println("Press Enter to continue...");
+            scanner.nextLine();
+            return;
+        }
         String paymentMethodStr = "";
         switch (paymentMethod) {
             case 1: paymentMethodStr = "Cash"; break;
@@ -933,11 +948,28 @@ public class TreatmentManagement {
             case 3: paymentMethodStr = "Debit Card"; break;
             case 4: paymentMethodStr = "Online Banking"; break;
         }
-
-        System.out.print("Enter amount received: RM ");
-        double amountReceived = getUserInputDouble(prescription.getTotalCost(), prescription.getTotalCost() * 2);
-
-        double change = amountReceived - prescription.getTotalCost();
+        
+        double amountReceived;
+        double change;
+        
+        if (paymentMethod == 1) {
+            System.out.println("\nCash payment selected. Please enter the amount received or 0 to cancel:");
+            System.out.print("Amount: RM ");
+            amountReceived = getUserInputDouble(0, prescription.getTotalCost() * 2);
+            
+            if (amountReceived == 0) {
+                System.out.println("\nPayment cancelled. Returning to main menu...");
+                System.out.println("Press Enter to continue...");
+                scanner.nextLine();
+                return;
+            }
+            
+            change = amountReceived - prescription.getTotalCost();
+        } else {
+            System.out.println("\n" + paymentMethodStr + " payment selected. Processing payment automatically...");
+            amountReceived = prescription.getTotalCost();
+            change = 0.0;
+        }
 
         prescription.setPaid(true);
 
@@ -948,14 +980,26 @@ public class TreatmentManagement {
         System.out.println("Patient ID: " + prescription.getPatientId());
         System.out.println("Diagnosis: " + prescription.getDiagnosis());
         System.out.println("Total Cost: RM " + String.format("%.2f", prescription.getTotalCost()));
-        System.out.println("Amount Received: RM " + String.format("%.2f", amountReceived));
-        System.out.println("Change: RM " + String.format("%.2f", change));
+        
+        if (paymentMethod == 1) { // Cash payment
+            System.out.println("Amount Received: RM " + String.format("%.2f", amountReceived));
+            System.out.println("Change: RM " + String.format("%.2f", change));
+        } else { // Other payment methods
+            System.out.println("Amount Paid: RM " + String.format("%.2f", amountReceived));
+            System.out.println("Change: RM 0.00");
+        }
+        
         System.out.println("Payment Method: " + paymentMethodStr);
         System.out.println("Payment Status: PAID");
         System.out.println("Date: " + java.time.LocalDate.now());
         System.out.println("Time: " + java.time.LocalTime.now().toString().substring(0, 8));
         System.out.println(StringUtility.repeatString("=", 50));
-        System.out.println("Thank you for your payment!");
+        
+        if (paymentMethod == 1) {
+            System.out.println("Thank you for your payment!");
+        } else {
+            System.out.println("Payment processed successfully!");
+        }
         
         System.out.println("\nPress Enter to continue...");
         scanner.nextLine();
@@ -981,5 +1025,9 @@ public class TreatmentManagement {
     
     public Object[] getAllPrescriptions() {
         return prescriptionList.toArray(); //adt method
+    }
+    
+    public void addMedicine(Medicine medicine) {
+        medicineList.add(medicine);
     }
 } 
