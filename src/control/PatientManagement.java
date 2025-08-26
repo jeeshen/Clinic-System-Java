@@ -359,27 +359,82 @@ public class PatientManagement {
     
     public void searchPatientByName() {
         String patientName = InputValidator.getValidStringAllowCancel(scanner, "Enter patient name to search");
-        
+
         if (patientName == null) {
             System.out.println("Operation cancelled.");
             return;
         }
-        
+
         Object[] patientsArray = patientList.toArray(); //adt method
-        Patient foundPatient = null;
+        SetAndQueueInterface<Patient> matchingPatients = new SetQueueArray<>();
 
         for (Object obj : patientsArray) {
             Patient patient = (Patient) obj;
             if (patient.getName().toLowerCase().contains(patientName.toLowerCase())) {
-                foundPatient = patient;
-                break;
+                matchingPatients.add(patient);
             }
         }
-        
-        if (foundPatient != null) {
-            displayPatientDetails(foundPatient);
+
+        if (matchingPatients.size() > 0) {
+            Object[] foundPatientsArray = matchingPatients.toArray();
+
+            if (foundPatientsArray.length == 1) {
+                //if only one patient found, display details directly
+                displayPatientDetails((Patient) foundPatientsArray[0]);
+            } else {
+                //if multiple patients found, show list and let user select
+                System.out.println("\n" + StringUtility.repeatString("=", 85));
+                System.out.println("        MULTIPLE PATIENTS FOUND WITH NAME CONTAINING: " + patientName);
+                System.out.println(StringUtility.repeatString("=", 85));
+
+                String[] headers = {"ID", "Name", "Age", "Gender", "Contact", "Status"};
+                Object[][] rows = new Object[foundPatientsArray.length][headers.length];
+                for (int i = 0; i < foundPatientsArray.length; i++) {
+                    Patient patient = (Patient) foundPatientsArray[i];
+                    rows[i][0] = patient.getId();
+                    rows[i][1] = patient.getName();
+                    rows[i][2] = patient.getAge();
+                    rows[i][3] = patient.getGender();
+                    rows[i][4] = patient.getContactNumber();
+                    rows[i][5] = patient.getStatus();
+                }
+
+                System.out.print(StringUtility.formatTableNoDividers(
+                    "MATCHING PATIENTS",
+                    headers,
+                    rows
+                ));
+
+                System.out.println("Total matching patients: " + foundPatientsArray.length);
+
+                //ask user if they want to view details of a specific patient
+                Integer selectedId = InputValidator.getValidIntAllowCancel(scanner, 1, 9999, "Enter patient ID to view details");
+
+                if (selectedId != null) {
+                    Patient selectedPatient = findPatientById(selectedId);
+                    if (selectedPatient != null) {
+                        //verify the selected patient is in the matching list
+                        boolean isInMatchingList = false;
+                        for (Object obj : foundPatientsArray) {
+                            Patient matchingPatient = (Patient) obj;
+                            if (matchingPatient.getId() == selectedId) {
+                                isInMatchingList = true;
+                                break;
+                            }
+                        }
+
+                        if (isInMatchingList) {
+                            displayPatientDetails(selectedPatient);
+                        } else {
+                            System.out.println("Selected patient ID is not in the matching results!");
+                        }
+                    } else {
+                        System.out.println("Patient not found!");
+                    }
+                }
+            }
         } else {
-            System.out.println("Patient not found!");
+            System.out.println("No patients found with name containing: " + patientName);
         }
     }
     
@@ -970,22 +1025,31 @@ public class PatientManagement {
         return patientList.search(dummy); //adt method
     }
 
+    private String normalizePhoneNumber(String phoneNumber) {
+        //remove all dashes and spaces to normalize phone number for comparison
+        return phoneNumber.replaceAll("[-\\s]", "");
+    }
+
     private boolean isPatientExists(String phoneNumber) {
+        String normalizedInput = normalizePhoneNumber(phoneNumber);
         Object[] patientsArray = patientList.toArray(); //adt method
         for (Object obj : patientsArray) {
             Patient patient = (Patient) obj;
-            if (patient.getContactNumber().equals(phoneNumber)) {
+            String normalizedExisting = normalizePhoneNumber(patient.getContactNumber());
+            if (normalizedExisting.equals(normalizedInput)) {
                 return true;
             }
         }
         return false;
     }
-    
+
     private boolean isPhoneNumberExistsForOtherPatient(String contactNumber, int currentPatientId) {
+        String normalizedInput = normalizePhoneNumber(contactNumber);
         Object[] patientsArray = patientList.toArray(); //adt method
         for (Object obj : patientsArray) {
             Patient patient = (Patient) obj;
-            if (patient.getContactNumber().equals(contactNumber) && patient.getId() != currentPatientId) {
+            String normalizedExisting = normalizePhoneNumber(patient.getContactNumber());
+            if (normalizedExisting.equals(normalizedInput) && patient.getId() != currentPatientId) {
                 return true;
             }
         }

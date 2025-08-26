@@ -130,8 +130,13 @@ public class ConsultationManagement {
         System.out.println("Doctor: " + selectedDoctor.getName());
         
         //get diagnosis
-        System.out.print("Enter diagnosis: ");
-        String diagnosis = scanner.nextLine();
+        System.out.print("Enter diagnosis (or press Enter to cancel): ");
+        String diagnosis = scanner.nextLine().trim();
+
+        if (diagnosis.isEmpty()) {
+            System.out.println("Operation cancelled.");
+            return;
+        }
         
         //create consultation
         String consultationId = "CON" + consultationIdCounter++;
@@ -217,8 +222,13 @@ public class ConsultationManagement {
     }
     
     public void searchConsultationById() {
-        System.out.print("Enter consultation ID to search: ");
-        String consultationId = scanner.nextLine();
+        System.out.print("Enter consultation ID to search (or press Enter to cancel): ");
+        String consultationId = scanner.nextLine().trim();
+
+        if (consultationId.isEmpty()) {
+            System.out.println("Operation cancelled.");
+            return;
+        }
         
         Object[] consultationsArray = consultationList.toArray(); //adt method
         Consultation foundConsultation = null;
@@ -239,8 +249,13 @@ public class ConsultationManagement {
     }
     
     public void searchConsultationsByDoctor() {
-        System.out.print("Enter doctor ID to search consultations: ");
-        String doctorId = scanner.nextLine();
+        System.out.print("Enter doctor ID to search consultations (or press Enter to cancel): ");
+        String doctorId = scanner.nextLine().trim();
+
+        if (doctorId.isEmpty()) {
+            System.out.println("Operation cancelled.");
+            return;
+        }
         
         Object[] consultationsArray = consultationList.toArray(); //adt method
         String[] headers = {"Consultation ID", "Patient Name", "Date", "Status"};

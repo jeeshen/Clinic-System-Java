@@ -90,9 +90,14 @@ public class PharmacyManagement {
     }
     
     public void searchMedicineById() {
-        System.out.print("Enter medicine ID to search: ");
-        String medicineId = scanner.nextLine();
-        
+        System.out.print("Enter medicine ID to search (or press Enter to cancel): ");
+        String medicineId = scanner.nextLine().trim();
+
+        if (medicineId.isEmpty()) {
+            System.out.println("Operation cancelled.");
+            return;
+        }
+
         Medicine foundMedicine = findMedicineById(medicineId);
         if (foundMedicine != null) {
             displayMedicineDetails(foundMedicine);
@@ -102,8 +107,13 @@ public class PharmacyManagement {
     }
     
     public void searchMedicineByName() {
-        System.out.print("Enter medicine name to search: ");
-        String name = scanner.nextLine();
+        System.out.print("Enter medicine name to search (or press Enter to cancel): ");
+        String name = scanner.nextLine().trim();
+
+        if (name.isEmpty()) {
+            System.out.println("Operation cancelled.");
+            return;
+        }
         
         Object[] medicinesArray = medicineList.toArray(); //adt method
         String[] headers = {"ID", "Name", "Brand", "Stock", "Price"};
@@ -184,11 +194,22 @@ public class PharmacyManagement {
         System.out.print("Price (RM): ");
         double price = getUserInputDouble(0.01, 10000.00);
         
-        System.out.print("Expiry Date (YYYY-MM-DD): ");
-        String expiryDate = scanner.nextLine();
-        if (expiryDate.trim().isEmpty()) {
-            System.out.println("[ERROR] Expiry date cannot be empty!");
-            return;
+        String expiryDate = "";
+        boolean validExpiryDate = false;
+        while (!validExpiryDate) {
+            System.out.print("Expiry Date (YYYY-MM-DD): ");
+            expiryDate = scanner.nextLine().trim();
+
+            if (expiryDate.isEmpty()) {
+                System.out.println("[ERROR] Expiry date cannot be empty!");
+            } else if (!isValidDateFormat(expiryDate)) {
+                System.out.println("[ERROR] Invalid date format! Please use YYYY-MM-DD format (e.g., 2025-12-31)");
+            } else if (!isExpiryDateValid(expiryDate)) {
+                System.out.println("[ERROR] Expiry date cannot be in the past! Please enter a future date.");
+            } else {
+                validExpiryDate = true;
+                System.out.println("[OK] Valid expiry date entered.");
+            }
         }
 
         Medicine newMedicine = new Medicine(newMedicineId, name, brand, stockQuantity, 
@@ -235,7 +256,7 @@ public class PharmacyManagement {
         if (!date.matches("\\d{4}-\\d{2}-\\d{2}")) {
             return false;
         }
-        
+
         try {
             //parse the date to validate it's a real date
             String[] parts = date.split("-");
@@ -243,7 +264,7 @@ public class PharmacyManagement {
             int month = Integer.parseInt(parts[1]);
             int day = Integer.parseInt(parts[2]);
 
-            if (year < 2024 || year > 2030) {
+            if (year < 2024 || year > 2050) {
                 return false;
             }
             if (month < 1 || month > 12) {
@@ -261,8 +282,24 @@ public class PharmacyManagement {
                     return false;
                 }
             }
-            
+
             return true;
+        } catch (Exception e) {
+            return false;
+        }
+    }
+
+    private boolean isExpiryDateValid(String expiryDate) {
+        if (!isValidDateFormat(expiryDate)) {
+            return false;
+        }
+
+        try {
+            //check if expiry date is not in the past
+            java.time.LocalDate expiry = java.time.LocalDate.parse(expiryDate);
+            java.time.LocalDate today = java.time.LocalDate.now();
+
+            return !expiry.isBefore(today);
         } catch (Exception e) {
             return false;
         }
@@ -290,8 +327,13 @@ public class PharmacyManagement {
         System.out.println("Total Medicines: " + medicinesArray.length);
         System.out.println(StringUtility.repeatString("=", 60));
         
-        System.out.print("Enter medicine ID to remove: ");
-        String medicineId = scanner.nextLine();
+        System.out.print("Enter medicine ID to remove (or press Enter to cancel): ");
+        String medicineId = scanner.nextLine().trim();
+
+        if (medicineId.isEmpty()) {
+            System.out.println("Operation cancelled.");
+            return;
+        }
         
         Medicine medicine = findMedicineById(medicineId);
         if (medicine != null) {
@@ -302,7 +344,12 @@ public class PharmacyManagement {
             if (confirm.toLowerCase().equals("yes")) {
                 boolean removed = medicineList.remove(medicine); //adt method
                 if (removed) {
+                    // Also remove from treatment management if available
+                    if (treatmentManagement != null) {
+                        treatmentManagement.removeMedicine(medicine);
+                    }
                     System.out.println("[OK] Medicine removed successfully!");
+                    System.out.println("Medicine has been removed from all systems including prescription options.");
                 } else {
                     System.out.println("[ERROR] Failed to remove medicine from system!");
                 }
@@ -367,8 +414,13 @@ public class PharmacyManagement {
         System.out.println("Total Medicines: " + medicinesArray.length);
         System.out.println(StringUtility.repeatString("=", 80));
         
-        System.out.print("\nEnter medicine ID to update: ");
-        String medicineId = scanner.nextLine();
+        System.out.print("\nEnter medicine ID to update (or press Enter to cancel): ");
+        String medicineId = scanner.nextLine().trim();
+
+        if (medicineId.isEmpty()) {
+            System.out.println("Operation cancelled.");
+            return;
+        }
         
         Medicine medicine = findMedicineById(medicineId);
         if (medicine != null) {
@@ -401,14 +453,22 @@ public class PharmacyManagement {
             String category = scanner.nextLine();
             if (!category.isEmpty()) medicine.setCategory(category);
 
-            System.out.print("Expiry Date [" + medicine.getExpiryDate() + "] (YYYY-MM-DD): ");
-            String expiryDate = scanner.nextLine();
-            if (!expiryDate.isEmpty()) {
-                if (isValidDateFormat(expiryDate)) {
-                    medicine.setExpiryDate(expiryDate);
+            String expiryDate = "";
+            boolean validExpiryDate = false;
+            while (!validExpiryDate) {
+                System.out.print("Expiry Date [" + medicine.getExpiryDate() + "] (YYYY-MM-DD or press Enter to skip): ");
+                expiryDate = scanner.nextLine().trim();
+
+                if (expiryDate.isEmpty()) {
+                    validExpiryDate = true; // Skip update
+                } else if (!isValidDateFormat(expiryDate)) {
+                    System.out.println("[ERROR] Invalid date format! Please use YYYY-MM-DD format (e.g., 2025-12-31) or press Enter to skip.");
+                } else if (!isExpiryDateValid(expiryDate)) {
+                    System.out.println("[ERROR] Expiry date cannot be in the past! Please enter a future date or press Enter to skip.");
                 } else {
-                    System.out.println("[ERROR] Invalid date format! Please use YYYY-MM-DD format (e.g., 2025-12-31)");
-                    System.out.println("Expiry date not updated.");
+                    medicine.setExpiryDate(expiryDate);
+                    System.out.println("[OK] Expiry date updated successfully!");
+                    validExpiryDate = true;
                 }
             }
 
@@ -472,8 +532,13 @@ public class PharmacyManagement {
         System.out.println("Total Medicines: " + medicinesArray.length);
         System.out.println(StringUtility.repeatString("=", 80));
         
-        System.out.print("\nEnter medicine ID to update stock: ");
-        String medicineId = scanner.nextLine();
+        System.out.print("\nEnter medicine ID to update stock (or press Enter to cancel): ");
+        String medicineId = scanner.nextLine().trim();
+
+        if (medicineId.isEmpty()) {
+            System.out.println("Operation cancelled.");
+            return;
+        }
         
         Medicine medicine = findMedicineById(medicineId);
         if (medicine != null) {
@@ -690,8 +755,13 @@ public class PharmacyManagement {
 
         System.out.println(StringUtility.repeatString("-", 100));
 
-        System.out.print("Enter prescription ID to dispense medicines: ");
-        String prescriptionId = scanner.nextLine();
+        System.out.print("Enter prescription ID to dispense medicines (or press Enter to cancel): ");
+        String prescriptionId = scanner.nextLine().trim();
+
+        if (prescriptionId.isEmpty()) {
+            System.out.println("Operation cancelled.");
+            return;
+        }
 
         Prescription prescription = treatmentManagement.findPrescriptionById(prescriptionId);
         if (prescription == null) {
@@ -795,8 +865,13 @@ public class PharmacyManagement {
                 System.out.println("\n[ERROR] Some medicines could not be dispensed due to insufficient stock.");
             }
         } else {
-            System.out.print("Enter medicine name to dispense: ");
-            String medicineName = scanner.nextLine();
+            System.out.print("Enter medicine name to dispense (or press Enter to cancel): ");
+            String medicineName = scanner.nextLine().trim();
+
+            if (medicineName.isEmpty()) {
+                System.out.println("Operation cancelled.");
+                return;
+            }
             boolean found = false;
             for (Object obj : prescribedMedicinesArray) {
                 PrescribedMedicine pm = (PrescribedMedicine) obj;
@@ -969,8 +1044,13 @@ public class PharmacyManagement {
         String choice = scanner.nextLine();
         if (!choice.equalsIgnoreCase("y")) return false;
 
-        System.out.print("Enter alternative medicine ID to dispense: ");
-        String altId = scanner.nextLine();
+        System.out.print("Enter alternative medicine ID to dispense (or press Enter to cancel): ");
+        String altId = scanner.nextLine().trim();
+
+        if (altId.isEmpty()) {
+            System.out.println("Operation cancelled.");
+            return false;
+        }
         Medicine selectedAlt = findMedicineById(altId);
         if (selectedAlt == null || selectedAlt.getStockQuantity() < pm.getQuantity()) {
             System.out.println("[ERROR] Invalid selection or insufficient stock for selected alternative.");
@@ -1015,8 +1095,13 @@ public class PharmacyManagement {
         String choice = scanner.nextLine();
         if (!choice.equalsIgnoreCase("y")) return false;
 
-        System.out.print("Enter alternative medicine ID to dispense: ");
-        String altId = scanner.nextLine();
+        System.out.print("Enter alternative medicine ID to dispense (or press Enter to cancel): ");
+        String altId = scanner.nextLine().trim();
+
+        if (altId.isEmpty()) {
+            System.out.println("Operation cancelled.");
+            return false;
+        }
         Medicine selectedAlt = findMedicineById(altId);
         if (selectedAlt == null || selectedAlt.getStockQuantity() < pm.getQuantity()) {
             System.out.println("[ERROR] Invalid selection or insufficient stock for selected alternative.");

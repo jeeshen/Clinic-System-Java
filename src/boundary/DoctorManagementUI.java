@@ -19,7 +19,7 @@ public class DoctorManagementUI {
             System.out.println("\n" + StringUtility.repeatString("=", 50));
             System.out.println("        DOCTORS ON DUTY MANAGEMENT");
             System.out.println(StringUtility.repeatString("=", 50));
-            System.out.println("1 . View All Doctors");
+            System.out.println("1 . View All Doctors (Sorted by ID)");
             System.out.println("2 . View Doctors on Duty");
             System.out.println("3 . Add Doctor to Duty");
             System.out.println("4 . Remove Doctor from Duty");
@@ -31,7 +31,7 @@ public class DoctorManagementUI {
             
             switch (choice) {
                 case 1:
-                    doctorManagement.displayAllDoctors();
+                    doctorManagement.displayAllDoctorsSorted();
                     break;
                 case 2:
                     doctorManagement.displayDoctorsOnDuty();

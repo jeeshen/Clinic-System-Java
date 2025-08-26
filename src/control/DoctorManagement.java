@@ -55,27 +55,6 @@ public class DoctorManagement {
         }
     }
     
-    public void displayAllDoctors() {
-        Object[] doctorsArray = doctorList.toArray(); //adt method
-        String[] headers = {"ID", "Name", "Specialization", "Contact", "Available"};
-        Object[][] rows = new Object[doctorsArray.length][headers.length];
-        for (int i = 0; i < doctorsArray.length; i++) {
-            Doctor doctor = (Doctor) doctorsArray[i];
-            rows[i][0] = doctor.getDoctorId();
-            rows[i][1] = doctor.getName();
-            rows[i][2] = doctor.getSpecialization();
-            rows[i][3] = doctor.getContactNumber();
-            rows[i][4] = doctor.isIsAvailable() ? "Yes" : "No";
-        }
-        System.out.print(StringUtility.formatTableNoDividers(
-            "ALL DOCTORS",
-            headers,
-            rows
-        ));
-        System.out.println("Press Enter to continue...");
-        scanner.nextLine();
-    }
-    
     public void displayDoctorsOnDuty() {
         Object[] doctorsArray = onDutyDoctorList.toArray(); //adt method
         String[] headers = {"ID", "Name", "Specialization", "Contact"};
@@ -126,8 +105,13 @@ public class DoctorManagement {
             headers,
             filteredRows
         ));
-        System.out.print("\nEnter Doctor ID to add to duty: ");
-        String doctorId = scanner.nextLine();
+        System.out.print("\nEnter Doctor ID to add to duty (or press Enter to cancel): ");
+        String doctorId = scanner.nextLine().trim();
+
+        if (doctorId.isEmpty()) {
+            System.out.println("Operation cancelled.");
+            return;
+        }
         
         Doctor doctor = findDoctorById(doctorId);
         if (doctor != null) {
@@ -147,8 +131,13 @@ public class DoctorManagement {
     }
     
     public void removeDoctorFromDuty() {
-        System.out.print("Enter Doctor ID to remove from duty: ");
-        String doctorId = scanner.nextLine();
+        System.out.print("Enter Doctor ID to remove from duty (or press Enter to cancel): ");
+        String doctorId = scanner.nextLine().trim();
+
+        if (doctorId.isEmpty()) {
+            System.out.println("Operation cancelled.");
+            return;
+        }
 
         Doctor doctor = findDoctorById(doctorId);
         if (doctor != null && onDutyDoctorList.contains(doctor)) { //adt method
@@ -241,9 +230,15 @@ public class DoctorManagement {
     }
     
     public void searchDoctorById() {
-        System.out.print("Enter doctor ID to search: ");
-        String doctorId = scanner.nextLine();
-        
+        System.out.print("Enter doctor ID to search (or press Enter to cancel): ");
+        String doctorId = scanner.nextLine().trim();
+
+        if (doctorId.isEmpty()) {
+            System.out.println("Operation cancelled.");
+            return;
+        }
+
+        doctorId = doctorId.toUpperCase();
         Doctor foundDoctor = findDoctorById(doctorId);
         if (foundDoctor != null) {
             displayDoctorDetails(foundDoctor);
@@ -253,16 +248,21 @@ public class DoctorManagement {
     }
     
     public void searchDoctorBySpecialization() {
-        System.out.print("Enter specialization to search: ");
-        String specialization = scanner.nextLine();
+        System.out.print("Enter specialization to search (or press Enter to cancel): ");
+        String specialization = scanner.nextLine().trim();
+
+        if (specialization.isEmpty()) {
+            System.out.println("Operation cancelled.");
+            return;
+        }
 
         Object[] doctorsArray = doctorList.toArray(); //adt method
-        String[] headers = {"ID", "Name", "Contact", "Available"};
+        String[] headers = {"ID", "Name", "Specialization", "Contact", "Available"};
         SetAndQueueInterface<Object[]> rowList = new SetQueueArray<>();
         for (Object obj : doctorsArray) {
             Doctor doctor = (Doctor) obj;
             if (doctor.getSpecialization().toLowerCase().contains(specialization.toLowerCase())) {
-                rowList.add(new Object[]{doctor.getDoctorId(), doctor.getName(), doctor.getContactNumber(), doctor.isIsAvailable() ? "Yes" : "No"}); //adt method
+                rowList.add(new Object[]{doctor.getDoctorId(), doctor.getName(), doctor.getSpecialization(), doctor.getContactNumber(), doctor.isIsAvailable() ? "Yes" : "No"}); //adt method
             }
         }
         Object[][] rows = new Object[rowList.size()][headers.length]; //adt method
@@ -342,8 +342,15 @@ public class DoctorManagement {
         System.out.println("Total Doctors: " + doctorArray.length);
         System.out.println(StringUtility.repeatString("=", 60));
         
-        System.out.print("Enter doctor ID to update: ");
-        String doctorId = scanner.nextLine();
+        System.out.print("Enter doctor ID to update (or press Enter to cancel): ");
+        String doctorId = scanner.nextLine().trim();
+
+        if (doctorId.isEmpty()) {
+            System.out.println("Operation cancelled.");
+            return;
+        }
+
+        doctorId = doctorId.toUpperCase();
         
         Doctor doctor = findDoctorById(doctorId);
         if (doctor != null) {
@@ -365,27 +372,45 @@ public class DoctorManagement {
             if (!specialization.isEmpty()) doctor.setSpecialization(specialization);
             
             //update contact number
-            System.out.print("Contact Number [" + doctor.getContactNumber() + "]: ");
-            String contact = scanner.nextLine();
-            if (!contact.isEmpty()) {
-                //check if contact number already exists for another doctor
-                if (!contact.equals(doctor.getContactNumber()) && isContactNumberExists(contact)) {
-                    System.out.println("Contact number already exists for another doctor! Update cancelled.");
-                    return;
+            String contact = "";
+            boolean validContact = false;
+            while (!validContact) {
+                contact = InputValidator.getValidStringAllowEmpty(scanner, "Contact Number [" + doctor.getContactNumber() + "]: ");
+                if (contact.isEmpty()) {
+                    validContact = true; //skip update
+                } else if (contact.matches("^(01[0-9]|03|04|05|06|07|08|09)-?[0-9]{7,8}$")) {
+                    //check if contact number already exists for another doctor
+                    if (!contact.equals(doctor.getContactNumber()) && isContactNumberExists(contact)) {
+                        System.out.println("[ERROR] Contact number already exists for another doctor! Please enter a different number or press Enter to skip.");
+                    } else {
+                        doctor.setContactNumber(contact);
+                        System.out.println("[OK] Contact number updated successfully!");
+                        validContact = true;
+                    }
+                } else {
+                    System.out.println("Invalid phone number format. Please enter a valid Malaysian phone number (e.g., 012-3456789) or press Enter to skip.");
                 }
-                doctor.setContactNumber(contact);
             }
-            
+
             //update email
-            System.out.print("Email [" + doctor.getEmail() + "]: ");
-            String email = scanner.nextLine();
-            if (!email.isEmpty()) {
-                //check if email already exists for another doctor
-                if (!email.equals(doctor.getEmail()) && isEmailExists(email)) {
-                    System.out.println("Email already exists for another doctor! Update cancelled.");
-                    return;
+            String email = "";
+            boolean validEmail = false;
+            while (!validEmail) {
+                email = InputValidator.getValidStringAllowEmpty(scanner, "Email [" + doctor.getEmail() + "]: ");
+                if (email.isEmpty()) {
+                    validEmail = true; //skip update
+                } else if (email.matches("^[A-Za-z0-9+_.-]+@[A-Za-z0-9.-]+\\.[A-Za-z]{2,}$")) {
+                    //check if email already exists for another doctor
+                    if (!email.equals(doctor.getEmail()) && isEmailExists(email)) {
+                        System.out.println("[ERROR] Email already exists for another doctor! Please enter a different email or press Enter to skip.");
+                    } else {
+                        doctor.setEmail(email);
+                        System.out.println("[OK] Email updated successfully!");
+                        validEmail = true;
+                    }
+                } else {
+                    System.out.println("Invalid email format. Please enter a valid email address or press Enter to skip.");
                 }
-                doctor.setEmail(email);
             }
             
             System.out.println("\n[OK] Doctor details updated successfully!");
@@ -434,8 +459,15 @@ public class DoctorManagement {
         System.out.println("Total Doctors: " + doctorArray.length);
         System.out.println(StringUtility.repeatString("=", 60));
         
-        System.out.print("Enter doctor ID to update schedule: ");
-        String doctorId = scanner.nextLine();
+        System.out.print("Enter doctor ID to update schedule (or press Enter to cancel): ");
+        String doctorId = scanner.nextLine().trim();
+
+        if (doctorId.isEmpty()) {
+            System.out.println("Operation cancelled.");
+            return;
+        }
+
+        doctorId = doctorId.toUpperCase();
         
         Doctor doctor = findDoctorById(doctorId);
         if (doctor != null) {
@@ -591,8 +623,15 @@ public class DoctorManagement {
         System.out.println("Total Doctors: " + doctorsArray.length);
         System.out.println(StringUtility.repeatString("=", 110));
         
-        System.out.print("Enter doctor ID to remove: ");
-        String doctorId = scanner.nextLine();
+        System.out.print("Enter doctor ID to remove (or press Enter to cancel): ");
+        String doctorId = scanner.nextLine().trim();
+
+        if (doctorId.isEmpty()) {
+            System.out.println("Operation cancelled.");
+            return;
+        }
+
+        doctorId = doctorId.toUpperCase();
         
         Doctor doctor = findDoctorById(doctorId);
         if (doctor != null) {
@@ -964,11 +1003,18 @@ public class DoctorManagement {
         return doctorList.search(dummy); //adt method
     }
     
+    private String normalizePhoneNumber(String phoneNumber) {
+        //remove all dashes and spaces to normalize phone number for comparison
+        return phoneNumber.replaceAll("[-\\s]", "");
+    }
+
     private boolean isContactNumberExists(String contactNumber) {
+        String normalizedInput = normalizePhoneNumber(contactNumber);
         Object[] doctorsArray = doctorList.toArray();
         for (Object obj : doctorsArray) {
             Doctor doctor = (Doctor) obj;
-            if (doctor.getContactNumber().equals(contactNumber)) {
+            String normalizedExisting = normalizePhoneNumber(doctor.getContactNumber());
+            if (normalizedExisting.equals(normalizedInput)) {
                 return true;
             }
         }
@@ -1008,8 +1054,15 @@ public class DoctorManagement {
     }
 
     public void searchDoctorConsultations() {
-        System.out.print("Enter doctor ID to search consultations: ");
-        String doctorId = scanner.nextLine();
+        System.out.print("Enter doctor ID to search consultations (or press Enter to cancel): ");
+        String doctorId = scanner.nextLine().trim();
+
+        if (doctorId.isEmpty()) {
+            System.out.println("Operation cancelled.");
+            return;
+        }
+
+        doctorId = doctorId.toUpperCase();
         
         Doctor doctor = findDoctorById(doctorId);
         if (doctor == null) {
@@ -1041,8 +1094,15 @@ public class DoctorManagement {
     }
     
     public void searchDoctorTreatments() {
-        System.out.print("Enter doctor ID to search treatments: ");
-        String doctorId = scanner.nextLine();
+        System.out.print("Enter doctor ID to search treatments (or press Enter to cancel): ");
+        String doctorId = scanner.nextLine().trim();
+
+        if (doctorId.isEmpty()) {
+            System.out.println("Operation cancelled.");
+            return;
+        }
+
+        doctorId = doctorId.toUpperCase();
         
         Doctor doctor = findDoctorById(doctorId);
         if (doctor == null) {
@@ -1074,8 +1134,15 @@ public class DoctorManagement {
     }
     
     public void searchDoctorPrescriptions() {
-        System.out.print("Enter doctor ID to search prescriptions: ");
-        String doctorId = scanner.nextLine();
+        System.out.print("Enter doctor ID to search prescriptions (or press Enter to cancel): ");
+        String doctorId = scanner.nextLine().trim();
+
+        if (doctorId.isEmpty()) {
+            System.out.println("Operation cancelled.");
+            return;
+        }
+
+        doctorId = doctorId.toUpperCase();
         
         Doctor doctor = findDoctorById(doctorId);
         if (doctor == null) {

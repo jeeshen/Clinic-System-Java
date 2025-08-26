@@ -155,12 +155,15 @@ public class TreatmentManagement {
         
         boolean addMoreMedicines = true;
         while (addMoreMedicines) {
-            System.out.print("Enter medicine ID to prescribe (or 'done' to finish): ");
-            String medicineId = scanner.nextLine();
+            System.out.print("Enter medicine ID to prescribe (or 'done' to finish, or press Enter to cancel): ");
+            String medicineId = scanner.nextLine().trim();
             
             if (medicineId.equalsIgnoreCase("done")) {
                 addMoreMedicines = false;
                 break;
+            } else if (medicineId.isEmpty()) {
+                System.out.println("Operation cancelled.");
+                return;
             }
             
             Medicine medicine = findMedicineById(medicineId);
@@ -324,8 +327,15 @@ public class TreatmentManagement {
     }
     
     public void searchPrescriptionsByDoctor() {
-        System.out.print("Enter doctor ID to search prescriptions: ");
-        String doctorId = scanner.nextLine();
+        System.out.print("Enter doctor ID to search prescriptions (or press Enter to cancel): ");
+        String doctorId = scanner.nextLine().trim();
+
+        if (doctorId.isEmpty()) {
+            System.out.println("Operation cancelled.");
+            return;
+        }
+
+        doctorId = doctorId.toUpperCase();
         
         Object[] prescriptionsArray = prescriptionList.toArray();
         String[] headers = {"Prescription ID", "Patient ID", "Diagnosis", "Total Cost", "Status"};
@@ -886,11 +896,11 @@ public class TreatmentManagement {
         }
         
         System.out.println(StringUtility.repeatString("-", 80));
-        System.out.println("Enter prescription ID to process payment or '0' to cancel:");
+        System.out.println("Enter prescription ID to process payment (or press Enter to cancel):");
         System.out.print("Prescription ID: ");
-        String prescriptionId = scanner.nextLine();
+        String prescriptionId = scanner.nextLine().trim();
         
-        if (prescriptionId.equals("0")) {
+        if (prescriptionId.isEmpty()) {
             System.out.println("\nPayment process cancelled. Returning to main menu...");
             System.out.println("Press Enter to continue...");
             scanner.nextLine();
@@ -1030,4 +1040,8 @@ public class TreatmentManagement {
     public void addMedicine(Medicine medicine) {
         medicineList.add(medicine);
     }
-} 
+
+    public void removeMedicine(Medicine medicine) {
+        medicineList.remove(medicine);
+    }
+}
