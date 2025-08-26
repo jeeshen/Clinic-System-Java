@@ -71,12 +71,11 @@ public class PatientManagementUI {
             System.out.println("6 . Search Patient Prescriptions");
             System.out.println("7 . Update Patient Information");
             System.out.println("8 . Remove Patient");
-            System.out.println("9 . Clear All Patient Records");
             System.out.println("0 . Back to Main Menu");
             System.out.println(StringUtility.repeatString("-", 50));
             System.out.print("Enter your choice: ");
             
-            int choice = getUserInputInt(0, 9);
+            int choice = getUserInputInt(0, 8);
             
             switch (choice) {
                 case 1:
@@ -102,9 +101,6 @@ public class PatientManagementUI {
                     break;
                 case 8:
                     patientManagement.removePatient();
-                    break;
-                case 9:
-                    patientManagement.clearSet();
                     break;
                 case 0:
                     back = true;

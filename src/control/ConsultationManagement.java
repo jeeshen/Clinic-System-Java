@@ -43,14 +43,16 @@ public class ConsultationManagement {
     }
     
     private void loadSampleData() {
-        Consultation[] sampleConsultations = DataInitializer.initializeSampleConsultations();
-        for (Consultation consultation : sampleConsultations) {
-            consultationList.add(consultation); //adt method
+        SetAndQueueInterface<Consultation> sampleConsultations = DataInitializer.initializeSampleConsultations();
+        Object[] sampleConsultationsArray = sampleConsultations.toArray();
+        for (Object obj : sampleConsultationsArray) {
+            consultationList.add((Consultation) obj); //adt method
         }
         
-        if (sampleConsultations.length > 0) {
+        if (sampleConsultations.size() > 0) {
             int maxId = 0;
-            for (Consultation consultation : sampleConsultations) {
+            for (Object obj : sampleConsultationsArray) {
+                Consultation consultation = (Consultation) obj;
                 String consultationId = consultation.getConsultationId();
                 if (consultationId.startsWith("CON")) {
                     try {
@@ -59,7 +61,7 @@ public class ConsultationManagement {
                             maxId = idNumber;
                         }
                     } catch (NumberFormatException e) {
-                        // Skip invalid IDs
+                        //skip invalid IDs
                     }
                 }
             }
@@ -164,11 +166,15 @@ public class ConsultationManagement {
         
         //create prescription through treatment management
         treatmentManagement.createPrescription(consultationId, currentPatient, selectedDoctor, diagnosis, consultationDate);
-        
+
+        //create treatment record
+        treatmentManagement.createTreatment(String.valueOf(currentPatient.getId()), selectedDoctor.getDoctorId(), diagnosis, consultationDate);
+
         currentPatient.setStatus("Consulted");
-        
+
         System.out.println("\nConsultation completed successfully!");
         System.out.println("Consultation ID: " + consultationId);
+        System.out.println("Treatment record created automatically.");
     }
     
     public void displayAllConsultationsSorted() {
@@ -324,6 +330,73 @@ public class ConsultationManagement {
         scanner.nextLine();
     }
     
+    public void updateConsultation() {
+        System.out.println("\n" + StringUtility.repeatString("=", 90));
+        System.out.println("        UPDATE CONSULTATION");
+        System.out.println(StringUtility.repeatString("=", 90));
+
+        System.out.println("CURRENT CONSULTATION LIST:");
+        System.out.println(StringUtility.repeatString("-", 90));
+        System.out.printf("%-15s %-30s %-40s %-15s %-15s\n", "Consultation ID", "Patient Name", "Doctor Name", "Date", "Status");
+        System.out.println(StringUtility.repeatString("-", 90));
+
+        Object[] consultationsArray = consultationList.toArray(); //adt method
+        for (Object obj : consultationsArray) {
+            Consultation consultation = (Consultation) obj;
+            System.out.printf("%-15s %-30s %-40s %-15s %-15s\n",
+                consultation.getConsultationId(),
+                getPatientName(consultation.getPatientId()),
+                getDoctorName(consultation.getDoctorId()),
+                consultation.getConsultationDate(),
+                consultation.getStatus());
+        }
+        System.out.println(StringUtility.repeatString("-", 90));
+        System.out.println("Total Consultations: " + consultationsArray.length);
+        System.out.println(StringUtility.repeatString("=", 90));
+
+        System.out.print("Enter consultation ID to update (or press Enter to cancel): ");
+        String consultationId = scanner.nextLine().trim();
+
+        if (consultationId.isEmpty()) {
+            System.out.println("Operation cancelled.");
+            return;
+        }
+
+        Consultation consultation = findConsultationById(consultationId);
+        if (consultation != null) {
+            System.out.println("Current consultation information:");
+            displayConsultationDetails(consultation);
+
+            System.out.println("\nEnter new information (press Enter to keep current value):");
+
+            //update status
+            System.out.print("Status [" + consultation.getStatus() + "] (Completed/In Progress/Cancelled): ");
+            String status = scanner.nextLine().trim();
+            if (!status.isEmpty()) {
+                if (status.equalsIgnoreCase("Completed") || status.equalsIgnoreCase("In Progress") || status.equalsIgnoreCase("Cancelled")) {
+                    consultation.setStatus(status);
+                    System.out.println("[OK] Status updated successfully!");
+                } else {
+                    System.out.println("[WARNING] Invalid status. Status not updated.");
+                }
+            }
+
+            //update notes (diagnosis)
+            System.out.print("Notes/Diagnosis [" + consultation.getNotes() + "]: ");
+            String notes = scanner.nextLine().trim();
+            if (!notes.isEmpty()) {
+                consultation.setNotes(notes);
+                System.out.println("[OK] Notes updated successfully!");
+            }
+
+            System.out.println("\n[OK] Consultation information updated successfully!");
+            System.out.println("\nUpdated consultation information:");
+            displayConsultationDetails(consultation);
+        } else {
+            System.out.println("[ERROR] Consultation not found!");
+        }
+    }
+
     public void removeConsultation() {
         System.out.println("\n" + StringUtility.repeatString("=", 90));
         System.out.println("        REMOVE CONSULTATION");
@@ -836,7 +909,7 @@ public class ConsultationManagement {
             scanner.nextLine();
 
             if (input == 0) {
-                return 0; // Return 0 for cancellation
+                return 0; //return 0 for cancellation
             }
 
             if (input < min || input > max) {

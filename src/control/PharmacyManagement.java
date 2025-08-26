@@ -26,9 +26,9 @@ public class PharmacyManagement {
     }
     
     private void loadSampleData() {
-        Medicine[] sampleMedicines = DataInitializer.initializeSampleMedicines();
-        for (Medicine medicine : sampleMedicines) {
-            medicineList.add(medicine); //adt method
+        SetAndQueueInterface<Medicine> sampleMedicines = DataInitializer.initializeSampleMedicines();
+        for (Object obj : sampleMedicines.toArray()) {
+            medicineList.add((Medicine) obj); //adt method
         }
     }
     
@@ -344,7 +344,7 @@ public class PharmacyManagement {
             if (confirm.toLowerCase().equals("yes")) {
                 boolean removed = medicineList.remove(medicine); //adt method
                 if (removed) {
-                    // Also remove from treatment management if available
+                    //also remove from treatment management if available
                     if (treatmentManagement != null) {
                         treatmentManagement.removeMedicine(medicine);
                     }
@@ -460,7 +460,7 @@ public class PharmacyManagement {
                 expiryDate = scanner.nextLine().trim();
 
                 if (expiryDate.isEmpty()) {
-                    validExpiryDate = true; // Skip update
+                    validExpiryDate = true; //skip update
                 } else if (!isValidDateFormat(expiryDate)) {
                     System.out.println("[ERROR] Invalid date format! Please use YYYY-MM-DD format (e.g., 2025-12-31) or press Enter to skip.");
                 } else if (!isExpiryDateValid(expiryDate)) {

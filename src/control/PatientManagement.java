@@ -30,15 +30,18 @@ public class PatientManagement {
     }
     
     private void loadSampleData() {
-        Patient[] samplePatients = DataInitializer.initializeSamplePatients();
-        for (Patient patient : samplePatients) {
+        SetAndQueueInterface<Patient> samplePatients = DataInitializer.initializeSamplePatients();
+        Object[] samplePatientsArray = samplePatients.toArray();
+        for (Object obj : samplePatientsArray) {
+            Patient patient = (Patient) obj;
             patient.setStatus("Active");
             patientList.add(patient); //adt method
         }
         
-        if (samplePatients.length > 0) {
+        if (samplePatients.size() > 0) {
             int maxId = 0;
-            for (Patient patient : samplePatients) {
+            for (Object obj : samplePatientsArray) {
+                Patient patient = (Patient) obj;
                 if (patient.getId() > maxId) {
                     maxId = patient.getId();
                 }
@@ -503,9 +506,9 @@ public class PatientManagement {
             while (!validContact) {
                 contact = InputValidator.getValidStringAllowEmpty(scanner, "Contact [" + patient.getContactNumber() + "]: ");
                 if (contact.isEmpty()) {
-                    validContact = true; // Skip update
+                    validContact = true; //skip update
                 } else if (contact.matches("^(01[0-9]|03|04|05|06|07|08|09)-?[0-9]{7,8}$")) {
-                    // Check if phone number already exists for another patient
+                    //check if phone number already exists for another patient
                     if (isPhoneNumberExistsForOtherPatient(contact, patient.getId())) {
                         System.out.println("[ERROR] Phone number already exists for another patient. Please enter a different number or press Enter to skip.");
                     } else {
@@ -666,7 +669,7 @@ public class PatientManagement {
                 if (diagnosis != null && !diagnosis.trim().isEmpty()) {
                     uniqueDiseases.add(diagnosis);
 
-                    // Count diseases
+                    //count diseases
                     boolean found = false;
                     for (int i = 0; i < diseaseIndex; i++) {
                         if (diseaseArray[i].equals(diagnosis)) {
@@ -762,7 +765,7 @@ public class PatientManagement {
         //draw labels aligned with bars (4-char labels with proper spacing)
         System.out.print("    ");
         for (String ageGroup : ageGroupNames) {
-            System.out.printf("%-4s  ", ageGroup); // 4-char label with 2 spaces
+            System.out.printf("%-4s  ", ageGroup); //4-char label with 2 spaces
         }
         System.out.println();
         System.out.println();
@@ -1005,7 +1008,7 @@ public class PatientManagement {
         for (int i = 0; i < numPatients; i++) {
             Patient p = (Patient) patientsArray[i];
             String shortName = p.getName().length() > 4 ? p.getName().substring(0, 4) : p.getName();
-            System.out.printf("%-4s  ", shortName); // 4-char label with 2 spaces
+            System.out.printf("%-4s  ", shortName); //4-char label with 2 spaces
         }
         System.out.println();
         System.out.println();
@@ -1060,10 +1063,7 @@ public class PatientManagement {
         return waitingPatientList.dequeue(); //adt method
     }
 
-    public void clearSet() {
-        patientList.clearSet(); //adt method
-        System.out.println("[OK] All patient records cleared successfully!");
-    }
+    
 
     public int getTotalPatientCount() {
         return patientList.size(); //adt method
@@ -1080,18 +1080,6 @@ public class PatientManagement {
     public boolean isQueueEmpty() {
         return waitingPatientList.isQueueEmpty();
     }
-
-    private int countConsultationsForPatient(String patientId, Object[] consultationsArray) {
-        int count = 0;
-        for (Object obj : consultationsArray) {
-            Consultation consultation = (Consultation) obj;
-            if (consultation.getPatientId().equals(patientId)) {
-                count++;
-            }
-        }
-        return count;
-    }
-
     private boolean isPatientInQueue(Patient patient) {
         Object[] queueArray = waitingPatientList.toQueueArray();
         for (Object obj : queueArray) {
@@ -1155,14 +1143,13 @@ public class PatientManagement {
         }
         
         Object[] treatmentsArray = patient.getTreatments().toArray();
-        String[] headers = {"Treatment ID", "Doctor ID", "Diagnosis", "Medications", "Date"};
+        String[] headers = {"Treatment ID", "Doctor ID", "Diagnosis", "Date"};
         Object[][] rows = new Object[treatmentsArray.length][headers.length];
         for (int i = 0; i < treatmentsArray.length; i++) {
             Treatment treatment = (Treatment) treatmentsArray[i];
             rows[i][0] = treatment.getTreatmentId();
             rows[i][1] = treatment.getDoctorId();
             rows[i][2] = treatment.getDiagnosis();
-            rows[i][3] = treatment.getPrescribedMedications();
             rows[i][4] = treatment.getTreatmentDate();
         }
         System.out.print(StringUtility.formatTableNoDividers(

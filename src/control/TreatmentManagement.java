@@ -16,10 +16,12 @@ import utility.InputValidator;
 
 public class TreatmentManagement {
     private SetAndQueueInterface<Prescription> prescriptionList = new SetQueueArray<>();
+    private SetAndQueueInterface<Treatment> treatmentList = new SetQueueArray<>();
     private SetAndQueueInterface<Medicine> medicineList = new SetQueueArray<>();
     private Scanner scanner;
     private int prescriptionIdCounter = 3001;
     private int prescribedMedicineIdCounter = 4001;
+    private int treatmentIdCounter = 211;
     private PatientManagement patientManagement;
     private DoctorManagement doctorManagement;
     
@@ -37,22 +39,29 @@ public class TreatmentManagement {
     }
 
     private void loadSampleData() {
-        Medicine[] sampleMedicines = DataInitializer.initializeSampleMedicines();
-        for (Medicine medicine : sampleMedicines) {
-            medicineList.add(medicine); //adt method
+        SetAndQueueInterface<Medicine> sampleMedicines = DataInitializer.initializeSampleMedicines();
+        for (Object obj : sampleMedicines.toArray()) {
+            medicineList.add((Medicine) obj); //adt method
         }
 
-        Prescription[] samplePrescriptions = DataInitializer.initializeSamplePrescriptions();
-        for (Prescription prescription : samplePrescriptions) {
-            prescriptionList.add(prescription); //adt method
+        SetAndQueueInterface<Prescription> samplePrescriptions = DataInitializer.initializeSamplePrescriptions();
+        for (Object obj : samplePrescriptions.toArray()) {
+            prescriptionList.add((Prescription) obj); //adt method
         }
-        
+
+        SetAndQueueInterface<Treatment> sampleTreatments = DataInitializer.initializeSampleTreatments();
+        for (Object obj : sampleTreatments.toArray()) {
+            treatmentList.add((Treatment) obj); //adt method
+        }
+
         //update prescription ID counter to continue from the last used ID
-        if (samplePrescriptions.length > 0) {
+        if (samplePrescriptions.size() > 0) {
             int maxPrescriptionId = 0;
             int maxPrescribedMedicineId = 0;
+            int maxTreatmentId = 0;
             
-            for (Prescription prescription : samplePrescriptions) {
+            for (Object obj : samplePrescriptions.toArray()) {
+                Prescription prescription = (Prescription) obj;
                 String prescriptionId = prescription.getPrescriptionId();
                 if (prescriptionId.startsWith("PRE")) {
                     try {
@@ -67,8 +76,8 @@ public class TreatmentManagement {
                 
                 //check prescribed medicine IDs within each prescription
                 Object[] prescribedMedicinesArray = prescription.getPrescribedMedicines().toArray();
-                for (Object obj : prescribedMedicinesArray) {
-                    PrescribedMedicine pm = (PrescribedMedicine) obj;
+                for (Object pmObj : prescribedMedicinesArray) {
+                    PrescribedMedicine pm = (PrescribedMedicine) pmObj;
                     String pmId = pm.getPrescribedMedicineId();
                     if (pmId.startsWith("PM")) {
                         try {
@@ -82,8 +91,25 @@ public class TreatmentManagement {
                     }
                 }
             }
+
+            for (Object obj : sampleTreatments.toArray()) {
+                Treatment treatment = (Treatment) obj;
+                String treatmentId = treatment.getTreatmentId();
+                if (treatmentId.startsWith("TRE")) {
+                    try {
+                        int idNumber = Integer.parseInt(treatmentId.substring(3));
+                        if (idNumber > maxTreatmentId) {
+                            maxTreatmentId = idNumber;
+                        }
+                    } catch (NumberFormatException e) {
+                        //skip invalid IDs
+                    }
+                }
+            }
+
             prescriptionIdCounter = maxPrescriptionId + 1;
             prescribedMedicineIdCounter = maxPrescribedMedicineId + 1;
+            treatmentIdCounter = maxTreatmentId + 1;
         }
     }
     
@@ -112,8 +138,9 @@ public class TreatmentManagement {
             }
         }
         
-        Treatment[] sampleTreatments = DataInitializer.initializeSampleTreatments();
-        for (Treatment treatment : sampleTreatments) {
+        Object[] treatmentsArray = treatmentList.toArray();
+        for (Object obj : treatmentsArray) {
+            Treatment treatment = (Treatment) obj;
             try {
                 int patientId = Integer.parseInt(treatment.getPatientId());
                 Patient patient = patientManagement.findPatientById(patientId);
@@ -123,15 +150,16 @@ public class TreatmentManagement {
             } catch (NumberFormatException e) {
                 System.out.println("Error parsing patient ID: " + treatment.getPatientId());
             }
-            
+
             Doctor doctor = doctorManagement.findDoctorById(treatment.getDoctorId());
             if (doctor != null) {
                 doctor.getTreatments().add(treatment);
             }
         }
         
-        PharmacyTransaction[] sampleTransactions = DataInitializer.initializeSampleTransactions();
-        for (PharmacyTransaction transaction : sampleTransactions) {
+        SetAndQueueInterface<PharmacyTransaction> sampleTransactions = DataInitializer.initializeSampleTransactions();
+        for (Object obj : sampleTransactions.toArray()) {
+            PharmacyTransaction transaction = (PharmacyTransaction) obj;
             try {
                 int patientId = Integer.parseInt(transaction.getPatientId());
                 Patient patient = patientManagement.findPatientById(patientId);
@@ -775,7 +803,7 @@ public class TreatmentManagement {
             Doctor doctor = doctorManagement.findDoctorById(doctorId);
             if (doctor != null) {
                 String name = doctor.getName();
-                // Remove "Dr." prefix if present
+                //remove "Dr." prefix if present
                 if (name.startsWith("Dr.")) {
                     name = name.substring(3).trim();
                 }
@@ -991,10 +1019,10 @@ public class TreatmentManagement {
         System.out.println("Diagnosis: " + prescription.getDiagnosis());
         System.out.println("Total Cost: RM " + String.format("%.2f", prescription.getTotalCost()));
         
-        if (paymentMethod == 1) { // Cash payment
+        if (paymentMethod == 1) { //cash payment
             System.out.println("Amount Received: RM " + String.format("%.2f", amountReceived));
             System.out.println("Change: RM " + String.format("%.2f", change));
-        } else { // Other payment methods
+        } else { //other payment methods
             System.out.println("Amount Paid: RM " + String.format("%.2f", amountReceived));
             System.out.println("Change: RM 0.00");
         }
@@ -1043,5 +1071,386 @@ public class TreatmentManagement {
 
     public void removeMedicine(Medicine medicine) {
         medicineList.remove(medicine);
+    }
+
+    public void createTreatment(String patientId, String doctorId, String diagnosis, String treatmentDate) {
+        String treatmentId = "TRE" + String.format("%03d", treatmentIdCounter++);
+        Treatment treatment = new Treatment(treatmentId, patientId, doctorId, diagnosis, treatmentDate);
+
+        treatmentList.add(treatment); //adt method
+
+        //link to patient and doctor
+        if (patientManagement != null) {
+            try {
+                int patId = Integer.parseInt(patientId);
+                Patient patient = patientManagement.findPatientById(patId);
+                if (patient != null) {
+                    patient.getTreatments().add(treatment);
+                }
+            } catch (NumberFormatException e) {
+                System.out.println("Error parsing patient ID: " + patientId);
+            }
+        }
+
+        if (doctorManagement != null) {
+            Doctor doctor = doctorManagement.findDoctorById(doctorId);
+            if (doctor != null) {
+                doctor.getTreatments().add(treatment);
+            }
+        }
+
+        System.out.println("[OK] Treatment created successfully with ID: " + treatmentId);
+    }
+
+    public SetAndQueueInterface<Treatment> getTreatmentList() {
+        return treatmentList;
+    }
+
+    public void displayAllTreatments() {
+        System.out.println("\n" + StringUtility.repeatString("=", 90));
+        System.out.println("        ALL TREATMENTS");
+        System.out.println(StringUtility.repeatString("=", 90));
+
+        Object[] treatmentsArray = treatmentList.toArray(); //adt method
+        if (treatmentsArray.length == 0) {
+            System.out.println("No treatments found in the system.");
+            return;
+        }
+
+        System.out.println(StringUtility.repeatString("-", 90));
+        System.out.printf("%-15s %-15s %-15s %-30s %-15s\n", "Treatment ID", "Patient ID", "Doctor ID", "Diagnosis", "Date");
+        System.out.println(StringUtility.repeatString("-", 90));
+
+        for (Object obj : treatmentsArray) {
+            Treatment treatment = (Treatment) obj;
+            System.out.printf("%-15s %-15s %-15s %-30s %-15s\n",
+                treatment.getTreatmentId(),
+                treatment.getPatientId(),
+                treatment.getDoctorId(),
+                treatment.getDiagnosis().length() > 28 ? treatment.getDiagnosis().substring(0, 27) + "..." : treatment.getDiagnosis(),
+                treatment.getTreatmentDate());
+        }
+        System.out.println(StringUtility.repeatString("-", 90));
+        System.out.println("Total Treatments: " + treatmentsArray.length);
+        System.out.println(StringUtility.repeatString("=", 90));
+    }
+
+    public void updatePrescription() {
+        System.out.println("\n" + StringUtility.repeatString("=", 90));
+        System.out.println("        UPDATE PRESCRIPTION");
+        System.out.println(StringUtility.repeatString("=", 90));
+
+        System.out.println("CURRENT PRESCRIPTION LIST:");
+        System.out.println(StringUtility.repeatString("-", 90));
+        System.out.printf("%-15s %-15s %-15s %-25s %-15s\n", "Prescription ID", "Patient ID", "Doctor ID", "Diagnosis", "Status");
+        System.out.println(StringUtility.repeatString("-", 90));
+
+        Object[] prescriptionsArray = prescriptionList.toArray(); //adt method
+        for (Object obj : prescriptionsArray) {
+            Prescription prescription = (Prescription) obj;
+            System.out.printf("%-15s %-15s %-15s %-25s %-15s\n",
+                prescription.getPrescriptionId(),
+                prescription.getPatientId(),
+                prescription.getDoctorId(),
+                prescription.getDiagnosis().length() > 23 ? prescription.getDiagnosis().substring(0, 22) + "..." : prescription.getDiagnosis(),
+                prescription.getStatus());
+        }
+        System.out.println(StringUtility.repeatString("-", 90));
+        System.out.println("Total Prescriptions: " + prescriptionsArray.length);
+        System.out.println(StringUtility.repeatString("=", 90));
+
+        System.out.print("Enter prescription ID to update (or press Enter to cancel): ");
+        String prescriptionId = scanner.nextLine().trim();
+
+        if (prescriptionId.isEmpty()) {
+            System.out.println("Operation cancelled.");
+            return;
+        }
+
+        Prescription prescription = findPrescriptionById(prescriptionId);
+        if (prescription != null) {
+            System.out.println("Current prescription information:");
+            displayPrescriptionDetails(prescription);
+
+            System.out.println("\nEnter new information (press Enter to keep current value):");
+
+            //update status
+            System.out.print("Status [" + prescription.getStatus() + "] (active/dispensed/cancelled): ");
+            String status = scanner.nextLine().trim();
+            if (!status.isEmpty()) {
+                if (status.equalsIgnoreCase("active") || status.equalsIgnoreCase("dispensed") || status.equalsIgnoreCase("cancelled")) {
+                    prescription.setStatus(status);
+                    System.out.println("[OK] Status updated successfully!");
+                } else {
+                    System.out.println("[WARNING] Invalid status. Status not updated.");
+                }
+            }
+
+            //update diagnosis
+            System.out.print("Diagnosis [" + prescription.getDiagnosis() + "]: ");
+            String diagnosis = scanner.nextLine().trim();
+            if (!diagnosis.isEmpty()) {
+                prescription.setDiagnosis(diagnosis);
+                System.out.println("[OK] Diagnosis updated successfully!");
+            }
+
+            //update prescribed medicines
+            System.out.println("\nCurrent prescribed medicines:");
+            Object[] prescribedMedicinesArray = prescription.getPrescribedMedicines().toArray(); //adt method
+            if (prescribedMedicinesArray.length > 0) {
+                for (int i = 0; i < prescribedMedicinesArray.length; i++) {
+                    PrescribedMedicine pm = (PrescribedMedicine) prescribedMedicinesArray[i];
+                    System.out.println((i + 1) + ". " + pm.getMedicineName() + " - Quantity: " + pm.getQuantity() + " - Dosage: " + pm.getDosage());
+                }
+
+                System.out.print("\nDo you want to modify prescribed medicines? (yes/no): ");
+                String modifyChoice = scanner.nextLine().trim();
+
+                if (modifyChoice.equalsIgnoreCase("yes")) {
+                    System.out.println("\nOptions:");
+                    System.out.println("1. Add new medicine");
+                    System.out.println("2. Remove existing medicine");
+                    System.out.println("3. Update medicine quantity/dosage");
+                    System.out.print("Enter your choice (1-3 or press Enter to skip): ");
+                    String choice = scanner.nextLine().trim();
+
+                    if (!choice.isEmpty()) {
+                        switch (choice) {
+                            case "1":
+                                addMedicineToPrescription(prescription);
+                                break;
+                            case "2":
+                                removeMedicineFromPrescription(prescription);
+                                break;
+                            case "3":
+                                updateMedicineInPrescription(prescription);
+                                break;
+                            default:
+                                System.out.println("Invalid choice. Skipping medicine modification.");
+                        }
+                    }
+                }
+            } else {
+                System.out.println("No medicines currently prescribed.");
+                System.out.print("Do you want to add medicines to this prescription? (yes/no): ");
+                String addChoice = scanner.nextLine().trim();
+                if (addChoice.equalsIgnoreCase("yes")) {
+                    addMedicineToPrescription(prescription);
+                }
+            }
+
+            System.out.println("\n[OK] Prescription information updated successfully!");
+            System.out.println("\nUpdated prescription information:");
+            displayPrescriptionDetails(prescription);
+        } else {
+            System.out.println("[ERROR] Prescription not found!");
+        }
+    }
+
+    private void addMedicineToPrescription(Prescription prescription) {
+        System.out.println("\nAvailable medicines:");
+        displayAvailableMedicines();
+
+        System.out.print("Enter medicine ID to add (or press Enter to cancel): ");
+        String medicineId = scanner.nextLine().trim();
+
+        if (medicineId.isEmpty()) {
+            System.out.println("Operation cancelled.");
+            return;
+        }
+
+        Medicine medicine = findMedicineById(medicineId);
+        if (medicine != null) {
+            Integer quantity = InputValidator.getValidIntAllowCancel(scanner, 1, 100, "Enter quantity (or press Enter to cancel)");
+            if (quantity == null) {
+                System.out.println("Operation cancelled.");
+                return;
+            }
+
+            String dosage = InputValidator.getValidStringAllowCancel(scanner, "Enter dosage instructions (or press Enter to cancel)");
+            if (dosage == null) {
+                System.out.println("Operation cancelled.");
+                return;
+            }
+
+            String prescribedMedicineId = "PM" + String.format("%04d", prescribedMedicineIdCounter++);
+            double totalPrice = medicine.getPrice() * quantity;
+
+            PrescribedMedicine prescribedMedicine = new PrescribedMedicine(
+                prescribedMedicineId,
+                prescription.getPrescriptionId(),
+                medicine.getMedicineId(),
+                medicine.getName(),
+                quantity,
+                dosage,
+                "",
+                medicine.getPrice(),
+                totalPrice,
+                false
+            );
+
+            prescription.getPrescribedMedicines().add(prescribedMedicine); //adt method
+            prescription.setTotalCost(prescription.getTotalCost() + totalPrice);
+
+            System.out.println("[OK] Medicine added to prescription successfully!");
+        } else {
+            System.out.println("[ERROR] Medicine not found!");
+        }
+    }
+
+    private void removeMedicineFromPrescription(Prescription prescription) {
+        Object[] prescribedMedicinesArray = prescription.getPrescribedMedicines().toArray(); //adt method
+        if (prescribedMedicinesArray.length == 0) {
+            System.out.println("No medicines to remove.");
+            return;
+        }
+
+        System.out.println("\nCurrent prescribed medicines:");
+        for (int i = 0; i < prescribedMedicinesArray.length; i++) {
+            PrescribedMedicine pm = (PrescribedMedicine) prescribedMedicinesArray[i];
+            System.out.println((i + 1) + ". " + pm.getMedicineName() + " - Quantity: " + pm.getQuantity() + " - Total: RM" + String.format("%.2f", pm.getTotalPrice()));
+        }
+
+        Integer choice = InputValidator.getValidIntAllowCancel(scanner, 1, prescribedMedicinesArray.length, "Enter medicine number to remove");
+        if (choice == null) {
+            System.out.println("Operation cancelled.");
+            return;
+        }
+
+        PrescribedMedicine toRemove = (PrescribedMedicine) prescribedMedicinesArray[choice - 1];
+        prescription.getPrescribedMedicines().remove(toRemove); //adt method
+        prescription.setTotalCost(prescription.getTotalCost() - toRemove.getTotalPrice());
+
+        System.out.println("[OK] Medicine removed from prescription successfully!");
+    }
+
+    private void updateMedicineInPrescription(Prescription prescription) {
+        Object[] prescribedMedicinesArray = prescription.getPrescribedMedicines().toArray(); //adt method
+        if (prescribedMedicinesArray.length == 0) {
+            System.out.println("No medicines to update.");
+            return;
+        }
+
+        System.out.println("\nCurrent prescribed medicines:");
+        for (int i = 0; i < prescribedMedicinesArray.length; i++) {
+            PrescribedMedicine pm = (PrescribedMedicine) prescribedMedicinesArray[i];
+            System.out.println((i + 1) + ". " + pm.getMedicineName() + " - Quantity: " + pm.getQuantity() + " - Dosage: " + pm.getDosage());
+        }
+
+        Integer choice = InputValidator.getValidIntAllowCancel(scanner, 1, prescribedMedicinesArray.length, "Enter medicine number to update (or press Enter to cancel)");
+        if (choice == null) {
+            System.out.println("Operation cancelled.");
+            return;
+        }
+
+        PrescribedMedicine toUpdate = (PrescribedMedicine) prescribedMedicinesArray[choice - 1];
+
+        System.out.println("\nUpdating: " + toUpdate.getMedicineName());
+        System.out.print("New quantity [" + toUpdate.getQuantity() + "] (or press Enter to keep current): ");
+        String quantityStr = scanner.nextLine().trim();
+
+        if (!quantityStr.isEmpty()) {
+            try {
+                int newQuantity = Integer.parseInt(quantityStr);
+                if (newQuantity > 0 && newQuantity <= 100) {
+                    //update total cost
+                    prescription.setTotalCost(prescription.getTotalCost() - toUpdate.getTotalPrice());
+                    toUpdate.setQuantity(newQuantity);
+                    toUpdate.setTotalPrice(toUpdate.getUnitPrice() * newQuantity);
+                    prescription.setTotalCost(prescription.getTotalCost() + toUpdate.getTotalPrice());
+                    System.out.println("[OK] Quantity updated successfully!");
+                } else {
+                    System.out.println("[WARNING] Invalid quantity. Quantity not updated.");
+                }
+            } catch (NumberFormatException e) {
+                System.out.println("[WARNING] Invalid quantity format. Quantity not updated.");
+            }
+        }
+
+        System.out.print("New dosage [" + toUpdate.getDosage() + "] (or press Enter to keep current): ");
+        String newDosage = scanner.nextLine().trim();
+        if (!newDosage.isEmpty()) {
+            toUpdate.setDosage(newDosage);
+            System.out.println("[OK] Dosage updated successfully!");
+        }
+    }
+
+    public void updateTreatment() {
+        System.out.println("\n" + StringUtility.repeatString("=", 90));
+        System.out.println("        UPDATE TREATMENT");
+        System.out.println(StringUtility.repeatString("=", 90));
+
+        System.out.println("CURRENT TREATMENT LIST:");
+        System.out.println(StringUtility.repeatString("-", 90));
+        System.out.printf("%-15s %-20s %-20s %-25s %-15s\n", "Treatment ID", "Patient ID", "Doctor ID", "Diagnosis", "Date");
+        System.out.println(StringUtility.repeatString("-", 90));
+
+        Object[] treatmentsArray = treatmentList.toArray(); //adt method
+        for (Object obj : treatmentsArray) {
+            Treatment treatment = (Treatment) obj;
+            System.out.printf("%-15s %-20s %-20s %-25s %-15s\n",
+                treatment.getTreatmentId(),
+                treatment.getPatientId(),
+                treatment.getDoctorId(),
+                treatment.getDiagnosis().length() > 23 ? treatment.getDiagnosis().substring(0, 22) + "..." : treatment.getDiagnosis(),
+                treatment.getTreatmentDate());
+        }
+        System.out.println(StringUtility.repeatString("-", 90));
+        System.out.println("Total Treatments: " + treatmentsArray.length);
+        System.out.println(StringUtility.repeatString("=", 90));
+
+        System.out.print("Enter treatment ID to update (or press Enter to cancel): ");
+        String treatmentId = scanner.nextLine().trim();
+
+        if (treatmentId.isEmpty()) {
+            System.out.println("Operation cancelled.");
+            return;
+        }
+
+        Treatment treatment = findTreatmentById(treatmentId);
+        if (treatment != null) {
+            System.out.println("Current treatment information:");
+            displayTreatmentDetails(treatment);
+
+            System.out.println("\nEnter new information (press Enter to keep current value):");
+
+            //update diagnosis
+            System.out.print("Diagnosis [" + treatment.getDiagnosis() + "]: ");
+            String diagnosis = scanner.nextLine().trim();
+            if (!diagnosis.isEmpty()) {
+                treatment.setDiagnosis(diagnosis);
+                System.out.println("[OK] Diagnosis updated successfully!");
+            }
+
+            System.out.println("\n[OK] Treatment information updated successfully!");
+            System.out.println("\nUpdated treatment information:");
+            displayTreatmentDetails(treatment);
+        } else {
+            System.out.println("[ERROR] Treatment not found!");
+        }
+    }
+
+    private Treatment findTreatmentById(String treatmentId) {
+        Object[] treatmentsArray = treatmentList.toArray(); //adt method
+        for (Object obj : treatmentsArray) {
+            Treatment treatment = (Treatment) obj;
+            if (treatment.getTreatmentId().equals(treatmentId)) {
+                return treatment;
+            }
+        }
+        return null;
+    }
+
+    private void displayTreatmentDetails(Treatment treatment) {
+        System.out.println("\n" + StringUtility.repeatString("-", 60));
+        System.out.println("TREATMENT DETAILS");
+        System.out.println(StringUtility.repeatString("-", 60));
+        System.out.println("Treatment ID: " + treatment.getTreatmentId());
+        System.out.println("Patient ID: " + treatment.getPatientId());
+        System.out.println("Doctor ID: " + treatment.getDoctorId());
+        System.out.println("Diagnosis: " + treatment.getDiagnosis());
+        System.out.println("Treatment Date: " + treatment.getTreatmentDate());
+        System.out.println("Note: Prescribed medications are managed through prescriptions.");
+        System.out.println(StringUtility.repeatString("-", 60));
     }
 }

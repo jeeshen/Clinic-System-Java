@@ -28,17 +28,20 @@ public class DoctorManagement {
     }
     
     private void loadSampleData() {
-        Doctor[] sampleDoctors = DataInitializer.initializeSampleDoctors();
-        for (Doctor doctor : sampleDoctors) {
+        SetAndQueueInterface<Doctor> sampleDoctors = DataInitializer.initializeSampleDoctors();
+        Object[] sampleDoctorsArray = sampleDoctors.toArray();
+        for (Object obj : sampleDoctorsArray) {
+            Doctor doctor = (Doctor) obj;
             doctorList.add(doctor); //adt method
             if (doctor.isIsAvailable() && !doctor.isOnLeave()) {
                 onDutyDoctorList.add(doctor); //adt method
             }
         }
 
-        if (sampleDoctors.length > 0) {
+        if (sampleDoctors.size() > 0) {
             int maxId = 0;
-            for (Doctor doctor : sampleDoctors) {
+            for (Object obj : sampleDoctorsArray) {
+                Doctor doctor = (Doctor) obj;
                 String doctorId = doctor.getDoctorId();
                 if (doctorId.startsWith("DOC")) {
                     try {
@@ -47,7 +50,7 @@ public class DoctorManagement {
                             maxId = idNumber;
                         }
                     } catch (NumberFormatException e) {
-                        // Skip invalid IDs
+                        //skip invalid IDs
                     }
                 }
             }
@@ -143,7 +146,7 @@ public class DoctorManagement {
         if (doctor != null && onDutyDoctorList.contains(doctor)) { //adt method
             onDutyDoctorList.remove(doctor); //adt method
             
-            // Sort the remaining doctors on duty to maintain proper order
+            //sort the remaining doctors on duty to maintain proper order
             if (onDutyDoctorList.size() > 1) {
                 Object[] remainingDoctors = onDutyDoctorList.toArray();
                 SetAndQueueInterface<Doctor> tempList = new SetQueueArray<>();
@@ -152,7 +155,7 @@ public class DoctorManagement {
                 }
                 tempList.sort(); //adt method
                 
-                // Clear and re-add sorted doctors
+                //clear and re-add sorted doctors
                 onDutyDoctorList.clearSet(); //adt method
                 Object[] sortedDoctors = tempList.toArray();
                 for (Object obj : sortedDoctors) {
@@ -297,7 +300,11 @@ public class DoctorManagement {
         System.out.println("Duty Schedule: " + doctor.getDutySchedule());
         System.out.println("On Leave: " + (doctor.isOnLeave() ? "Yes" : "No"));
         if (doctor.isOnLeave()) {
-            System.out.println("Leave Period: " + doctor.getLeaveDateStart() + " to " + doctor.getLeaveDateEnd());
+            String start = doctor.getLeaveDateStart();
+            String end = doctor.getLeaveDateEnd();
+            if (start != null && !start.isEmpty() && end != null && !end.isEmpty()) {
+                System.out.println("Leave Period: " + start + " to " + end);
+            }
         }
         System.out.println(StringUtility.repeatString("-", 60));
         System.out.println("Press Enter to continue...");
@@ -1111,14 +1118,13 @@ public class DoctorManagement {
         }
         
         Object[] treatmentsArray = doctor.getTreatments().toArray();
-        String[] headers = {"Treatment ID", "Patient ID", "Diagnosis", "Medications", "Date"};
+        String[] headers = {"Treatment ID", "Patient ID", "Diagnosis", "Date"};
         Object[][] rows = new Object[treatmentsArray.length][headers.length];
         for (int i = 0; i < treatmentsArray.length; i++) {
             Treatment treatment = (Treatment) treatmentsArray[i];
             rows[i][0] = treatment.getTreatmentId();
             rows[i][1] = treatment.getPatientId();
             rows[i][2] = treatment.getDiagnosis();
-            rows[i][3] = treatment.getPrescribedMedications();
             rows[i][4] = treatment.getTreatmentDate();
         }
         System.out.print(StringUtility.formatTableNoDividers(

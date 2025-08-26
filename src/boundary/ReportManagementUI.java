@@ -65,7 +65,7 @@ public class ReportManagementUI {
             int choice = getUserInputInt(0, 12);
             
             switch (choice) {
-                // Patient Reports
+                //patient Reports
                 case 1:
                     if (patientManagement != null) {
                         patientManagement.generatePatientDemographicsAndDiseaseAnalysisReport();
@@ -81,7 +81,7 @@ public class ReportManagementUI {
                     }
                     break;
                     
-                // Doctor Reports
+                //doctor Reports
                 case 3:
                     if (doctorManagement != null) {
                         doctorManagement.generateDoctorPerformanceAndWorkloadReport();
@@ -97,7 +97,7 @@ public class ReportManagementUI {
                     }
                     break;
                     
-                // Consultation Reports
+                //consultation Reports
                 case 5:
                     if (consultationManagement != null) {
                         consultationManagement.generateConsultationVolumeAndTrendsReport();
@@ -113,7 +113,7 @@ public class ReportManagementUI {
                     }
                     break;
                     
-                // Treatment Reports
+                //treatment Reports
                 case 7:
                     if (treatmentManagement != null) {
                         treatmentManagement.generatePatientMedicineAdherenceReport();
@@ -129,7 +129,7 @@ public class ReportManagementUI {
                     }
                     break;
                     
-                // Pharmacy Reports
+                //pharmacy Reports
                 case 9:
                     if (pharmacyManagement != null) {
                         pharmacyManagement.generatePharmacyInventoryAndUsageReport();
