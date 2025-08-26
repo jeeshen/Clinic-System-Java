@@ -113,9 +113,15 @@ public class ConsultationManagement {
             Doctor doctor = doctorsArray[i];
             System.out.println((i + 1) + ". " + doctor.getName() + " (" + doctor.getSpecialization() + ")");
         }
-        
-        System.out.print("Select doctor (1-" + doctorsArray.length + "): ");
-        int doctorChoice = getUserInputInt(1, doctorsArray.length);
+
+        System.out.print("Select doctor (1-" + doctorsArray.length + " or 0 to cancel): ");
+        int doctorChoice = getUserInputIntWithCancel(1, doctorsArray.length);
+
+        if (doctorChoice == 0) {
+            System.out.println("Consultation cancelled.");
+            return;
+        }
+
         Doctor selectedDoctor = doctorsArray[doctorChoice - 1];
         
         //get next patient from queue
@@ -810,12 +816,34 @@ public class ConsultationManagement {
             }
             input = scanner.nextInt();
             scanner.nextLine();
-            
+
             if (input < min || input > max) {
                 System.out.print("Please enter a number between " + min + " and " + max + ": ");
             }
         } while (input < min || input > max);
-        
+
+        return input;
+    }
+
+    private int getUserInputIntWithCancel(int min, int max) {
+        int input;
+        do {
+            while (!scanner.hasNextInt()) {
+                System.out.print("Invalid input! Please enter a number between " + min + " and " + max + " (or 0 to cancel): ");
+                scanner.next();
+            }
+            input = scanner.nextInt();
+            scanner.nextLine();
+
+            if (input == 0) {
+                return 0; // Return 0 for cancellation
+            }
+
+            if (input < min || input > max) {
+                System.out.print("Please enter a number between " + min + " and " + max + " (or 0 to cancel): ");
+            }
+        } while (input < min || input > max);
+
         return input;
     }
 
