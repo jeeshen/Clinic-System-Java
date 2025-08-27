@@ -127,7 +127,7 @@ public class TreatmentManagement {
                 int patientId = Integer.parseInt(prescription.getPatientId());
                 Patient patient = patientManagement.findPatientById(patientId);
                 if (patient != null) {
-                    patient.getPrescriptions().add(prescription);
+                    patient.getPrescriptions().add(prescription); //adt method
                 }
             } catch (NumberFormatException e) {
                 System.out.println("Error parsing patient ID: " + prescription.getPatientId());
@@ -135,7 +135,7 @@ public class TreatmentManagement {
             
             Doctor doctor = doctorManagement.findDoctorById(prescription.getDoctorId());
             if (doctor != null) {
-                doctor.getPrescriptions().add(prescription);
+                doctor.getPrescriptions().add(prescription); //adt method
             }
         }
         
@@ -146,7 +146,7 @@ public class TreatmentManagement {
                 int patientId = Integer.parseInt(treatment.getPatientId());
                 Patient patient = patientManagement.findPatientById(patientId);
                 if (patient != null) {
-                    patient.getTreatments().add(treatment);
+                    patient.getTreatments().add(treatment); //adt method
                 }
             } catch (NumberFormatException e) {
                 System.out.println("Error parsing patient ID: " + treatment.getPatientId());
@@ -154,7 +154,7 @@ public class TreatmentManagement {
 
             Doctor doctor = doctorManagement.findDoctorById(treatment.getDoctorId());
             if (doctor != null) {
-                doctor.getTreatments().add(treatment);
+                doctor.getTreatments().add(treatment); //adt method
             }
         }
         
@@ -165,7 +165,7 @@ public class TreatmentManagement {
                 int patientId = Integer.parseInt(transaction.getPatientId());
                 Patient patient = patientManagement.findPatientById(patientId);
                 if (patient != null) {
-                    patient.getPharmacyTransactions().add(transaction);
+                    patient.getPharmacyTransactions().add(transaction); //adt method
                 }
             } catch (NumberFormatException e) {
                 System.out.println("Error parsing patient ID: " + transaction.getPatientId());

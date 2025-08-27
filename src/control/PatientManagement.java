@@ -32,14 +32,14 @@ public class PatientManagement {
     
     private void loadSampleData() {
         SetAndQueueInterface<Patient> samplePatients = DataInitializer.initializeSamplePatients();
-        Object[] samplePatientsArray = samplePatients.toArray();
+        Object[] samplePatientsArray = samplePatients.toArray(); //adt method
         for (Object obj : samplePatientsArray) {
             Patient patient = (Patient) obj;
             patient.setStatus("Active");
             patientList.add(patient); //adt method
         }
         
-        if (samplePatients.size() > 0) {
+        if (samplePatients.size() > 0) { //adt method
             int maxId = 0;
             for (Object obj : samplePatientsArray) {
                 Patient patient = (Patient) obj;
@@ -124,7 +124,7 @@ public class PatientManagement {
         Patient selectedPatient = findPatientById(patientId);
         if (selectedPatient != null) {
             boolean alreadyInQueue = false;
-            Object[] queueArray = waitingPatientList.toQueueArray();
+            Object[] queueArray = waitingPatientList.toQueueArray(); //adt method
             
             for (Object obj : queueArray) {
                 Patient queuePatient = (Patient) obj;
@@ -147,7 +147,7 @@ public class PatientManagement {
     }
     
     public void displayWaitingQueue() {
-        Object[] queueArray = waitingPatientList.toQueueArray();
+        Object[] queueArray = waitingPatientList.toQueueArray(); //adt method
         String[] headers = {"ID", "Name", "Age", "Gender", "Contact"};
         Object[][] rows = new Object[queueArray.length][headers.length];
         for (int i = 0; i < queueArray.length; i++) {
@@ -212,7 +212,7 @@ public class PatientManagement {
         if (patient != null) {
             boolean foundInQueue = false;
             SetAndQueueInterface<Patient> newQueue = new SetQueueArray<>();
-            Object[] queueArray = waitingPatientList.toQueueArray();
+            Object[] queueArray = waitingPatientList.toQueueArray(); //adt method
             
             for (Object obj : queueArray) {
                 Patient queuePatient = (Patient) obj;
@@ -236,7 +236,7 @@ public class PatientManagement {
     }
     
     public void clearPatientQueue() {
-        if (waitingPatientList.isQueueEmpty()) {
+        if (waitingPatientList.isQueueEmpty()) { //adt method
             System.out.println("No patients in waiting queue to clear.");
             return;
         }
@@ -257,12 +257,12 @@ public class PatientManagement {
     }
     
     public void viewNextPatientInQueue() {
-        if (waitingPatientList.isQueueEmpty()) {
+        if (waitingPatientList.isQueueEmpty()) { //adt method
             System.out.println("No patients in waiting queue.");
             return;
         }
         
-        Patient nextPatient = waitingPatientList.getFront();
+        Patient nextPatient = waitingPatientList.getFront(); //adt method
         if (nextPatient != null) {
             System.out.println("\n" + StringUtility.repeatString("-", 60));
             System.out.println("NEXT PATIENT IN QUEUE");

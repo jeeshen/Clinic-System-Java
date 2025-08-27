@@ -83,7 +83,7 @@ public class ConsultationManagement {
                 int patientId = Integer.parseInt(consultation.getPatientId());
                 Patient patient = patientManagement.findPatientById(patientId);
                 if (patient != null) {
-                    patient.getConsultations().add(consultation);
+                    patient.getConsultations().add(consultation); //adt method
                 }
             } catch (NumberFormatException e) {
                 System.out.println("Error parsing patient ID: " + consultation.getPatientId());
@@ -91,7 +91,7 @@ public class ConsultationManagement {
             
             Doctor doctor = doctorManagement.findDoctorById(consultation.getDoctorId());
             if (doctor != null) {
-                doctor.getConsultations().add(consultation);
+                doctor.getConsultations().add(consultation); //adt method
             }
         }
     }
@@ -157,12 +157,12 @@ public class ConsultationManagement {
         
         Patient patient = patientManagement.findPatientById(currentPatient.getId());
         if (patient != null) {
-            patient.getConsultations().add(consultation);
+            patient.getConsultations().add(consultation); //adt method
         }
         
         Doctor doctor = doctorManagement.findDoctorById(selectedDoctor.getDoctorId());
         if (doctor != null) {
-            doctor.getConsultations().add(consultation);
+            doctor.getConsultations().add(consultation); //adt method
         }
         
         //create prescription through treatment management
