@@ -1590,11 +1590,7 @@ public class PharmacyManagement {
         }
 
         String barColor = "\u001B[42m"; //green background
-
-        int increment = 50;
-        int maxLevel = ((maxUsage / increment) + 1) * increment; //round up to next 50
-        
-        for (int level = maxLevel; level > 0; level -= increment) {
+        for (int level = maxUsage; level > 0; level--) {
             System.out.printf("%3d |", level);
             for (int i = 0; i < numMedicines; i++) {
                 if (medicineUsageCounts[i] >= level) {
