@@ -11,6 +11,7 @@ import java.util.Scanner;
 import utility.StringUtility;
 import utility.InputValidator;
 
+//leow wei lun
 public class DoctorManagement {
     private SetAndQueueInterface<Doctor> doctorList = new SetQueueArray<>();
     private SetAndQueueInterface<Doctor> onDutyDoctorList = new SetQueueArray<>();

@@ -13,6 +13,7 @@ import entity.Treatment;
 import entity.Prescription;
 import utility.StringUtility;
 
+//chong jian sheng
 public class PatientManagement {
     private SetAndQueueInterface<Patient> patientList = new SetQueueArray<>();
     private SetAndQueueInterface<Patient> waitingPatientList = new SetQueueArray<>();

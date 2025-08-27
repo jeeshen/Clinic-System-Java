@@ -10,6 +10,7 @@ import utility.StringUtility;
 import java.util.Scanner;
 import utility.InputValidator;
 
+//chan jee shen
 public class PharmacyManagement {
     private SetAndQueueInterface<Medicine> medicineList = new SetQueueArray<>();
     private Scanner scanner;

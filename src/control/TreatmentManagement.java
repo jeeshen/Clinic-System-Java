@@ -14,6 +14,7 @@ import java.util.Scanner;
 import utility.StringUtility;
 import utility.InputValidator;
 
+//edward long wai pin
 public class TreatmentManagement {
     private SetAndQueueInterface<Prescription> prescriptionList = new SetQueueArray<>();
     private SetAndQueueInterface<Treatment> treatmentList = new SetQueueArray<>();

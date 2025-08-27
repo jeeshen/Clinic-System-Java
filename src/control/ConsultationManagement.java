@@ -12,6 +12,7 @@ import java.time.format.DateTimeFormatter;
 import java.util.Scanner;
 import utility.InputValidator;
 
+//tew jun xiang
 public class ConsultationManagement {
     private SetAndQueueInterface<Consultation> consultationList = new SetQueueArray<>();
     private Scanner scanner;
@@ -878,24 +879,6 @@ public class ConsultationManagement {
 
     public Object[] getAllConsultations() {
         return consultationList.toArray(); //adt method
-    }
-    
-    private int getUserInputInt(int min, int max) {
-        int input;
-        do {
-            while (!scanner.hasNextInt()) {
-                System.out.print("Invalid input! Please enter a number between " + min + " and " + max + ": ");
-                scanner.next();
-            }
-            input = scanner.nextInt();
-            scanner.nextLine();
-
-            if (input < min || input > max) {
-                System.out.print("Please enter a number between " + min + " and " + max + ": ");
-            }
-        } while (input < min || input > max);
-
-        return input;
     }
 
     private int getUserInputIntWithCancel(int min, int max) {
