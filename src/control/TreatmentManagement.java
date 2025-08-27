@@ -1196,12 +1196,22 @@ public class TreatmentManagement {
             }
 
             //update prescribed medicines
-            System.out.println("\nCurrent prescribed medicines:");
+            System.out.println("\nCurrent prescribed medicines (not dispensed only):");
             Object[] prescribedMedicinesArray = prescription.getPrescribedMedicines().toArray(); //adt method
-            if (prescribedMedicinesArray.length > 0) {
-                for (int i = 0; i < prescribedMedicinesArray.length; i++) {
-                    PrescribedMedicine pm = (PrescribedMedicine) prescribedMedicinesArray[i];
-                    System.out.println((i + 1) + ". " + pm.getMedicineName() + " - Quantity: " + pm.getQuantity() + " - Dosage: " + pm.getDosage());
+
+            //filter out dispensed medicines - only show non-dispensed medicines for modification
+            java.util.List<PrescribedMedicine> nonDispensedMedicines = new java.util.ArrayList<>();
+            for (Object obj : prescribedMedicinesArray) {
+                PrescribedMedicine pm = (PrescribedMedicine) obj;
+                if (!pm.isDispensed()) {
+                    nonDispensedMedicines.add(pm);
+                }
+            }
+
+            if (nonDispensedMedicines.size() > 0) {
+                for (int i = 0; i < nonDispensedMedicines.size(); i++) {
+                    PrescribedMedicine pm = nonDispensedMedicines.get(i);
+                    System.out.println((i + 1) + ". " + pm.getMedicineName() + " - Quantity: " + pm.getQuantity() + " - Dosage: " + pm.getDosage() + " [Not Dispensed]");
                 }
 
                 System.out.print("\nDo you want to modify prescribed medicines? (yes/no): ");
@@ -1210,8 +1220,8 @@ public class TreatmentManagement {
                 if (modifyChoice.equalsIgnoreCase("yes")) {
                     System.out.println("\nOptions:");
                     System.out.println("1. Add new medicine");
-                    System.out.println("2. Remove existing medicine");
-                    System.out.println("3. Update medicine quantity/dosage");
+                    System.out.println("2. Remove existing medicine (not dispensed only)");
+                    System.out.println("3. Update medicine quantity/dosage (not dispensed only)");
                     System.out.print("Enter your choice (1-3 or press Enter to skip): ");
                     String choice = scanner.nextLine().trim();
 
@@ -1232,8 +1242,23 @@ public class TreatmentManagement {
                     }
                 }
             } else {
-                System.out.println("No medicines currently prescribed.");
-                System.out.print("Do you want to add medicines to this prescription? (yes/no): ");
+                // Check if all medicines are dispensed
+                boolean allDispensed = true;
+                for (Object obj : prescribedMedicinesArray) {
+                    PrescribedMedicine pm = (PrescribedMedicine) obj;
+                    if (!pm.isDispensed()) {
+                        allDispensed = false;
+                        break;
+                    }
+                }
+
+                if (allDispensed && prescribedMedicinesArray.length > 0) {
+                    System.out.println("All medicines in this prescription have been dispensed and cannot be modified.");
+                    System.out.print("Do you want to add new medicines to this prescription? (yes/no): ");
+                } else {
+                    System.out.println("No medicines currently prescribed.");
+                    System.out.print("Do you want to add medicines to this prescription? (yes/no): ");
+                }
                 String addChoice = scanner.nextLine().trim();
                 if (addChoice.equalsIgnoreCase("yes")) {
                     addMedicineToPrescription(prescription);
@@ -1301,24 +1326,35 @@ public class TreatmentManagement {
 
     private void removeMedicineFromPrescription(Prescription prescription) {
         Object[] prescribedMedicinesArray = prescription.getPrescribedMedicines().toArray(); //adt method
-        if (prescribedMedicinesArray.length == 0) {
-            System.out.println("No medicines to remove.");
+
+        // Filter out dispensed medicines - only show non-dispensed medicines for removal
+        java.util.List<PrescribedMedicine> nonDispensedMedicines = new java.util.ArrayList<>();
+        for (Object obj : prescribedMedicinesArray) {
+            PrescribedMedicine pm = (PrescribedMedicine) obj;
+            if (!pm.isDispensed()) {
+                nonDispensedMedicines.add(pm);
+            }
+        }
+
+        if (nonDispensedMedicines.size() == 0) {
+            System.out.println("No non-dispensed medicines available to remove.");
+            System.out.println("Only medicines that have not been dispensed can be removed from prescriptions.");
             return;
         }
 
-        System.out.println("\nCurrent prescribed medicines:");
-        for (int i = 0; i < prescribedMedicinesArray.length; i++) {
-            PrescribedMedicine pm = (PrescribedMedicine) prescribedMedicinesArray[i];
-            System.out.println((i + 1) + ". " + pm.getMedicineName() + " - Quantity: " + pm.getQuantity() + " - Total: RM" + String.format("%.2f", pm.getTotalPrice()));
+        System.out.println("\nNon-dispensed prescribed medicines available for removal:");
+        for (int i = 0; i < nonDispensedMedicines.size(); i++) {
+            PrescribedMedicine pm = nonDispensedMedicines.get(i);
+            System.out.println((i + 1) + ". " + pm.getMedicineName() + " - Quantity: " + pm.getQuantity() + " - Total: RM" + String.format("%.2f", pm.getTotalPrice()) + " [Not Dispensed]");
         }
 
-        Integer choice = InputValidator.getValidIntAllowCancel(scanner, 1, prescribedMedicinesArray.length, "Enter medicine number to remove");
+        Integer choice = InputValidator.getValidIntAllowCancel(scanner, 1, nonDispensedMedicines.size(), "Enter medicine number to remove");
         if (choice == null) {
             System.out.println("Operation cancelled.");
             return;
         }
 
-        PrescribedMedicine toRemove = (PrescribedMedicine) prescribedMedicinesArray[choice - 1];
+        PrescribedMedicine toRemove = nonDispensedMedicines.get(choice - 1);
         prescription.getPrescribedMedicines().remove(toRemove); //adt method
         prescription.setTotalCost(prescription.getTotalCost() - toRemove.getTotalPrice());
 
@@ -1327,24 +1363,35 @@ public class TreatmentManagement {
 
     private void updateMedicineInPrescription(Prescription prescription) {
         Object[] prescribedMedicinesArray = prescription.getPrescribedMedicines().toArray(); //adt method
-        if (prescribedMedicinesArray.length == 0) {
-            System.out.println("No medicines to update.");
+
+        // Filter out dispensed medicines - only show non-dispensed medicines for updating
+        java.util.List<PrescribedMedicine> nonDispensedMedicines = new java.util.ArrayList<>();
+        for (Object obj : prescribedMedicinesArray) {
+            PrescribedMedicine pm = (PrescribedMedicine) obj;
+            if (!pm.isDispensed()) {
+                nonDispensedMedicines.add(pm);
+            }
+        }
+
+        if (nonDispensedMedicines.size() == 0) {
+            System.out.println("No non-dispensed medicines available to update.");
+            System.out.println("Only medicines that have not been dispensed can be updated in prescriptions.");
             return;
         }
 
-        System.out.println("\nCurrent prescribed medicines:");
-        for (int i = 0; i < prescribedMedicinesArray.length; i++) {
-            PrescribedMedicine pm = (PrescribedMedicine) prescribedMedicinesArray[i];
-            System.out.println((i + 1) + ". " + pm.getMedicineName() + " - Quantity: " + pm.getQuantity() + " - Dosage: " + pm.getDosage());
+        System.out.println("\nNon-dispensed prescribed medicines available for updating:");
+        for (int i = 0; i < nonDispensedMedicines.size(); i++) {
+            PrescribedMedicine pm = nonDispensedMedicines.get(i);
+            System.out.println((i + 1) + ". " + pm.getMedicineName() + " - Quantity: " + pm.getQuantity() + " - Dosage: " + pm.getDosage() + " [Not Dispensed]");
         }
 
-        Integer choice = InputValidator.getValidIntAllowCancel(scanner, 1, prescribedMedicinesArray.length, "Enter medicine number to update");
+        Integer choice = InputValidator.getValidIntAllowCancel(scanner, 1, nonDispensedMedicines.size(), "Enter medicine number to update");
         if (choice == null) {
             System.out.println("Operation cancelled.");
             return;
         }
 
-        PrescribedMedicine toUpdate = (PrescribedMedicine) prescribedMedicinesArray[choice - 1];
+        PrescribedMedicine toUpdate = nonDispensedMedicines.get(choice - 1);
 
         System.out.println("\nUpdating: " + toUpdate.getMedicineName());
         System.out.print("New quantity [" + toUpdate.getQuantity() + "] (or press Enter to keep current): ");

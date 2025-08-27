@@ -812,9 +812,9 @@ public class PharmacyManagement {
         System.out.println("Payment Status: " + (prescription.isPaid() ? "[PAID]" : "[UNPAID]"));
 
         System.out.println("\nPrescribed Medicines:");
-        System.out.println(StringUtility.repeatString("-", 120));
-        System.out.printf("%-20s %-10s %-20s %-20s %-10s %-10s %-15s\n", "Medicine", "Quantity", "Dosage", "Instructions", "Price", "Dispensed", "Payment Status");
-        System.out.println(StringUtility.repeatString("-", 120));
+        System.out.println(StringUtility.repeatString("-", 140));
+        System.out.printf("%-20s %-10s %-20s %-40s %-10s %-10s %-15s\n", "Medicine", "Quantity", "Dosage", "Instructions", "Price", "Dispensed", "Payment Status");
+        System.out.println(StringUtility.repeatString("-", 140));
 
         Object[] prescribedMedicinesArray = prescription.getPrescribedMedicines().toArray();
         boolean allDispensed = true;
@@ -823,7 +823,7 @@ public class PharmacyManagement {
             String dosage = (pm.getDosage() == null || pm.getDosage().trim().isEmpty()) ? "-" : pm.getDosage();
             String instructions = (pm.getInstructions() == null || pm.getInstructions().trim().isEmpty()) ? "-" : pm.getInstructions();
             String paymentStatus = prescription.isPaid() ? "[PAID]" : "[UNPAID]";
-            System.out.printf("%-20s %-10s %-20s %-20s %-10s %-10s %-15s\n",
+            System.out.printf("%-20s %-10s %-20s %-40s %-10s %-10s %-15s\n",
                 pm.getMedicineName(), pm.getQuantity(), dosage,
                 instructions, "RM " + String.format("%.2f", pm.getUnitPrice()),
                 pm.isDispensed() ? "Yes" : "No", paymentStatus);
@@ -836,7 +836,7 @@ public class PharmacyManagement {
             return;
         }
 
-        System.out.println(StringUtility.repeatString("-", 120));
+        System.out.println(StringUtility.repeatString("-", 140));
         System.out.println("\nDispensing Options:");
         System.out.println("1. Dispense all undispensed medicines");
         System.out.println("2. Dispense specific medicine");
