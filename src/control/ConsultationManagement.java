@@ -503,17 +503,17 @@ public class ConsultationManagement {
         String[] diagnosisArray = new String[100];
         int diagnosisIndex = 0;
 
-        //analyze prescriptions per diagnosis
+        //analyze treatments per diagnosis
         if (treatmentManagement != null) {
-            Object[] prescriptionsArray = treatmentManagement.getAllPrescriptions();
-            for (Object prescObj : prescriptionsArray) {
-                entity.Prescription prescription = (entity.Prescription) prescObj;
-                String diagnosis = prescription.getDiagnosis();
-                
+            Object[] treatmentsArray = treatmentManagement.getTreatmentList().toArray();
+            for (Object treatObj : treatmentsArray) {
+                entity.Treatment treatment = (entity.Treatment) treatObj;
+                String diagnosis = treatment.getDiagnosis();
+
                 if (diagnosis != null && !diagnosis.trim().isEmpty()) {
                     uniqueDiagnoses.add(diagnosis);
 
-                    //count prescriptions per diagnosis
+                    //count treatments per diagnosis
                     boolean diagnosisFound = false;
                     for (int i = 0; i < diagnosisIndex; i++) {
                         if (diagnosisArray[i].equals(diagnosis)) {
@@ -655,10 +655,10 @@ public class ConsultationManagement {
             //analyze diagnosis data from TreatmentManagement
             SetAndQueueInterface<String> uniqueDiagnoses = new SetQueueArray<>();
 
-            Object[] prescriptionsArray = treatmentManagement.getAllPrescriptions();
-            for (Object prescObj : prescriptionsArray) {
-                entity.Prescription prescription = (entity.Prescription) prescObj;
-                String diagnosis = prescription.getDiagnosis();
+            Object[] treatmentsArray = treatmentManagement.getTreatmentList().toArray();
+            for (Object treatObj : treatmentsArray) {
+                entity.Treatment treatment = (entity.Treatment) treatObj;
+                String diagnosis = treatment.getDiagnosis();
                 if (diagnosis != null && !diagnosis.trim().isEmpty()) {
                     uniqueDiagnoses.add(diagnosis);
 
@@ -724,12 +724,12 @@ public class ConsultationManagement {
 
         //analyze actual patient-diagnosis data
         if (treatmentManagement != null) {
-            Object[] prescriptionsArray = treatmentManagement.getAllPrescriptions();
-            for (Object prescObj : prescriptionsArray) {
-                entity.Prescription prescription = (entity.Prescription) prescObj;
-                String diagnosis = prescription.getDiagnosis();
-                String patientId = prescription.getPatientId();
-                
+            Object[] treatmentsArray = treatmentManagement.getTreatmentList().toArray();
+            for (Object treatObj : treatmentsArray) {
+                entity.Treatment treatment = (entity.Treatment) treatObj;
+                String diagnosis = treatment.getDiagnosis();
+                String patientId = treatment.getPatientId();
+
                 if (diagnosis != null && !diagnosis.trim().isEmpty() && patientId != null) {
                     //find which disease this is
                     for (int i = 0; i < Math.min(diagnosisIndex, 5); i++) {

@@ -1261,7 +1261,7 @@ public class TreatmentManagement {
 
         Medicine medicine = findMedicineById(medicineId);
         if (medicine != null) {
-            Integer quantity = InputValidator.getValidIntAllowCancel(scanner, 1, 100, "Enter quantity (or press Enter to cancel)");
+            Integer quantity = InputValidator.getValidIntAllowCancel(scanner, 1, 100, "Enter quantity");
             if (quantity == null) {
                 System.out.println("Operation cancelled.");
                 return;
@@ -1337,7 +1337,7 @@ public class TreatmentManagement {
             System.out.println((i + 1) + ". " + pm.getMedicineName() + " - Quantity: " + pm.getQuantity() + " - Dosage: " + pm.getDosage());
         }
 
-        Integer choice = InputValidator.getValidIntAllowCancel(scanner, 1, prescribedMedicinesArray.length, "Enter medicine number to update (or press Enter to cancel)");
+        Integer choice = InputValidator.getValidIntAllowCancel(scanner, 1, prescribedMedicinesArray.length, "Enter medicine number to update");
         if (choice == null) {
             System.out.println("Operation cancelled.");
             return;

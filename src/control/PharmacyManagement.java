@@ -634,10 +634,28 @@ public class PharmacyManagement {
             }
         }
         
-        String[] headers = {"ID", "Name", "Brand", "Stock", "Price", "Category"};
-        Object[][] rows = new Object[medicinesArray.length][headers.length];
+        //sort medicines by stock quantity (descending) to show top medicines first
+        Medicine[] sortedMedicines = new Medicine[medicinesArray.length];
         for (int i = 0; i < medicinesArray.length; i++) {
-            Medicine m = (Medicine) medicinesArray[i];
+            sortedMedicines[i] = (Medicine) medicinesArray[i];
+        }
+
+        //bubble sort by stock quantity (descending)
+        for (int i = 0; i < sortedMedicines.length - 1; i++) {
+            for (int j = 0; j < sortedMedicines.length - i - 1; j++) {
+                if (sortedMedicines[j].getStockQuantity() < sortedMedicines[j + 1].getStockQuantity()) {
+                    Medicine temp = sortedMedicines[j];
+                    sortedMedicines[j] = sortedMedicines[j + 1];
+                    sortedMedicines[j + 1] = temp;
+                }
+            }
+        }
+
+        String[] headers = {"ID", "Name", "Brand", "Stock", "Price", "Category"};
+        int topMedicinesCount = Math.min(medicinesArray.length, 10); // Show top 10 medicines
+        Object[][] rows = new Object[topMedicinesCount][headers.length];
+        for (int i = 0; i < topMedicinesCount; i++) {
+            Medicine m = sortedMedicines[i];
             rows[i][0] = m.getMedicineId();
             rows[i][1] = m.getName();
             rows[i][2] = m.getBrand();
@@ -645,24 +663,23 @@ public class PharmacyManagement {
             rows[i][4] = String.format("RM %.2f", m.getPrice());
             rows[i][5] = m.getCategory();
         }
-        System.out.println("\nMEDICINE LIST:");
+        System.out.println("\nTOP 10 MEDICINES BY STOCK:");
         System.out.print(StringUtility.formatTableWithDividers(headers, rows));
 
-        System.out.println("\nSTOCK STATUS DISTRIBUTION:");
+        System.out.println("\nTOP 10 MEDICINES STOCK STATUS DISTRIBUTION:");
         int barWidth = 30;
         int maxStock = 0;
-        for (Object obj : medicinesArray) {
-            Medicine medicine = (Medicine) obj;
-            if (medicine.getStockQuantity() > maxStock) {
-                maxStock = medicine.getStockQuantity();
+        for (int i = 0; i < topMedicinesCount; i++) {
+            if (sortedMedicines[i].getStockQuantity() > maxStock) {
+                maxStock = sortedMedicines[i].getStockQuantity();
             }
         }
-        
-        for (Object obj : medicinesArray) {
-            Medicine medicine = (Medicine) obj;
+
+        for (int i = 0; i < topMedicinesCount; i++) {
+            Medicine medicine = sortedMedicines[i];
             int stock = medicine.getStockQuantity();
-            System.out.printf("%-25s [%s] %d\n", 
-                medicine.getName() + ":", 
+            System.out.printf("%-25s [%s] %d\n",
+                medicine.getName() + ":",
                 StringUtility.greenBarChart(stock, maxStock, barWidth),
                 stock);
         }
@@ -1195,10 +1212,28 @@ public class PharmacyManagement {
             }
         }
         
-        String[] headers = {"ID", "Name", "Brand", "Category", "Stock", "Price"};
-        Object[][] rows = new Object[medicinesArray.length][headers.length];
+        //sort medicines by stock quantity (descending) to show top medicines first
+        Medicine[] sortedMedicines = new Medicine[medicinesArray.length];
         for (int i = 0; i < medicinesArray.length; i++) {
-            Medicine m = (Medicine) medicinesArray[i];
+            sortedMedicines[i] = (Medicine) medicinesArray[i];
+        }
+
+        //bubble sort by stock quantity (descending)
+        for (int i = 0; i < sortedMedicines.length - 1; i++) {
+            for (int j = 0; j < sortedMedicines.length - i - 1; j++) {
+                if (sortedMedicines[j].getStockQuantity() < sortedMedicines[j + 1].getStockQuantity()) {
+                    Medicine temp = sortedMedicines[j];
+                    sortedMedicines[j] = sortedMedicines[j + 1];
+                    sortedMedicines[j + 1] = temp;
+                }
+            }
+        }
+
+        String[] headers = {"ID", "Name", "Brand", "Category", "Stock", "Price"};
+        int topMedicinesCount = Math.min(medicinesArray.length, 10); // Show top 10 medicines
+        Object[][] rows = new Object[topMedicinesCount][headers.length];
+        for (int i = 0; i < topMedicinesCount; i++) {
+            Medicine m = sortedMedicines[i];
             rows[i][0] = m.getMedicineId();
             rows[i][1] = m.getName();
             rows[i][2] = m.getBrand();
@@ -1206,26 +1241,44 @@ public class PharmacyManagement {
             rows[i][4] = m.getStockQuantity();
             rows[i][5] = String.format("RM %.2f", m.getPrice());
         }
-        System.out.println("\nMEDICINE LIST:");
+        System.out.println("\nTOP 10 MEDICINES BY STOCK:");
         System.out.print(StringUtility.formatTableWithDividers(headers, rows));
 
-        System.out.println("\nCATEGORY DISTRIBUTION:");
+        //sort categories by count (descending) to show top categories first
+        for (int i = 0; i < categoryIndex - 1; i++) {
+            for (int j = 0; j < categoryIndex - i - 1; j++) {
+                if (categoryCounts[j] < categoryCounts[j + 1]) {
+                    //swap categories
+                    String tempCategory = categoryArray[j];
+                    categoryArray[j] = categoryArray[j + 1];
+                    categoryArray[j + 1] = tempCategory;
+
+                    //swap counts
+                    int tempCount = categoryCounts[j];
+                    categoryCounts[j] = categoryCounts[j + 1];
+                    categoryCounts[j + 1] = tempCount;
+                }
+            }
+        }
+
+        System.out.println("\nTOP 5 CATEGORY DISTRIBUTION:");
         int barWidth = 30;
+        int topCategoriesCount = Math.min(categoryIndex, 5); // Show top 5 categories
         int maxCategory = 0;
-        for (int i = 0; i < categoryIndex; i++) {
+        for (int i = 0; i < topCategoriesCount; i++) {
             if (categoryCounts[i] > maxCategory) {
                 maxCategory = categoryCounts[i];
             }
         }
-        
-        for (int i = 0; i < categoryIndex; i++) {
+
+        for (int i = 0; i < topCategoriesCount; i++) {
             String category = categoryArray[i];
             int count = categoryCounts[i];
             double percentage = (double) count / medicinesArray.length * 100;
-            System.out.printf("%-25s [%s] %d medicines (%.1f%%)\n", 
-                category + ":", 
+            System.out.printf("%-25s [%s] %d medicines (%.1f%%)\n",
+                category + ":",
                 StringUtility.greenBarChart(count, maxCategory, barWidth),
-                count, 
+                count,
                 percentage);
         }
 
@@ -1260,10 +1313,30 @@ public class PharmacyManagement {
             }
         }
 
-        String[] headers = {"ID", "Name", "Stock", "Unit Price", "Total Value", "Status"};
-        Object[][] rows = new Object[medicinesArray.length][headers.length];
+        //sort medicines by total value (descending) to show top medicines first
+        Medicine[] sortedMedicines = new Medicine[medicinesArray.length];
         for (int i = 0; i < medicinesArray.length; i++) {
-            Medicine m = (Medicine) medicinesArray[i];
+            sortedMedicines[i] = (Medicine) medicinesArray[i];
+        }
+
+        //bubble sort by total value (descending)
+        for (int i = 0; i < sortedMedicines.length - 1; i++) {
+            for (int j = 0; j < sortedMedicines.length - i - 1; j++) {
+                double valueJ = sortedMedicines[j].getStockQuantity() * sortedMedicines[j].getPrice();
+                double valueJ1 = sortedMedicines[j + 1].getStockQuantity() * sortedMedicines[j + 1].getPrice();
+                if (valueJ < valueJ1) {
+                    Medicine temp = sortedMedicines[j];
+                    sortedMedicines[j] = sortedMedicines[j + 1];
+                    sortedMedicines[j + 1] = temp;
+                }
+            }
+        }
+
+        String[] headers = {"ID", "Name", "Stock", "Unit Price", "Total Value", "Status"};
+        int topMedicinesCount = Math.min(medicinesArray.length, 10); // Show top 10 medicines by value
+        Object[][] rows = new Object[topMedicinesCount][headers.length];
+        for (int i = 0; i < topMedicinesCount; i++) {
+            Medicine m = sortedMedicines[i];
             double itemValue = m.getStockQuantity() * m.getPrice();
             String status = m.getStockQuantity() <= 10 ? "LOW STOCK" : "OK";
             rows[i][0] = m.getMedicineId();
@@ -1273,25 +1346,24 @@ public class PharmacyManagement {
             rows[i][4] = String.format("RM %.2f", itemValue);
             rows[i][5] = status;
         }
-        System.out.println("\nMEDICINE LIST:");
+        System.out.println("\nTOP 10 MEDICINES BY INVENTORY VALUE:");
         System.out.print(StringUtility.formatTableWithDividers(headers, rows));
 
-        System.out.println("\nINVENTORY VALUE DISTRIBUTION:");
+        System.out.println("\nTOP 10 MEDICINES INVENTORY VALUE DISTRIBUTION:");
         int barWidth = 30;
         double maxValue = 0.0;
-        for (Object obj : medicinesArray) {
-            Medicine medicine = (Medicine) obj;
-            double itemValue = medicine.getStockQuantity() * medicine.getPrice();
+        for (int i = 0; i < topMedicinesCount; i++) {
+            double itemValue = sortedMedicines[i].getStockQuantity() * sortedMedicines[i].getPrice();
             if (itemValue > maxValue) {
                 maxValue = itemValue;
             }
         }
-        
-        for (Object obj : medicinesArray) {
-            Medicine medicine = (Medicine) obj;
+
+        for (int i = 0; i < topMedicinesCount; i++) {
+            Medicine medicine = sortedMedicines[i];
             double itemValue = medicine.getStockQuantity() * medicine.getPrice();
-            System.out.printf("%-25s [%s] RM %.2f\n", 
-                medicine.getName() + ":", 
+            System.out.printf("%-25s [%s] RM %.2f\n",
+                medicine.getName() + ":",
                 StringUtility.greenBarChart((int)(itemValue * 100), (int)(maxValue * 100), barWidth),
                 itemValue);
         }

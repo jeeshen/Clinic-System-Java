@@ -894,7 +894,7 @@ public class DoctorManagement {
         }
 
         //display specialization and consultation count table
-        System.out.println("SPECIALIZATION AND CONSULTATION COUNT TABLE");
+        System.out.println("TOP 10 SPECIALIZATIONS AND CONSULTATION COUNT TABLE");
         System.out.println(StringUtility.repeatString("-", 95));
         System.out.print("| Specialization            | Number of Doctors | Total Consultations                         |");
         System.out.println();
@@ -928,7 +928,8 @@ public class DoctorManagement {
             }
         }
 
-        for (int i = 0; i < specializationIndex; i++) {
+        int topSpecializationsCount = Math.min(specializationIndex, 10); // Show top 10 specializations
+        for (int i = 0; i < topSpecializationsCount; i++) {
             System.out.printf("| %-25s | %-17d | %-43d |%n",
                 specializationArray[i].length() > 25 ? specializationArray[i].substring(0, 25) : specializationArray[i],
                 specializationCounts[i],

@@ -658,14 +658,14 @@ public class PatientManagement {
             }
         }
 
-        //analyze diseases from patient prescriptions
+        //analyze diseases from patient treatments
         for (Object obj : patientsArray) {
             Patient patient = (Patient) obj;
             boolean isMale = patient.getGender().equalsIgnoreCase("Male");
-            Object[] prescriptionsArray = patient.getPrescriptions().toArray();
-            for (Object prescObj : prescriptionsArray) {
-                entity.Prescription prescription = (entity.Prescription) prescObj;
-                String diagnosis = prescription.getDiagnosis();
+            Object[] treatmentsArray = patient.getTreatments().toArray();
+            for (Object treatObj : treatmentsArray) {
+                entity.Treatment treatment = (entity.Treatment) treatObj;
+                String diagnosis = treatment.getDiagnosis();
                 if (diagnosis != null && !diagnosis.trim().isEmpty()) {
                     uniqueDiseases.add(diagnosis);
 
