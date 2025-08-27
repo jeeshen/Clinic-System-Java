@@ -651,8 +651,14 @@ public class ConsultationManagement {
         System.out.printf("| %-20s | %-12s | %-15s | %-15s | %-17s |%n", "Disease", "Total Cases", "Unique Patients", "Repeat Patients", "Repeat Rate");
         System.out.println(StringUtility.repeatString("-", 95));
 
-        //get diagnosis data - if not available from volume report, analyze here
-        if (diagnosisIndex == 0 && treatmentManagement != null) {
+        diagnosisIndex = 0;
+        for (int i = 0; i < diagnosisArray.length; i++) {
+            diagnosisArray[i] = null;
+            diagnosisCounts[i] = 0;
+        }
+
+        //get diagnosis data
+        if (treatmentManagement != null) {
             //analyze diagnosis data from TreatmentManagement
             SetAndQueueInterface<String> uniqueDiagnoses = new SetQueueArray<>();
 
