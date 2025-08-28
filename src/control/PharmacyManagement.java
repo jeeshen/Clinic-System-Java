@@ -28,7 +28,8 @@ public class PharmacyManagement {
     
     private void loadSampleData() {
         SetAndQueueInterface<Medicine> sampleMedicines = DataInitializer.initializeSampleMedicines();
-        for (Object obj : sampleMedicines.toArray()) {
+        Object[] sampleMedicinesArray = sampleMedicines.toArray();
+        for (Object obj : sampleMedicinesArray) {
             medicineList.add((Medicine) obj); //adt method
         }
     }

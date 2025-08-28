@@ -12,7 +12,7 @@ public interface SetAndQueueInterface<T> {
     
     public void clearSet();
     public int size();
-    public Object[] toArray(); //to translate set to array for displaying
+    public T[] toArray(); //to translate set to array for displaying
     
     public SetAndQueueInterface<T> union(SetAndQueueInterface<T> otherSet);
     public SetAndQueueInterface<T> intersection(SetAndQueueInterface<T> otherSet);
@@ -24,7 +24,7 @@ public interface SetAndQueueInterface<T> {
     public T getFront();
     public boolean isQueueEmpty();
     public void clearQueue();
-    public Object[] toQueueArray(); //to translate queue to array for displaying
+    public T[] toQueueArray(); //to translate queue to array for displaying
 
     //search and sort methods
     public T search(T target);

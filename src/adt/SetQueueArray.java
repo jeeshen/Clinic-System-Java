@@ -254,12 +254,12 @@ public class SetQueueArray<T> implements SetAndQueueInterface<T> {
     }
     
     @Override
-    public Object[] toQueueArray() {
+    public T[] toQueueArray() {
         if (isQueueEmpty()) {
-            return new Object[0];
+            return (T[]) new Object[0];
         }
         
-        Object[] result = new Object[queueSize];
+        T[] result = (T[]) new Object[queueSize];
         int currentIndex = frontIndex;
         
         for (int i = 0; i < queueSize; i++) {

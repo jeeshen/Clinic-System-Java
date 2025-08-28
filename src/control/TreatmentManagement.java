@@ -41,17 +41,20 @@ public class TreatmentManagement {
 
     private void loadSampleData() {
         SetAndQueueInterface<Medicine> sampleMedicines = DataInitializer.initializeSampleMedicines();
-        for (Object obj : sampleMedicines.toArray()) {
+        Object[] sampleMedicinesArray = sampleMedicines.toArray();
+        for (Object obj : sampleMedicinesArray) {
             medicineList.add((Medicine) obj); //adt method
         }
 
         SetAndQueueInterface<Prescription> samplePrescriptions = DataInitializer.initializeSamplePrescriptions();
-        for (Object obj : samplePrescriptions.toArray()) {
+        Object[] samplePrescriptionsArray = samplePrescriptions.toArray();
+        for (Object obj : samplePrescriptionsArray) {
             prescriptionList.add((Prescription) obj); //adt method
         }
 
         SetAndQueueInterface<Treatment> sampleTreatments = DataInitializer.initializeSampleTreatments();
-        for (Object obj : sampleTreatments.toArray()) {
+        Object[] sampleTreatmentsArray = sampleTreatments.toArray();
+        for (Object obj : sampleTreatmentsArray) {
             treatmentList.add((Treatment) obj); //adt method
         }
 
@@ -61,7 +64,7 @@ public class TreatmentManagement {
             int maxPrescribedMedicineId = 0;
             int maxTreatmentId = 0;
             
-            for (Object obj : samplePrescriptions.toArray()) {
+            for (Object obj : samplePrescriptionsArray) {
                 Prescription prescription = (Prescription) obj;
                 String prescriptionId = prescription.getPrescriptionId();
                 if (prescriptionId.startsWith("PRE")) {
@@ -93,7 +96,7 @@ public class TreatmentManagement {
                 }
             }
 
-            for (Object obj : sampleTreatments.toArray()) {
+            for (Object obj : sampleTreatmentsArray) {
                 Treatment treatment = (Treatment) obj;
                 String treatmentId = treatment.getTreatmentId();
                 if (treatmentId.startsWith("TRE")) {
@@ -159,7 +162,8 @@ public class TreatmentManagement {
         }
         
         SetAndQueueInterface<PharmacyTransaction> sampleTransactions = DataInitializer.initializeSampleTransactions();
-        for (Object obj : sampleTransactions.toArray()) {
+        Object[] sampleTransactionsArray = sampleTransactions.toArray();
+        for (Object obj : sampleTransactionsArray) {
             PharmacyTransaction transaction = (PharmacyTransaction) obj;
             try {
                 int patientId = Integer.parseInt(transaction.getPatientId());
