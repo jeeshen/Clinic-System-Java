@@ -1204,7 +1204,7 @@ public class TreatmentManagement {
             Object[] prescribedMedicinesArray = prescription.getPrescribedMedicines().toArray(); //adt method
 
             //filter out dispensed medicines - only show non-dispensed medicines for modification
-            java.util.List<PrescribedMedicine> nonDispensedMedicines = new java.util.ArrayList<>();
+            SetAndQueueInterface<PrescribedMedicine> nonDispensedMedicines = new SetQueueArray<>();
             for (Object obj : prescribedMedicinesArray) {
                 PrescribedMedicine pm = (PrescribedMedicine) obj;
                 if (!pm.isDispensed()) {
@@ -1213,8 +1213,9 @@ public class TreatmentManagement {
             }
 
             if (nonDispensedMedicines.size() > 0) {
-                for (int i = 0; i < nonDispensedMedicines.size(); i++) {
-                    PrescribedMedicine pm = nonDispensedMedicines.get(i);
+                Object[] nonDispensedArray = nonDispensedMedicines.toArray();
+                for (int i = 0; i < nonDispensedArray.length; i++) {
+                    PrescribedMedicine pm = (PrescribedMedicine) nonDispensedArray[i];
                     System.out.println((i + 1) + ". " + pm.getMedicineName() + " - Quantity: " + pm.getQuantity() + " - Dosage: " + pm.getDosage() + " [Not Dispensed]");
                 }
 
@@ -1332,7 +1333,7 @@ public class TreatmentManagement {
         Object[] prescribedMedicinesArray = prescription.getPrescribedMedicines().toArray(); //adt method
 
         // Filter out dispensed medicines - only show non-dispensed medicines for removal
-        java.util.List<PrescribedMedicine> nonDispensedMedicines = new java.util.ArrayList<>();
+        SetAndQueueInterface<PrescribedMedicine> nonDispensedMedicines = new SetQueueArray<>();
         for (Object obj : prescribedMedicinesArray) {
             PrescribedMedicine pm = (PrescribedMedicine) obj;
             if (!pm.isDispensed()) {
@@ -1347,8 +1348,9 @@ public class TreatmentManagement {
         }
 
         System.out.println("\nNon-dispensed prescribed medicines available for removal:");
-        for (int i = 0; i < nonDispensedMedicines.size(); i++) {
-            PrescribedMedicine pm = nonDispensedMedicines.get(i);
+        Object[] nonDispensedArray = nonDispensedMedicines.toArray();
+        for (int i = 0; i < nonDispensedArray.length; i++) {
+            PrescribedMedicine pm = (PrescribedMedicine) nonDispensedArray[i];
             System.out.println((i + 1) + ". " + pm.getMedicineName() + " - Quantity: " + pm.getQuantity() + " - Total: RM" + String.format("%.2f", pm.getTotalPrice()) + " [Not Dispensed]");
         }
 
@@ -1358,7 +1360,7 @@ public class TreatmentManagement {
             return;
         }
 
-        PrescribedMedicine toRemove = nonDispensedMedicines.get(choice - 1);
+        PrescribedMedicine toRemove = (PrescribedMedicine) nonDispensedArray[choice - 1];
         prescription.getPrescribedMedicines().remove(toRemove); //adt method
         prescription.setTotalCost(prescription.getTotalCost() - toRemove.getTotalPrice());
 
@@ -1369,7 +1371,7 @@ public class TreatmentManagement {
         Object[] prescribedMedicinesArray = prescription.getPrescribedMedicines().toArray(); //adt method
 
         // Filter out dispensed medicines - only show non-dispensed medicines for updating
-        java.util.List<PrescribedMedicine> nonDispensedMedicines = new java.util.ArrayList<>();
+        SetAndQueueInterface<PrescribedMedicine> nonDispensedMedicines = new SetQueueArray<>();
         for (Object obj : prescribedMedicinesArray) {
             PrescribedMedicine pm = (PrescribedMedicine) obj;
             if (!pm.isDispensed()) {
@@ -1384,8 +1386,9 @@ public class TreatmentManagement {
         }
 
         System.out.println("\nNon-dispensed prescribed medicines available for updating:");
-        for (int i = 0; i < nonDispensedMedicines.size(); i++) {
-            PrescribedMedicine pm = nonDispensedMedicines.get(i);
+        Object[] nonDispensedArray2 = nonDispensedMedicines.toArray();
+        for (int i = 0; i < nonDispensedArray2.length; i++) {
+            PrescribedMedicine pm = (PrescribedMedicine) nonDispensedArray2[i];
             System.out.println((i + 1) + ". " + pm.getMedicineName() + " - Quantity: " + pm.getQuantity() + " - Dosage: " + pm.getDosage() + " [Not Dispensed]");
         }
 
@@ -1395,7 +1398,7 @@ public class TreatmentManagement {
             return;
         }
 
-        PrescribedMedicine toUpdate = nonDispensedMedicines.get(choice - 1);
+        PrescribedMedicine toUpdate = (PrescribedMedicine) nonDispensedArray2[choice - 1];
 
         System.out.println("\nUpdating: " + toUpdate.getMedicineName());
         System.out.print("New quantity [" + toUpdate.getQuantity() + "] (or press Enter to keep current): ");
