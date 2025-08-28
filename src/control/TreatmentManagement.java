@@ -1298,7 +1298,7 @@ public class TreatmentManagement {
                 return;
             }
 
-            String dosage = InputValidator.getValidStringAllowCancel(scanner, "Enter dosage instructions (or press Enter to cancel)");
+            String dosage = InputValidator.getValidStringAllowCancel(scanner, "Enter dosage instructions");
             if (dosage == null) {
                 System.out.println("Operation cancelled.");
                 return;
